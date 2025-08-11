@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GymApp - Tu Gimnasio Digital</title>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <style>
@@ -10,13 +10,22 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        background: linear-gradient(135deg, #000000 0%, #000000 100%);
             min-height: 100vh;
             color: #333;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      html {
+        height: 100%;
+        overflow-x: hidden;
         }
 
         .container {
@@ -24,11 +33,11 @@
             margin: 0 auto;
             background: white;
             min-height: 100vh;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
 
         .header {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        background: linear-gradient(135deg, #DB7EDD 0%, #292824 100%);
             color: white;
             padding: 20px;
             text-align: center;
@@ -45,42 +54,777 @@
         }
 
         .main-content {
+        padding: 0;
+        position: relative;
+        height: 100vh;
+        max-width: 400px;
+        margin: 0 auto;
+        overflow: hidden;
+        background: linear-gradient(135deg, #DB7EDD 0%, #292824 100%);
+      }
+
+      /* Header principal */
+      .main-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
             padding: 20px;
-        }
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 20;
+        max-width: 400px;
+        margin: 0 auto;
+      }
 
-        .hero-image {
-            margin: -20px -20px 20px -20px;
+      .logo-container {
+        display: flex;
+        align-items: center;
+      }
+
+      .logo-image {
+        width: 120px;
+        height: 50px;
+        object-fit: cover;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 8px 15px;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .logo-image:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+      }
+
+      .location-chip {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.95);
+        color: #333;
+        padding: 10px 15px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .location-chip:hover {
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .location-icon {
+        font-size: 16px;
+      }
+
+      .location-arrow {
+        font-size: 18px;
+        font-weight: bold;
+        color: #DB7EDD;
+      }
+
+      /* Hero Section */
+      .hero-section {
+        width: 100%;
+        height: 100vh;
+        position: relative;
             overflow: hidden;
-            border-radius: 0 0 20px 20px;
-        }
+        max-width: 400px;
+        margin: 0 auto;
+      }
 
-        .hero-image img {
+      .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+      }
+
+      .hero-background img {
             width: 100%;
-            height: 250px;
+        height: 100%;
             object-fit: cover;
-            display: block;
-        }
+      }
 
-        .hero-text {
+      .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(221, 206, 221, 0.151) 0%,
+          rgb(32, 31, 24) 100%
+        );
+        z-index: 2;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        padding: 0 30px;
             text-align: center;
+        color: white;
+      }
+
+      .hero-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 8px 16px;
+        border-radius: 25px;
+        margin-bottom: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .badge-icon {
+        font-size: 18px;
+      }
+
+      .badge-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: white;
+      }
+
+      .hero-title {
+        font-size: 28px;
+        font-weight: bold;
             margin-bottom: 30px;
-        }
+        line-height: 1.3;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
 
-        .hero-text h2 {
+      .hero-stats {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #DB7EDD;
+        text-shadow: 0 0 10px rgba(219, 126, 221, 0.5);
+      }
+
+      .stat-label {
+        font-size: 12px;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Indicadores de progreso */
+      .progress-indicators {
+        position: absolute;
+        bottom: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+      }
+
+      .progress-dot {
+        width: 8px;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+      }
+
+      .progress-dot.active {
+        background: #DB7EDD;
+        width: 24px;
+        border-radius: 4px;
+        box-shadow: 0 0 15px rgba(219, 126, 221, 0.6);
+      }
+
+      /* Sección de acciones */
+      .action-section {
+        position: absolute;
+        bottom: 30px;
+        left: 20px;
+        right: 20px;
+        max-width: 400px;
+        margin: 0 auto;
+        z-index: 10;
+      }
+
+      .primary-action {
+        background: linear-gradient(135deg, #DB7EDD 0%, #DB7EDD 100%);
+        color: white;
+        border: none;
+        padding: 20px 30px;
+        border-radius: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(219, 126, 221, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        backdrop-filter: blur(10px);
+      }
+
+      .primary-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(219, 126, 221, 0.6);
+      }
+
+      .action-text {
+        font-weight: bold;
+      }
+
+      .action-icon {
+        font-size: 20px;
+        transition: transform 0.3s ease;
+      }
+
+      .primary-action:hover .action-icon {
+        transform: translateX(5px);
+      }
+
+      /* Botones secundarios */
+      .secondary-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .action-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .action-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        background: white;
+      }
+
+      .card-icon {
+        font-size: 24px;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #DB7EDD 0%, #292824 100%);
+        border-radius: 15px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(219, 126, 221, 0.3);
+      }
+
+      .card-content {
+        flex: 1;
+      }
+
+      .card-content h3 {
+        font-size: 16px;
+        font-weight: bold;
             color: #333;
-            font-size: 24px;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
+        margin: 0 0 5px 0;
+      }
 
-        .hero-text p {
+      .card-content p {
+        font-size: 12px;
+        color: #666;
+        margin: 0;
+      }
+
+      .card-arrow {
+        font-size: 20px;
+        color: #DB7EDD;
+        font-weight: bold;
+        transition: transform 0.3s ease;
+      }
+
+      .action-card:hover .card-arrow {
+        transform: translateX(5px);
+      }
+
+      /* Estilos para la pantalla de búsqueda de gimnasios */
+      .search-container {
+        padding: 20px;
+        background: white;
+      }
+
+      .search-bar {
+        display: flex;
+        align-items: center;
+        background: #f5f5f5;
+        border-radius: 25px;
+        padding: 12px 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .search-icon {
+        margin-right: 10px;
+        font-size: 18px;
+        color: #666;
+      }
+
+      .search-input {
+        border: none;
+        background: transparent;
+        flex: 1;
+        font-size: 16px;
+        color: #333;
+        outline: none;
+      }
+
+      .search-input::placeholder {
+        color: #999;
+      }
+
+      .gym-list {
+        padding: 0 20px 20px 20px;
+      }
+
+      .gym-card {
+        background: white;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .gym-banner {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+      }
+
+      .gym-banner img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .plan-cards {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .plan-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 8px;
+        padding: 8px 12px;
+        text-align: center;
+        min-width: 80px;
+        backdrop-filter: blur(10px);
+      }
+
+      .plan-card.black {
+        border: 2px solid #FFD700;
+      }
+
+      .plan-card.black .plan-name,
+      .plan-card.black .plan-price {
+        color: #FFD700;
+        font-weight: bold;
+      }
+
+      .plan-card.fit,
+      .plan-card.smart {
+        border: 2px solid white;
+      }
+
+      .plan-card.fit .plan-name,
+      .plan-card.fit .plan-price,
+      .plan-card.smart .plan-name,
+      .plan-card.smart .plan-price {
+        color: white;
+        font-weight: bold;
+      }
+
+      .plan-name {
+        display: block;
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 2px;
+      }
+
+      .plan-price {
+        display: block;
+        font-size: 10px;
+      }
+
+      .gym-info {
+        padding: 20px;
+        background: white;
+      }
+
+      .gym-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .gym-name {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+      }
+
+      .gym-distance {
+        background: #f0f0f0;
+        color: #666;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .gym-address {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 15px;
+        line-height: 1.4;
+      }
+
+      .gym-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .know-unit-link {
+        color: #007bff;
+        text-decoration: underline;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+      }
+
+      .buy-plans-btn {
+        background: #333;
+        color: white;
+        border: none;
+        padding: 15px 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .buy-plans-btn:hover {
+        background: #555;
+      }
+
+      /* Estilos para la pantalla de login */
+      .login-container {
+        padding: 20px;
+        background: white;
+        min-height: calc(100vh - 80px);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-bottom: 40px;
+      }
+
+      .login-form-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-top: 20px;
+        margin-bottom: 40px;
+      }
+
+      .login-container .form-group {
+        margin-bottom: 25px;
+      }
+
+      .login-container label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+        font-size: 16px;
+      }
+
+      .login-input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        background: white;
+        color: #333;
+        outline: none;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+      }
+
+      .login-input:focus {
+        border-color: #DB7EDD;
+      }
+
+      .login-input::placeholder {
+        color: #999;
+      }
+
+      .login-btn {
+        background: linear-gradient(135deg, #DB7EDD 0%, #DB7EDD 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+        transition: transform 0.2s;
+        box-shadow: 0 4px 15px rgba(219, 126, 221, 0.3);
+      }
+
+      .login-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .login-btn-secondary {
+        background: #f8f9fa;
+        color: #333;
+        border: 2px solid #ddd;
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.2s;
+      }
+
+      .login-btn-secondary:hover {
+        background: #e9ecef;
+      }
+
+      .error-message {
+        background: #fff5f5;
+        border: 1px solid #fed7d7;
+        color: #c53030;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .privacy-notice {
+        text-align: center;
+        padding: 20px;
+        background: rgba(219, 126, 221, 0.15);
+        border: 2px solid rgba(219, 126, 221, 0.4);
+        border-radius: 12px;
+        position: relative;
+        margin-top: 60px;
+        margin-bottom: 20px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+        flex-shrink: 0;
+      }
+
+      .privacy-notice p {
+        color: #333;
+        font-size: 13px;
+        line-height: 1.5;
+        margin: 0 0 8px 0;
+        font-weight: 500;
+      }
+
+      .privacy-notice p:last-child {
+        color: #666;
+        font-size: 11px;
+        font-weight: 400;
+      }
+
+      .privacy-notice .underline {
+        text-decoration: underline;
+        color: #DB7EDD;
+        cursor: pointer;
+        font-weight: 600;
+        transition: color 0.3s ease;
+      }
+
+      .privacy-notice .underline:hover {
+        color: #292824;
+        text-decoration: underline;
+      }
+
+      /* Estilos para la pantalla de verificación de correo */
+      .verification-container {
+        padding: 20px;
+        background: white;
+        min-height: calc(100vh - 80px);
+      }
+
+      .verification-title h2 {
+            font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 30px;
+        text-align: center;
+      }
+
+      .verification-info {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .verification-info p {
+        color: #666;
+        font-size: 16px;
+            margin-bottom: 10px;
+      }
+
+      .email-masked {
+        color: #333 !important;
+        font-weight: 500;
+        font-size: 18px !important;
+      }
+
+      .verification-form {
+        margin-bottom: 40px;
+      }
+
+      .code-prompt {
             color: #666;
             font-size: 16px;
-            line-height: 1.5;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .verification-input {
+        width: 100%;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 18px;
+        background: white;
+        color: #333;
+        outline: none;
+        text-align: center;
+        box-sizing: border-box;
+      }
+
+      .verification-input:focus {
+        border-color: #DB7EDD;
+      }
+
+      .verification-actions {
+        margin-bottom: 40px;
+      }
+
+      .action-link {
+        text-align: center;
+        margin-bottom: 15px;
+      }
+
+      .action-link span {
+        color: #666;
+        font-size: 14px;
+      }
+
+      .link-blue {
+        color: #007bff;
+        text-decoration: underline;
+        font-size: 14px;
+        margin-left: 5px;
+        cursor: pointer;
+      }
+
+      .link-blue:hover {
+        color: #0056b3;
+      }
+
+      .verification-btn {
+        background: #f8f9fa;
+        color: #333;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.2s;
+      }
+
+      .verification-btn:hover {
+        background: #e9ecef;
+      }
+
+      /* Asegurar que el contenedor principal se adapte */
+      .container {
+        max-width: 400px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Asegurar que la pantalla principal ocupe todo el espacio */
+      #main-screen {
+        height: 100vh;
+        max-width: 400px;
+        margin: 0 auto;
+        overflow: hidden;
         }
 
         .btn {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        background: linear-gradient(135deg, #DB7EDD 0%, #DB7EDD 100%);
             color: white;
             border: none;
             padding: 15px 30px;
@@ -104,6 +848,9 @@
 
         .screen {
             display: none;
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
         }
 
         .screen.active {
@@ -125,7 +872,7 @@
             background: white;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
 
@@ -171,26 +918,27 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .form-group {
-            margin-bottom: 20px;
+        margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+        margin-bottom: 6px;
             font-weight: 600;
             color: #333;
+        font-size: 14px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px;
+        padding: 10px;
             border: 2px solid #ddd;
             border-radius: 8px;
-            font-size: 16px;
+        font-size: 14px;
         }
 
         .form-group input:focus {
@@ -220,20 +968,128 @@
             padding: 0;
             background: white;
             min-height: 100vh;
-            padding-bottom: 80px;
+        padding-bottom: 120px;
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+        scroll-behavior: smooth;
+      }
+
+      .dashboard-content::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .dashboard-content::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+      }
+
+      .dashboard-content::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 3px;
+      }
+
+      .dashboard-content::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #764ba2, #f093fb);
         }
 
         .dashboard-header {
-            background: #1e3a8a;
+        background: linear-gradient(135deg, #1a202c 0%, #2d3748 25%, #4a5568 50%, #718096 75%, #a0aec0 100%);
             color: white;
-            padding: 20px;
+        padding: 25px 20px 35px 20px;
             text-align: left;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+      }
+
+      .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+          radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+        animation: headerGlow 8s ease-in-out infinite;
+      }
+
+      .dashboard-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+          linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%),
+          url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.6;
         }
 
         .dashboard-header h1 {
-            font-size: 28px;
-            font-weight: bold;
+        font-size: 24px;
+        font-weight: 700;
             margin: 0;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        position: relative;
+        z-index: 2;
+        background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 50%, #cbd5e0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.3px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dashboard-header h1::before {
+        content: '👋';
+        font-size: 20px;
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+        animation: wave 2s ease-in-out infinite;
+      }
+
+      @keyframes headerGlow {
+        0%, 100% { 
+          opacity: 0.8;
+          transform: scale(1);
+        }
+        50% { 
+          opacity: 1;
+          transform: scale(1.05);
+        }
+      }
+
+      .dashboard-header .subtitle {
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 8px;
+        position: relative;
+        z-index: 2;
+        letter-spacing: 0.5px;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+
+      .dashboard-header .date-info {
+        font-size: 12px;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 4px;
+        position: relative;
+        z-index: 2;
+        letter-spacing: 0.3px;
+      }
+
+      @keyframes wave {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(15deg); }
+        75% { transform: rotate(-8deg); }
         }
 
         .section-divider {
@@ -242,17 +1098,63 @@
             margin: 0;
         }
 
-        .training-section, .next-training-section, .membership-days-section {
-            padding: 20px;
-        }
+      .training-section,
+      .next-training-section,
+      .membership-days-section {
+        padding: 25px 20px;
+        background: rgba(255, 255, 255, 0.95);
+        margin: 0 15px 20px 15px;
+        border-radius: 20px;
+        box-shadow: 
+          0 15px 30px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
 
-        .training-section h2, .next-training-section h2, .membership-days-section h2 {
-            color: #666;
-            font-size: 14px;
-            font-weight: 600;
+      .training-section::before,
+      .next-training-section::before,
+      .membership-days-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        border-radius: 25px 25px 0 0;
+      }
+
+      .training-section h2,
+      .next-training-section h2,
+      .membership-days-section h2 {
+        color: #2d3748;
+        font-size: 16px;
+        font-weight: 800;
             text-transform: uppercase;
-            margin-bottom: 15px;
-            letter-spacing: 0.5px;
+        margin-bottom: 20px;
+        letter-spacing: 1.5px;
+        position: relative;
+        padding-left: 18px;
+        display: flex;
+        align-items: center;
+      }
+
+      .training-section h2::before,
+      .next-training-section h2::before,
+      .membership-days-section h2::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 6px;
+        height: 25px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 3px;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
 
         .progress-info {
@@ -283,40 +1185,119 @@
         }
 
         .progress-bar-new {
-            background: #e0e0e0;
-            height: 6px;
-            border-radius: 3px;
+        background: rgba(0, 0, 0, 0.05);
+        height: 10px;
+        border-radius: 5px;
             overflow: hidden;
+        box-shadow: 
+          inset 0 2px 4px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        position: relative;
         }
 
         .progress-fill-new {
-            background: #28a745;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             height: 100%;
-            border-radius: 3px;
-            transition: width 0.3s;
+        border-radius: 6px;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 
+          0 4px 15px rgba(102, 126, 234, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .progress-fill-new::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+        animation: shimmer 3s ease-in-out infinite;
+      }
+
+      .progress-fill-new::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        right: 2px;
+        bottom: 2px;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%, rgba(255, 255, 255, 0.2) 100%);
+        border-radius: 4px;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes shimmer {
+        0% { transform: translateX(-100%) skewX(-15deg); }
+        100% { transform: translateX(200%) skewX(-15deg); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.8; }
         }
 
         .training-button {
-            background: #333;
-            border-radius: 12px;
-            padding: 20px;
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        border-radius: 20px;
+        padding: 25px;
             margin-bottom: 15px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 
+          0 15px 30px rgba(0, 0, 0, 0.2),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+      }
+
+      .training-button:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 
+          0 30px 60px rgba(0, 0, 0, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
         }
 
         .training-button::before {
-            content: '';
+        content: "";
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop') center/cover;
-            opacity: 0.4;
+        background: url("https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop")
+          center/cover;
+        opacity: 0.6;
             z-index: 1;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        filter: brightness(0.8) contrast(1.1);
+      }
+
+      .training-button:hover::before {
+        opacity: 0.8;
+        transform: scale(1.1) rotate(2deg);
+        filter: brightness(1) contrast(1.2);
+      }
+
+      .training-button::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        z-index: 2;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+
+      .training-button:hover::after {
+        opacity: 1;
         }
 
         .button-content {
@@ -345,7 +1326,7 @@
         }
 
         .arrow-yellow {
-            color: #FFA500;
+        color: #ffa500;
             font-weight: bold;
         }
 
@@ -363,7 +1344,7 @@
             padding: 20px;
             text-align: center;
             position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .card-icon {
@@ -371,7 +1352,8 @@
             margin-bottom: 10px;
         }
 
-        .card-number, .card-text {
+      .card-number,
+      .card-text {
             font-size: 24px;
             font-weight: bold;
             color: #000;
@@ -396,7 +1378,7 @@
         .commitment-bar {
             width: 4px;
             height: 40px;
-            background: #FFA500;
+        background: #ffa500;
             margin: 0 auto 10px;
             border-radius: 2px;
         }
@@ -417,38 +1399,789 @@
         }
 
         .membership-days-card {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 50%, rgba(240, 147, 251, 0.1) 100%);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 20px;
             padding: 25px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        box-shadow: 
+          0 12px 25px rgba(102, 126, 234, 0.15),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(15px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .membership-days-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+        animation: cardFloat 8s ease-in-out infinite;
+      }
+
+      .membership-days-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 
+          0 25px 50px rgba(102, 126, 234, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
         }
 
         .days-number {
             font-size: 48px;
-            font-weight: bold;
-            color: #28a745;
-            margin-bottom: 5px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+        text-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+        position: relative;
+        z-index: 2;
+        animation: numberGlow 3s ease-in-out infinite;
         }
 
         .days-text {
             font-size: 16px;
-            color: #666;
-            margin-bottom: 15px;
-            font-weight: 500;
+        color: #4a5568;
+        margin-bottom: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        position: relative;
+        z-index: 2;
         }
 
         .membership-info p {
-            color: #666;
+        color: #718096;
             font-size: 14px;
-            margin: 5px 0;
+        margin: 8px 0;
+        font-weight: 500;
+        position: relative;
+        z-index: 2;
         }
 
         .membership-info p:first-child {
-            font-weight: 600;
-            color: #333;
-        }
+        font-weight: 700;
+        color: #2d3748;
+        font-size: 15px;
+      }
+
+      @keyframes cardFloat {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(1deg); }
+      }
+
+            @keyframes numberGlow {
+        0%, 100% { filter: drop-shadow(0 0 5px rgba(102, 126, 234, 0.3)); }
+        50% { filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.6)); }
+      }
+
+      /* Estilos para la sección de mediciones */
+      .measurements-section {
+        padding: 25px 20px;
+        background: rgba(255, 255, 255, 0.95);
+        margin: 0 15px 20px 15px;
+        border-radius: 20px;
+        box-shadow: 
+          0 15px 30px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .measurements-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        border-radius: 20px 20px 0 0;
+      }
+
+      .measurements-section h2 {
+        color: #2d3748;
+        font-size: 16px;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        letter-spacing: 1.5px;
+        position: relative;
+        padding-left: 18px;
+        display: flex;
+        align-items: center;
+      }
+
+      .measurements-section h2::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 6px;
+        height: 25px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 3px;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      }
+
+      .measurements-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 50%, rgba(240, 147, 251, 0.1) 100%);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 20px;
+        padding: 25px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(15px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .measurements-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 
+          0 25px 50px rgba(102, 126, 234, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+      }
+
+      .measurements-content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .measurements-icon {
+        font-size: 32px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      }
+
+      .measurements-info {
+        flex: 1;
+      }
+
+      .measurements-info h3 {
+        color: #2d3748;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        line-height: 1.3;
+      }
+
+      .measurements-info p {
+        color: #718096;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.4;
+      }
+
+      .measurements-arrow {
+        font-size: 24px;
+        color: #667eea;
+        font-weight: bold;
+        transition: transform 0.3s ease;
+      }
+
+      .measurements-card:hover .measurements-arrow {
+        transform: translateX(5px);
+      }
+
+      /* Estilos para la sección de pesaje */
+      .weight-section {
+        padding: 25px 20px;
+        background: rgba(255, 255, 255, 0.95);
+        margin: 0 15px 20px 15px;
+        border-radius: 20px;
+        box-shadow: 
+          0 15px 30px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .weight-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        border-radius: 20px 20px 0 0;
+      }
+
+      .weight-section h2 {
+        color: #2d3748;
+        font-size: 16px;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        letter-spacing: 1.5px;
+        position: relative;
+        padding-left: 18px;
+        display: flex;
+        align-items: center;
+      }
+
+      .weight-section h2::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 6px;
+        height: 25px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 3px;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      }
+
+      .weight-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.05) 50%, rgba(240, 147, 251, 0.1) 100%);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 20px;
+        padding: 25px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(15px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .weight-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 
+          0 25px 50px rgba(102, 126, 234, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+      }
+
+      .weight-content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .weight-icon {
+        font-size: 32px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+      }
+
+      .weight-info {
+        flex: 1;
+      }
+
+      .weight-info h3 {
+        color: #2d3748;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        line-height: 1.3;
+      }
+
+      .weight-info p {
+        color: #718096;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.4;
+      }
+
+      .weight-arrow {
+        font-size: 24px;
+        color: #667eea;
+        font-weight: bold;
+        transition: transform 0.3s ease;
+      }
+
+      .weight-card:hover .weight-arrow {
+        transform: translateX(5px);
+      }
+
+      /* Estilos para la pantalla de pesaje */
+      .weight-container {
+        padding: 20px;
+        background: white;
+        padding-bottom: 120px;
+      }
+
+      .weight-list {
+        margin-bottom: 30px;
+      }
+
+      .weight-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #f7fafc;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .weight-item:hover {
+        background-color: #f7fafc;
+        margin: 0 -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .weight-name {
+        font-size: 14px;
+        color: #4a5568;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .weight-value {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .weight-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      /* Estilos para la pantalla de nuevo registro de pesaje */
+      .weight-record-container {
+        padding: 20px;
+        background: white;
+        min-height: calc(100vh - 120px);
+        padding-bottom: 120px;
+      }
+
+      .weight-record-form {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        max-width: 100%;
+      }
+
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .field-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .form-field label {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 5px;
+      }
+
+      .help-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        color: #718096;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .help-icon:hover {
+        background: #cbd5e0;
+        color: #4a5568;
+      }
+
+      .record-input {
+        padding: 15px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 16px;
+        background: #f7fafc;
+        color: #2d3748;
+        transition: all 0.3s ease;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .record-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .record-input::placeholder {
+        color: #a0aec0;
+      }
+
+      .optional-text {
+        font-size: 12px;
+        color: #a0aec0;
+        font-style: italic;
+        margin-top: 4px;
+      }
+
+      .save-btn {
+        background: #718096;
+        color: white;
+        border: none;
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        width: 100%;
+      }
+
+      .save-btn:hover {
+        background: #4a5568;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(113, 128, 150, 0.3);
+      }
+
+      .save-btn:active {
+        transform: translateY(0);
+      }
+
+      /* Estilos para la pantalla de mediciones */
+      .measurements-container {
+        padding: 20px;
+        background: white;
+        padding-bottom: 120px;
+      }
+
+      .last-record-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 20px;
+      }
+
+      .last-record-info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .last-record-label {
+        font-size: 14px;
+        color: #718096;
+        font-weight: 500;
+      }
+
+      .last-record-date {
+        font-size: 16px;
+        color: #2d3748;
+        font-weight: 600;
+      }
+
+      .delete-record-btn {
+        font-size: 20px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+      }
+
+      .delete-record-btn:hover {
+        background-color: #fed7d7;
+      }
+
+      .measurements-list {
+        margin-bottom: 30px;
+      }
+
+      .measurement-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #f7fafc;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .measurement-item:hover {
+        background-color: #f7fafc;
+        margin: 0 -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .measurement-info {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .measurement-name {
+        font-size: 14px;
+        color: #4a5568;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .measurement-value {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .value {
+        font-size: 18px;
+        color: #2d3748;
+        font-weight: 700;
+      }
+
+      .change-indicator {
+        background: #e6fffa;
+        color: #38b2ac;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .measurement-arrow {
+        font-size: 20px;
+        color: #cbd5e0;
+        font-weight: bold;
+        transition: color 0.3s ease;
+      }
+
+      .measurement-item:hover .measurement-arrow {
+        color: #667eea;
+      }
+
+      .measurements-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      .action-btn {
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .outline-btn {
+        background: transparent;
+        border: 2px solid #2d3748;
+        color: #2d3748;
+      }
+
+      .outline-btn:hover {
+        background: #2d3748;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(45, 55, 72, 0.3);
+      }
+
+      .solid-btn {
+        background: #2d3748;
+        border: 2px solid #2d3748;
+        color: white;
+      }
+
+      .solid-btn:hover {
+        background: #4a5568;
+        border-color: #4a5568;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(45, 55, 72, 0.3);
+      }
+
+      /* Estilos específicos para la pantalla de nuevo registro manual */
+      .manual-record-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 20px;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .manual-record-header .header-left,
+      .manual-record-header .header-right {
+        flex: 1;
+      }
+
+      .manual-record-header .header-center {
+        flex: 2;
+        text-align: center;
+      }
+
+      .manual-record-header h1 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .manual-record-header .back-arrow {
+        font-size: 24px;
+        color: #4a5568;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+      }
+
+      .manual-record-header .back-arrow:hover {
+        background-color: #f7fafc;
+      }
+
+      .manual-record-content {
+        background: white;
+        min-height: calc(100vh - 60px);
+        padding: 20px;
+      }
+
+      .manual-record-container {
+        max-width: 100%;
+        margin: 0 auto;
+      }
+
+      .manual-record-form {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+      }
+
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .form-field label {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 5px;
+      }
+
+      .field-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .field-header label {
+        margin-bottom: 0;
+      }
+
+      .help-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        color: #718096;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+      }
+
+      .help-icon:hover {
+        background: #cbd5e0;
+        color: #4a5568;
+      }
+
+      .manual-input {
+        padding: 15px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 16px;
+        background: #f7fafc;
+        color: #2d3748;
+        transition: all 0.3s ease;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .manual-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .manual-input::placeholder {
+        color: #a0aec0;
+      }
+
+      .optional-text {
+        font-size: 12px;
+        color: #a0aec0;
+        font-style: italic;
+        margin-top: 4px;
+      }
+
+      .manual-save-btn {
+        background: #718096;
+        color: white;
+        border: none;
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        width: 100%;
+      }
+
+      .manual-save-btn:hover {
+        background: #4a5568;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(113, 128, 150, 0.3);
+      }
+
+      .manual-save-btn:active {
+        transform: translateY(0);
+      }
 
         .bottom-nav {
             position: fixed;
@@ -457,44 +2190,110 @@
             transform: translateX(-50%);
             width: 100%;
             max-width: 400px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
+        background: rgba(255, 255, 255, 0.95);
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        padding: 20px 0 25px 0;
+        box-shadow: 
+          0 -20px 40px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(25px);
+        border-radius: 30px 30px 0 0;
+        overflow: hidden;
+        z-index: 1000;
+      }
+
+      .bottom-nav::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        border-radius: 30px 30px 0 0;
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+        gap: 8px;
             cursor: pointer;
-            padding: 5px;
+        padding: 12px 16px;
+        border-radius: 16px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 2;
         }
 
         .nav-item.active {
-            color: #FFA500;
+        color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
+        transform: translateY(-4px);
+        box-shadow: 
+          0 8px 20px rgba(102, 126, 234, 0.2),
+          0 0 0 1px rgba(102, 126, 234, 0.1);
         }
 
         .nav-item:not(.active) {
-            color: #666;
+        color: #718096;
+      }
+
+      .nav-item:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.05) 100%);
+        transform: translateY(-2px);
+        color: #4a5568;
         }
 
         .nav-icon {
             font-size: 24px;
             margin-bottom: 4px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
         }
 
         .nav-item span {
             font-size: 11px;
-            font-weight: 500;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
         }
 
         .nav-item.active .nav-icon {
-            transform: scale(1.2);
-            transition: transform 0.2s;
+        transform: scale(1.15);
+        filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.4));
+      }
+
+      .nav-item.active span {
+        color: #667eea;
+        font-weight: 800;
+      }
+
+      /* Asegurar que la navegación sea visible */
+      .bottom-nav {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+
+      /* Asegurar que los elementos de navegación sean visibles */
+      .nav-item {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+
+      .nav-icon {
+        display: block !important;
+        visibility: visible !important;
+      }
+
+      .nav-item span {
+        display: block !important;
+        visibility: visible !important;
         }
 
         .calendar-container {
@@ -502,7 +2301,7 @@
             border-radius: 15px;
             padding: 20px;
             margin: 20px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .calendar-header {
@@ -560,7 +2359,7 @@
             border-radius: 15px;
             padding: 20px;
             margin: 20px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .workout-category {
@@ -621,7 +2420,7 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .qr-code {
@@ -633,7 +2432,7 @@
             padding: 20px;
             border-radius: 15px;
             margin: 20px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .log-entry {
@@ -647,7 +2446,7 @@
             background: white;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .settings-item {
@@ -694,6 +2493,7 @@
         .account-content {
             background: white;
             min-height: calc(100vh - 120px);
+        padding-bottom: 120px;
         }
 
         .settings-menu {
@@ -758,25 +2558,95 @@
         .document-item {
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
+        padding: 12px;
+        margin-bottom: 12px;
             background: #f9f9f9;
         }
 
         .document-item h4 {
-            margin: 0 0 10px 0;
+        margin: 0 0 8px 0;
             color: #333;
-            font-size: 16px;
+        font-size: 14px;
+        font-weight: bold;
         }
 
         .document-item p {
-            margin: 0 0 10px 0;
+        margin: 0 0 8px 0;
             color: #666;
-            font-size: 14px;
+        font-size: 13px;
         }
 
         .document-item .btn {
             margin-top: 5px;
+        padding: 8px 15px;
+        font-size: 13px;
+      }
+
+      /* Estilos específicos para modales de cuentas */
+      .modal-content h2 {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+        margin-top: 10px;
+        text-align: center;
+      }
+
+      .modal-content p {
+        font-size: 14px;
+        line-height: 1.4;
+        color: #666;
+        margin-bottom: 12px;
+      }
+
+      .modal-content ul,
+      .modal-content ol {
+        font-size: 14px;
+        line-height: 1.4;
+        color: #666;
+        margin-bottom: 12px;
+        padding-left: 20px;
+      }
+
+      .modal-content li {
+        margin-bottom: 6px;
+      }
+
+      .modal-content h4 {
+        font-size: 15px;
+        font-weight: bold;
+        color: #333;
+        margin: 15px 0 8px 0;
+      }
+
+      /* Estilos específicos para el modal de instrucciones QR */
+      #qr-instructions-modal .instruction-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+      }
+
+      #qr-instructions-modal .instruction-icon {
+        font-size: 24px;
+        margin-right: 15px;
+        min-width: 30px;
+      }
+
+      #qr-instructions-modal .instruction-text h4 {
+        margin: 0 0 5px 0;
+        color: #333;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      #qr-instructions-modal .instruction-text p {
+        margin: 0;
+        color: #666;
+        font-size: 13px;
+        line-height: 1.4;
         }
 
         .qr-header {
@@ -793,46 +2663,317 @@
         }
 
         .qr-content {
-            background: white;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             padding: 20px;
             padding-top: 40px;
+        padding-bottom: 120px;
+        position: relative;
         }
 
         .qr-section {
             margin-bottom: 30px;
+        position: relative;
         }
 
         .qr-section h2 {
-            color: #333;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
+        color: #2d3748;
+        font-size: 20px;
+        font-weight: 800;
+        margin-bottom: 20px;
             text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .qr-card {
-            background: white;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
+        padding: 30px;
+        box-shadow: 
+          0 20px 40px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+        text-align: center;
+        margin-bottom: 25px;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .qr-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        border-radius: 25px 25px 0 0;
+      }
+
+              .qr-info {
+        margin-top: 25px;
+        padding: 20px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
             border-radius: 15px;
+        border: 1px solid rgba(102, 126, 234, 0.1);
+      }
+
+      .qr-info p {
+        margin: 8px 0;
+        color: #4a5568;
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 1.5;
+      }
+
+      .qr-validity {
+        color: #38a169 !important;
+        font-weight: 700;
+        font-size: 14px;
+        background: rgba(56, 161, 105, 0.1);
+        padding: 8px 12px;
+        border-radius: 8px;
+        display: inline-block;
+        margin-top: 10px;
+      }
+
+      .qr-instructions-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 10;
+      }
+
+      .instructions-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 50%;
+        font-size: 20px;
+        cursor: pointer;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+      }
+
+      .instructions-btn:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #f093fb 100%);
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+      }
+
+      /* Estilos para la sección de ingreso y salida en QR */
+      .qr-entry-section {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 25px;
             padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-top: 25px;
+        box-shadow: 
+          0 20px 40px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .qr-entry-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        border-radius: 25px 25px 0 0;
+      }
+
+      .qr-entry-section h3 {
+        color: #2d3748;
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 20px;
             text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+        z-index: 2;
+      }
+
+      .qr-entry-section .entry-log {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .qr-entry-section .log-record {
             margin-bottom: 20px;
-        }
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border-left: 4px solid #667eea;
+      }
 
-        .qr-info {
-            margin-top: 20px;
-        }
+      .qr-entry-section .log-record:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+      }
 
-        .qr-info p {
-            margin: 5px 0;
-            color: #666;
+      .qr-entry-section .log-date {
+        color: #2d3748;
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .qr-entry-section .log-details {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 15px;
+        backdrop-filter: blur(10px);
+      }
+
+      .qr-entry-section .log-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
             font-size: 14px;
-        }
+        transition: all 0.3s ease;
+      }
 
-        .qr-validity {
-            color: #28a745 !important;
+      .qr-entry-section .log-item:first-child {
+        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        padding-bottom: 15px;
+        margin-bottom: 10px;
+      }
+
+      .qr-entry-section .log-time {
+        color: #4a5568;
+        font-weight: 500;
+      }
+
+      .qr-entry-section .status-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
             font-weight: bold;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .qr-entry-section .status-icon.success {
+        background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
+        box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+      }
+
+      .qr-entry-section .status-icon.warning {
+        background: linear-gradient(135deg, #ed8936 0%, #f6ad55 100%);
+        box-shadow: 0 4px 12px rgba(237, 137, 54, 0.3);
+      }
+
+      /* Estilos para las pantallas de documentos */
+      .document-content {
+        background: white;
+        padding: 20px;
+        margin: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .document-content p {
+        color: #333;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+      }
+
+      .document-content ul,
+      .document-content ol {
+        color: #333;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        padding-left: 20px;
+      }
+
+      .document-content li {
+        margin-bottom: 8px;
+      }
+
+      .document-content strong {
+        color: #333;
+        font-weight: bold;
+      }
+
+      /* Estilos para el header con botón de regreso */
+      .account-header .header-left {
+        display: flex;
+        align-items: center;
+      }
+
+      .account-header .header-center {
+        flex: 1;
+        text-align: center;
+      }
+
+      .account-header .back-arrow {
+        font-size: 24px;
+        color: white;
+        cursor: pointer;
+        padding: 5px;
+        margin-right: 10px;
+      }
+
+      .account-header .back-arrow:hover {
+        opacity: 0.8;
+      }
+
+      /* Estilos para el botón de regreso en pantallas de documentos */
+      .workout-header .back-arrow {
+        font-size: 24px;
+        color: #333;
+        cursor: pointer;
+        padding: 10px;
+        margin-right: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .workout-header .back-arrow:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: scale(1.1);
         }
 
         .qr-instructions {
@@ -935,6 +3076,7 @@
         .workout-content {
             background: white;
             padding: 20px;
+        padding-bottom: 120px;
         }
 
         .weekly-calendar {
@@ -944,7 +3086,7 @@
             background: white;
             border-radius: 10px;
             padding: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .day-item {
@@ -1028,7 +3170,7 @@
             background: white;
             border-radius: 10px;
             padding: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             position: relative;
         }
 
@@ -1098,7 +3240,7 @@
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             gap: 15px;
@@ -1278,7 +3420,7 @@
             background: white;
             border-radius: 10px;
             padding: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             gap: 15px;
         }
 
@@ -1394,7 +3536,7 @@
             background: white;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
 
@@ -1424,144 +3566,688 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
+        }
+
+      .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         }
 
         .modal-content {
             background: white;
-            margin: 10% auto;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 90%;
-            max-height: 80%;
+        margin: 0 auto;
+        padding: 20px;
+        border-radius: 12px;
+        max-width: 350px;
+        width: 90%;
+        max-height: 80vh;
             overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        position: relative;
+        transform: translateY(-20px);
         }
 
         .close {
-            float: right;
-            font-size: 28px;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
             font-weight: bold;
             cursor: pointer;
+        color: #999;
+        background: none;
+        border: none;
+        padding: 5px;
         }
 
         .close:hover {
             color: #ff6b6b;
         }
 
+      /* Estilos para el modal de confirmación de finalizar entrenamiento */
+      .finish-workout-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      }
+
+      .finish-workout-modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .finish-workout-modal-content {
+        background: white;
+        margin: 0 auto;
+        padding: 20px;
+        border-radius: 12px;
+        max-width: 300px;
+        width: 90%;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        transform: translateY(-50px);
+      }
+
+      .finish-workout-modal h2 {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 12px;
+      }
+
+      .finish-workout-modal p {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 15px;
+        line-height: 1.3;
+      }
+
+      .finish-workout-modal .btn {
+        margin: 8px 4px;
+        min-width: 100px;
+        padding: 12px 20px;
+        font-size: 14px;
+        border-radius: 8px;
+      }
+
+      .finish-workout-modal .btn-confirm {
+        background: #333;
+        color: white;
+        border: none;
+      }
+
+      .finish-workout-modal .btn-cancel {
+        background: white;
+        color: #333;
+        border: 2px solid #ddd;
+      }
+
+      /* Estilos para la pantalla de éxito semanal */
+      .success-screen {
+        background: white;
+        min-height: 100vh;
+        padding: 15px;
+        padding-top: 30px;
+        text-align: center;
+      }
+
+      .success-header {
+        margin-bottom: 20px;
+        margin-top: 0;
+      }
+
+      .kettlebell-icon {
+        font-size: 60px;
+        margin-bottom: 15px;
+      }
+
+      .success-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .weekly-progress-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .progress-label {
+        font-size: 13px;
+        color: #666;
+      }
+
+      .progress-count {
+        font-size: 14px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .week-days {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .day-label {
+        font-size: 11px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+      }
+
+      .week-circles {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .day-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        position: relative;
+      }
+
+      .day-circle.completed {
+        background: #ffd700;
+        color: #333;
+      }
+
+      .day-circle.pending {
+        background: #f0f0f0;
+        color: #666;
+        border: 2px solid #ddd;
+      }
+
+      .day-circle.current {
+        background: #e0e0e0;
+        color: #333;
+        border: 2px solid #ffd700;
+      }
+
+      .streak-section {
+        margin-bottom: 20px;
+      }
+
+      .streak-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .flame-icon {
+        font-size: 32px;
+        color: #ffd700;
+      }
+
+      .streak-number {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .info-icon {
+        font-size: 14px;
+        color: #999;
+        cursor: pointer;
+      }
+
+      .streak-text {
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 4px;
+      }
+
+      .streak-record {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .success-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .go-home-link {
+        color: #333;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 15px;
+      }
+
+      .share-button {
+        background: #333;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        max-width: 250px;
+        margin: 0 auto;
+      }
+
+      .share-icon {
+        font-size: 16px;
+      }
+
+      /* Asegurar que la pantalla de éxito se mantenga dentro del contenedor */
+      #success-screen {
+        max-width: 400px;
+        margin: 0 auto;
+        background: white;
+        min-height: 100vh;
+        overflow-y: auto;
+      }
+
+      /* Ajustes adicionales para el modal en pantallas pequeñas */
         @media (max-width: 480px) {
             .container {
                 max-width: 100%;
+            }
+
+        .finish-workout-modal-content {
+          margin: 10% auto;
+          padding: 15px;
+          max-width: 90%;
+        }
+
+        .finish-workout-modal h2 {
+          font-size: 16px;
+        }
+
+        .finish-workout-modal p {
+          font-size: 13px;
+        }
+
+        .finish-workout-modal .btn {
+          padding: 10px 15px;
+          font-size: 13px;
+          min-width: 80px;
+        }
+
+        /* Ajustes para modales de cuentas en móvil */
+        .modal-content {
+          max-width: 320px;
+          padding: 15px;
+          margin: 10px;
+        }
+
+        .modal-content h2 {
+          font-size: 16px;
+          margin-bottom: 12px;
+        }
+
+        .modal-content p {
+          font-size: 13px;
+          margin-bottom: 10px;
+        }
+
+        .modal-content ul,
+        .modal-content ol {
+          font-size: 13px;
+          padding-left: 15px;
+        }
+
+        .modal-content h4 {
+          font-size: 14px;
+          margin: 12px 0 6px 0;
+        }
+
+        .form-group input {
+          padding: 8px;
+          font-size: 13px;
+        }
+
+        .document-item {
+          padding: 10px;
+          margin-bottom: 10px;
+        }
+
+        .document-item h4 {
+          font-size: 13px;
+        }
+
+        .document-item p {
+          font-size: 12px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="max-width: 400px; margin: 0 auto; padding: 0;">
         <!-- Pantalla Principal -->
         <div id="main-screen" class="screen active">
-                         <div class="header">
-                 <h1>GymApp</h1>
-                 <p>Tu gimnasio digital</p>
-             </div>
             <div class="main-content">
-                <div class="hero-image">
-                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop" alt="Gente entrenando en el gimnasio">
+        <!-- Header con logo y ubicación -->
+        <div class="main-header">
+          <div class="logo-container">
+            <img 
+              src="https://i.ibb.co/sp6HtbPg/imagen-2025-08-10-181755691-removebg-preview.png"
+              alt="UltraFit Logo"
+              class="logo-image"
+            />
                 </div>
-                <div class="hero-text">
-                    <h2>¡Transforma tu vida!</h2>
-                    <p>Únete a nuestra comunidad fitness y alcanza tus metas</p>
+        
                 </div>
-                <button class="btn" onclick="showScreen('sedes')">🏢 Nuestras Sedes</button>
-                <button class="btn" onclick="showScreen('login')">📱 Ingreso a la App</button>
+
+        <!-- Hero Section con imagen de fondo -->
+        <div class="hero-section">
+          <div class="hero-background">
+            <img
+              src="https://img.freepik.com/fotos-premium/apuesto-joven-afroamericano-haciendo-ejercicio-culturismo-pesas-gimnasio_116547-31785.jpg"
+              alt="Joven afroamericano entrenando"
+            />
+            <div class="hero-overlay"></div>
+          </div>
+          
+          <!-- Contenido del hero -->
+          <div class="hero-content">
+            <div class="hero-badge">
+              <span class="badge-icon">💪</span>
+              <span class="badge-text">Transforma tu vida</span>
+            </div>
+            
+            <h1 class="hero-title">Entrenamientos listos y gratuitos disponibles</h1>
+            
+            
+          </div>
+        </div>
+
+        <!-- Indicadores de progreso -->
+        <div class="progress-indicators">
+          <div class="progress-dot"></div>
+          <div class="progress-dot active"></div>
+          <div class="progress-dot"></div>
+        </div>
+
+        <!-- Sección de acciones -->
+        <div class="action-section">
+          <button class="primary-action" onclick="showStartOptions()">
+            <span class="action-text">Comenzar Ahora</span>
+            <span class="action-icon">→</span>
+          </button>
+
+          <div id="secondary-buttons" class="secondary-actions" style="display: none;">
+            <div class="action-card" onclick="showScreen('sedes')">
+        
+              <div class="card-content">
+                <h3>Nuestras Sedes</h3>
+                <p>Encuentra tu gimnasio más cercano</p>
+              </div>
+              <div class="card-arrow">›</div>
+            </div>
+            
+            <div class="action-card" onclick="showScreen('login')">
+            
+              <div class="card-content">
+                <h3>Ya pertenezco aquí</h3>
+                <p>Accede a tu cuenta</p>
+              </div>
+              <div class="card-arrow">›</div>
+            </div>
+          </div>
+        </div>
             </div>
         </div>
 
         <!-- Pantalla de Sedes -->
         <div id="sedes-screen" class="screen">
-            <div class="header">
-                <h1>🏢 Nuestras Sedes</h1>
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('main')">←</div>
             </div>
-            <div class="main-content">
-                <button class="btn back-btn" onclick="showScreen('main')">← Volver</button>
-                <div class="sedes-grid">
-                    <div class="sede-card">
-                        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400" alt="Sede Centro">
-                        <h3>GymApp Centro</h3>
-                        <p>Calle Principal #123, Centro Comercial</p>
-                        <div class="precios">
-                            <div class="precio">
-                                <div class="periodo">Mensual</div>
-                                <div>$25.000</div>
+        <div class="header-center">
+          <h1>Buscar Gimnasio</h1>
                             </div>
-                            <div class="precio">
-                                <div class="periodo">Trimestral</div>
-                                <div>$65.000</div>
+        <div class="header-right"></div>
                             </div>
-                            <div class="precio">
-                                <div class="periodo">Semestral</div>
-                                <div>$120.000</div>
+      <div class="workout-content">
+        <!-- Barra de búsqueda -->
+        <div class="search-container">
+          <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Buscar por código postal, dist..." class="search-input">
                             </div>
                         </div>
+
+        <!-- Lista de gimnasios -->
+        <div class="gym-list">
+          <!-- Gimnasio 1 -->
+          <div class="gym-card">
+            <div class="gym-banner">
+              <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400" alt="Mega Kywi">
+              
                     </div>
-                    <div class="sede-card">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400" alt="Sede Norte">
-                        <h3>GymApp Norte</h3>
-                        <p>Avenida Norte #456, Plaza Mayor</p>
-                        <div class="precios">
-                            <div class="precio">
-                                <div class="periodo">Mensual</div>
-                                <div>$28.000</div>
+            <div class="gym-info">
+              <div class="gym-header">
+                <h3 class="gym-name">La Carolina</h3>
+                
                             </div>
-                            <div class="precio">
-                                <div class="periodo">Trimestral</div>
-                                <div>$75.000</div>
+              <p class="gym-address">Avenida Los shyris y Wimper</p>
+              
                             </div>
-                            <div class="precio">
-                                <div class="periodo">Semestral</div>
-                                <div>$140.000</div>
                             </div>
+
+          <!-- Gimnasio 2 -->
+          <div class="gym-card">
+            <div class="gym-banner">
+              <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400" alt="UltraFit Norte">
+              <div class="plan-cards">
+               
+                <div class="plan-card fit">
+                  <span class="plan-name">FIT</span>
+                  <span class="plan-price">por solo 23.90</span>
                         </div>
+                <div class="plan-card smart">
+                  <span class="plan-name">SMART</span>
+                  <span class="plan-price">por solo 27.90</span>
                     </div>
-                    <div class="sede-card">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400" alt="Sede Sur">
-                        <h3>GymApp Sur</h3>
-                        <p>Calle Sur #789, Centro Empresarial</p>
-                        <div class="precios">
-                            <div class="precio">
-                                <div class="periodo">Mensual</div>
-                                <div>$30.000</div>
                             </div>
-                            <div class="precio">
-                                <div class="periodo">Trimestral</div>
-                                <div>$80.000</div>
                             </div>
-                            <div class="precio">
-                                <div class="periodo">Semestral</div>
-                                <div>$150.000</div>
+            <div class="gym-info">
+              <div class="gym-header">
+                <h3 class="gym-name">UltraFit Norte</h3>
+                <span class="gym-distance">3.5 km</span>
                             </div>
+              <p class="gym-address">Avenida Norte #456, Plaza Mayor</p>
+              <div class="gym-actions">
+                <a href="#" class="know-unit-link">CONOCER UNIDAD</a>
+                <button class="buy-plans-btn">Comprar Planes</button>
                         </div>
                     </div>
                 </div>
+
+          <!-- Gimnasio 3 -->
+          <div class="gym-card">
+            <div class="gym-banner">
+              <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400" alt="UltraFit Centro">
+              <div class="plan-cards">
+                <div class="plan-card black">
+                  <span class="plan-name">BLACK</span>
+                  <span class="plan-price">por solo 32.90</span>
+                </div>
+                <div class="plan-card fit">
+                  <span class="plan-name">FIT</span>
+                  <span class="plan-price">por solo 26.90</span>
+                </div>
+                <div class="plan-card smart">
+                  <span class="plan-name">SMART</span>
+                  <span class="plan-price">por solo 30.90</span>
+                </div>
+              </div>
+            </div>
+            <div class="gym-info">
+              <div class="gym-header">
+                <h3 class="gym-name">UltraFit Centro</h3>
+                <span class="gym-distance">1.2 km</span>
+              </div>
+              <p class="gym-address">Calle Principal #789, Centro Comercial</p>
+              <div class="gym-actions">
+                <a href="#" class="know-unit-link">CONOCER UNIDAD</a>
+                <button class="buy-plans-btn">Comprar Planes</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gimnasio 4 -->
+          <div class="gym-card">
+            <div class="gym-banner">
+              <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400" alt="UltraFit Sur">
+              <div class="plan-cards">
+                <div class="plan-card black">
+                  <span class="plan-name">BLACK</span>
+                  <span class="plan-price">por solo 28.90</span>
+                </div>
+                <div class="plan-card fit">
+                  <span class="plan-name">FIT</span>
+                  <span class="plan-price">por solo 22.90</span>
+                </div>
+                <div class="plan-card smart">
+                  <span class="plan-name">SMART</span>
+                  <span class="plan-price">por solo 26.90</span>
+                </div>
+              </div>
+            </div>
+            <div class="gym-info">
+              <div class="gym-header">
+                <h3 class="gym-name">UltraFit Sur</h3>
+                <span class="gym-distance">4.8 km</span>
+              </div>
+              <p class="gym-address">Calle Sur #321, Centro Empresarial</p>
+              <div class="gym-actions">
+                <a href="#" class="know-unit-link">CONOCER UNIDAD</a>
+                <button class="buy-plans-btn">Comprar Planes</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gimnasio 5 -->
+          <div class="gym-card">
+            <div class="gym-banner">
+              <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400" alt="UltraFit Este">
+              <div class="plan-cards">
+                <div class="plan-card black">
+                  <span class="plan-name">BLACK</span>
+                  <span class="plan-price">por solo 31.90</span>
+                </div>
+                <div class="plan-card fit">
+                  <span class="plan-name">FIT</span>
+                  <span class="plan-price">por solo 25.90</span>
+                </div>
+                <div class="plan-card smart">
+                  <span class="plan-name">SMART</span>
+                  <span class="plan-price">por solo 29.90</span>
+                </div>
+              </div>
+            </div>
+            <div class="gym-info">
+              <div class="gym-header">
+                <h3 class="gym-name">UltraFit Este</h3>
+                <span class="gym-distance">2.7 km</span>
+              </div>
+              <p class="gym-address">Avenida Este #654, Plaza Comercial</p>
+              <div class="gym-actions">
+                <a href="#" class="know-unit-link">CONOCER UNIDAD</a>
+                <button class="buy-plans-btn">Comprar Planes</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gimnasio 6 -->
+          <div class="gym-card">
+            <div class="gym-banner">
+              <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400" alt="UltraFit Oeste">
+              <div class="plan-cards">
+                <div class="plan-card black">
+                  <span class="plan-name">BLACK</span>
+                  <span class="plan-price">por solo 30.90</span>
+                </div>
+                <div class="plan-card fit">
+                  <span class="plan-name">FIT</span>
+                  <span class="plan-price">por solo 24.90</span>
+                </div>
+                <div class="plan-card smart">
+                  <span class="plan-name">SMART</span>
+                  <span class="plan-price">por solo 28.90</span>
+                </div>
+              </div>
+            </div>
+            <div class="gym-info">
+              <div class="gym-header">
+                <h3 class="gym-name">UltraFit Oeste</h3>
+                <span class="gym-distance">3.1 km</span>
+              </div>
+              <p class="gym-address">Calle Oeste #987, Centro Deportivo</p>
+              <div class="gym-actions">
+                <a href="#" class="know-unit-link">CONOCER UNIDAD</a>
+                <button class="buy-plans-btn">Comprar Planes</button>
+              </div>
+            </div>
+          </div>
+        </div>
             </div>
         </div>
 
         <!-- Pantalla de Login -->
         <div id="login-screen" class="screen">
-            <div class="header">
-                <h1>📱 Ingreso a la App</h1>
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('main')">←</div>
             </div>
-            <div class="main-content">
-                <button class="btn back-btn" onclick="showScreen('main')">← Volver</button>
-                <div class="login-form">
+        <div class="header-center">
+          <h1>Ingreso</h1>
+        </div>
+        <div class="header-right"></div>
+      </div>
+      <div class="workout-content">
+        <div class="login-container">
+          <div class="login-form-section">
                     <div class="form-group">
                         <label for="cedula">Cédula:</label>
-                        <input type="text" id="cedula" placeholder="Ingresa tu cédula" value="1754772778">
+              <input
+                type="text"
+                id="cedula"
+                placeholder="Ingresa tu cédula"
+                value="1754772778"
+                class="login-input"
+              />
                     </div>
-                    <button class="btn" onclick="validateCedula()">Validar Cédula</button>
-                    <div id="login-error" class="error-message" style="display: none;">
-                        No se encontraron tus datos. Para acceder a esta área es necesario ser cliente del gym. Por favor verificar e intentar nuevamente.
-                        <button class="btn btn-secondary" onclick="retryLogin()" style="margin-top: 10px;">Intentar de Nuevo</button>
+            <button class="login-btn" onclick="validateCedula()">Validar Cédula</button>
+            <div id="login-error" class="error-message" style="display: none">
+              No se encontraron tus datos. Para acceder a esta área es necesario
+              ser cliente del gym. Por favor verificar e intentar nuevamente.
+              <button
+                class="login-btn-secondary"
+                onclick="retryLogin()"
+                style="margin-top: 10px"
+              >
+                Intentar de Nuevo
+              </button>
+            </div>
+          </div>
+          
+          <div class="privacy-notice">
+            <p><strong>Al comenzar, aceptas nuestras <span class="underline">Política de privacidad</span> y con nuestro <span class="underline">Tratamiento de datos personales</span></strong></p>
+            <p style="font-size: 12px; margin-top: 8px; color: #666;">
+              Al ingresar tu cédula y continuar, confirmas que has leído y aceptas los términos y condiciones de uso de la aplicación.
+            </p>
                     </div>
                 </div>
             </div>
@@ -1569,21 +4255,49 @@
 
         <!-- Pantalla de Verificación de Correo -->
         <div id="email-verification-screen" class="screen">
-            <div class="header">
-                <h1>📧 Verificación de Correo</h1>
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('login')">←</div>
             </div>
-            <div class="main-content">
-                <button class="btn back-btn" onclick="showScreen('login')">← Volver</button>
-                <div class="login-form">
-                    <div class="success-message">
-                        Se ha enviado un código de verificación a tu correo electrónico.
+        <div class="header-center">
+          <h1>Autenticación</h1>
                     </div>
-                    <div class="form-group">
-                        <label for="verification-code">Código de Verificación:</label>
-                        <input type="text" id="verification-code" placeholder="Ingresa el código" value="123456">
+        <div class="header-right"></div>
                     </div>
-                    <button class="btn" onclick="verifyCode()">Verificar Código</button>
+      <div class="workout-content">
+        <div class="verification-container">
+          <div class="verification-title">
+            <h2>Verifica tu correo electrónico</h2>
                 </div>
+          
+          <div class="verification-info">
+            <p>Enviamos un código</p>
+            <p class="email-masked">jo*******@g*****.com</p>
+          </div>
+          
+          <div class="verification-form">
+            <p class="code-prompt">Ingresa el código recibido</p>
+            <input
+              type="text"
+              id="verification-code"
+              placeholder=""
+              class="verification-input"
+            />
+          </div>
+          
+          <div class="verification-actions">
+            <div class="action-link">
+              <span>¿No recibiste el código?</span>
+              <a href="#" class="link-blue">Enviar código de nuevo</a>
+            </div>
+            <div class="action-link">
+              <span>¿No es tu correo electrónico?</span>
+              <a href="#" class="link-blue">Editar correo electrónico</a>
+            </div>
+          </div>
+          
+          <button class="verification-btn" onclick="verifyCode()">Entrar</button>
+        </div>
             </div>
         </div>
 
@@ -1591,6 +4305,8 @@
         <div id="dashboard-screen" class="screen">
             <div class="dashboard-header">
                 <h1>Hola, Josue</h1>
+        <div class="subtitle">¡Listo para tu entrenamiento de hoy!</div>
+        <div class="date-info">Lunes, 15 de Enero</div>
             </div>
             <div class="dashboard-content">
                 <div class="section-divider"></div>
@@ -1632,8 +4348,24 @@
                          <div class="days-number">45</div>
                          <div class="days-text">días restantes</div>
                          <div class="membership-info">
-                             <p>Membresía Premium</p>
-                             <p>Vence el 15 de Enero, 2024</p>
+              <p>Membresía Mensual QT</p>
+              <p>Vence el 10 de Septiembre, 2025</p>
+                         </div>
+                     </div>
+                 </div>
+
+                 <div class="section-divider"></div>
+
+                 <div class="weight-section">
+                     <h2>TU PESAJE</h2>
+                     <div class="weight-card" onclick="showScreen('my-measurements')">
+                         <div class="weight-content">
+                             <div class="weight-icon">⚖️</div>
+                             <div class="weight-info">
+                                 <h3>Controla tu peso</h3>
+                                 <p>Mantén un seguimiento de tu progreso</p>
+                             </div>
+                             <div class="weight-arrow">→</div>
                          </div>
                      </div>
                  </div>
@@ -1641,24 +4373,43 @@
                                  <div class="bottom-nav">
                      <div class="nav-item active" onclick="showScreen('dashboard')">
                          <div class="nav-icon">
-                             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                 <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
                              </svg>
                          </div>
                          <span>Inicio</span>
                      </div>
                      <div class="nav-item" onclick="showScreen('qr')">
                          <div class="nav-icon">
-                             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                 <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"/>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"
+                />
                              </svg>
                          </div>
                          <span>QR</span>
                      </div>
                      <div class="nav-item" onclick="showScreen('settings')">
                          <div class="nav-icon">
-                             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                 <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+                />
                              </svg>
                          </div>
                          <span>Cuenta</span>
@@ -1673,22 +4424,33 @@
                  <h1>📹 Videos de Entrenamiento</h1>
              </div>
              <div class="main-content">
-                 <button class="btn back-btn" onclick="showScreen('dashboard')">← Volver</button>
+        <button class="btn back-btn" onclick="showScreen('dashboard')">
+          ← Volver
+        </button>
                  <div class="videos-grid">
                      <div class="video-card">
-                         <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop" alt="Video 1">
+            <img
+              src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop"
+              alt="Video 1"
+            />
                          <h3>Entrenamiento de Piernas</h3>
                          <p>Rutina completa para fortalecer piernas</p>
                          <button class="btn">Ver Video</button>
                      </div>
                      <div class="video-card">
-                         <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop" alt="Video 2">
+            <img
+              src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop"
+              alt="Video 2"
+            />
                          <h3>Entrenamiento de Pecho</h3>
                          <p>Ejercicios para desarrollar pectorales</p>
                          <button class="btn">Ver Video</button>
                      </div>
                      <div class="video-card">
-                         <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop" alt="Video 3">
+            <img
+              src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop"
+              alt="Video 3"
+            />
                          <h3>Entrenamiento de Abdomen</h3>
                          <p>Core fuerte y definido</p>
                          <button class="btn">Ver Video</button>
@@ -1707,8 +4469,9 @@
                     <h1>Mi entrenamiento</h1>
                 </div>
                 <div class="header-right">
-                    <div class="calendar-icon" onclick="showScreen('calendar-detail')">📅</div>
-                    
+          <div class="calendar-icon" onclick="showScreen('calendar-detail')">
+            📅
+          </div>
                 </div>
             </div>
             
@@ -1787,7 +4550,10 @@
                             <div class="division-arrow">→</div>
                         </div>
                         
-                        <div class="division-item proposed" onclick="showScreen('exercise-detail')">
+            <div
+              class="division-item proposed"
+              onclick="showScreen('exercise-detail')"
+            >
                             <div class="division-letter">E</div>
                             <div class="division-info">
                                 <span>Estiramiento</span>
@@ -1804,20 +4570,16 @@
         <div id="calendar-detail-screen" class="screen">
             <div class="calendar-header">
                 <div class="header-left">
-                    
                     <div class="back-arrow" onclick="showScreen('workout')">←</div>
                 </div>
                 <div class="header-center">
                     <h1>Calendario</h1>
                 </div>
-                <div class="header-right">
- 
-                </div>
+        <div class="header-right"></div>
             </div>
             
             <div class="calendar-content">
                 <!-- Resultados del Año -->
-                
 
                 <!-- Navegación del Mes -->
                 <div class="month-navigation">
@@ -1866,7 +4628,11 @@
                 
                 <div class="exercise-list">
                     <div class="exercise-item">
-                        <input type="checkbox" class="exercise-checkbox">
+            <input
+              type="checkbox"
+              class="exercise-checkbox"
+              onchange="checkExercise(this)"
+            />
                         <div class="exercise-thumbnail cardio">
                             <div class="heart-icon">❤️</div>
                         </div>
@@ -1878,36 +4644,54 @@
                     </div>
                     
                     <div class="exercise-item">
-                        <input type="checkbox" class="exercise-checkbox">
+            <input
+              type="checkbox"
+              class="exercise-checkbox"
+              onchange="checkExercise(this)"
+            />
                         <div class="exercise-thumbnail">
                             <div class="person-icon">👤</div>
                         </div>
                         <div class="exercise-details">
-                            <div class="exercise-name">Acostado Pierna Flexionada(1/2 Mariposa)</div>
+              <div class="exercise-name">
+                Acostado Pierna Flexionada(1/2 Mariposa)
+              </div>
                             <div class="exercise-info">3x 8 a 10</div>
                         </div>
                         <div class="exercise-arrow">→</div>
                     </div>
                     
                     <div class="exercise-item">
-                        <input type="checkbox" class="exercise-checkbox">
+            <input
+              type="checkbox"
+              class="exercise-checkbox"
+              onchange="checkExercise(this)"
+            />
                         <div class="exercise-thumbnail">
                             <div class="person-icon">👤</div>
                         </div>
                         <div class="exercise-details">
-                            <div class="exercise-name">Flexión De Rodilla Con Apoyo Unilateral</div>
+              <div class="exercise-name">
+                Flexión De Rodilla Con Apoyo Unilateral
+              </div>
                             <div class="exercise-info">3x 8 a 10</div>
                         </div>
                         <div class="exercise-arrow">→</div>
                     </div>
                     
                     <div class="exercise-item">
-                        <input type="checkbox" class="exercise-checkbox">
+            <input
+              type="checkbox"
+              class="exercise-checkbox"
+              onchange="checkExercise(this)"
+            />
                         <div class="exercise-thumbnail">
                             <div class="person-icon">👤</div>
                         </div>
                         <div class="exercise-details">
-                            <div class="exercise-name">Rotación Del Tronco Con Elevación De Pierna</div>
+              <div class="exercise-name">
+                Rotación Del Tronco Con Elevación De Pierna
+              </div>
                             <div class="exercise-info">3x 8 a 10</div>
                         </div>
                         <div class="exercise-arrow">→</div>
@@ -1915,7 +4699,9 @@
                 </div>
                 
                 <div class="finish-workout">
-                    <button class="finish-btn">Finalizar entrenamiento</button>
+          <button class="finish-btn" onclick="showFinishWorkoutModal()">
+            Finalizar entrenamiento
+          </button>
                 </div>
             </div>
         </div>
@@ -1926,36 +4712,80 @@
                 <div class="qr-section">
                     <h2>MI CÓDIGO QR</h2>
                     <div class="qr-card">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png" alt="Código QR" style="width: 150px; height: 150px; display: block; margin: 0 auto;">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png"
+              alt="Código QR"
+              style="
+                width: 150px;
+                height: 150px;
+                display: block;
+                margin: 0 auto;
+              "
+            />
                         <div class="qr-info">
-                            <p>Muestra este código al ingresar al gimnasio</p>
-                            <p class="qr-validity"><strong>Válido hasta:</strong> 31 de Diciembre, 2023</p>
+                            <p>Muestra este código al ingresar y al salir del gimnasio</p>
+              <p class="qr-validity">
+                <strong>Válido hasta:</strong> 10 de Septiembre, 2025
+              </p>
                         </div>
                     </div>
                 </div>
                 
-                <div class="qr-instructions">
-                    <h3>📱 Instrucciones de Uso</h3>
-                    <div class="instruction-item">
-                        <div class="instruction-icon">📱</div>
-                        <div class="instruction-text">
-                            <h4>1. Acerca tu teléfono</h4>
-                            <p>Muestra el código QR al personal de recepción</p>
+        <!-- Botón de instrucciones en la esquina -->
+        <div class="qr-instructions-button">
+          <button class="instructions-btn" onclick="showQRInstructionsModal()">
+            ℹ️
+          </button>
+                        </div>
+
+        <!-- Sección de Ingreso y Salida -->
+        <div class="qr-entry-section">
+          <h3>📊 Registro de Entrada/Salida</h3>
+          <div class="entry-log">
+            <!-- Registro 1 -->
+            <div class="log-record">
+              <div class="log-date">11 de septiembre de 2025</div>
+              <div class="log-details">
+                <div class="log-item">
+                  <span class="log-time">Entrada: 10:00 am</span>
+                  <div class="status-icon success">✓</div>
+                    </div>
+                <div class="log-item">
+                  <span class="log-time">Salida: 12:00 pm</span>
+                  <div class="status-icon success">✓</div>
                         </div>
                     </div>
-                    <div class="instruction-item">
-                        <div class="instruction-icon">✅</div>
-                        <div class="instruction-text">
-                            <h4>2. Verificación</h4>
-                            <p>El personal escaneará tu código para verificar tu membresía</p>
                         </div>
-                    </div>
-                    <div class="instruction-item">
-                        <div class="instruction-icon">🚪</div>
-                        <div class="instruction-text">
-                            <h4>3. Acceso</h4>
-                            <p>Una vez verificado, podrás ingresar al gimnasio</p>
-                        </div>
+
+            <!-- Registro 2 -->
+            <div class="log-record">
+              <div class="log-date">10 de septiembre de 2025</div>
+              <div class="log-details">
+                <div class="log-item">
+                  <span class="log-time">Entrada: 08:30 am</span>
+                  <div class="status-icon success">✓</div>
+                </div>
+                <div class="log-item">
+                  <span class="log-time">Salida: 11:45 am</span>
+                  <div class="status-icon success">✓</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Registro 3 -->
+            <div class="log-record">
+              <div class="log-date">9 de septiembre de 2025</div>
+              <div class="log-details">
+                <div class="log-item">
+                  <span class="log-time">Entrada: 07:15 am</span>
+                  <div class="status-icon success">✓</div>
+                </div>
+                <div class="log-item">
+                  <span class="log-time">Salida: No registro</span>
+                  <div class="status-icon warning">⚠</div>
+                </div>
+              </div>
+            </div>
                     </div>
                 </div>
             </div>
@@ -1964,7 +4794,7 @@
                  <div class="nav-item" onclick="showScreen('dashboard')">
                      <div class="nav-icon">
                          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
                          </svg>
                      </div>
                      <span>Inicio</span>
@@ -1972,7 +4802,9 @@
                  <div class="nav-item active" onclick="showScreen('qr')">
                      <div class="nav-icon">
                          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                             <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"/>
+              <path
+                d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"
+              />
                          </svg>
                      </div>
                      <span>QR</span>
@@ -1980,7 +4812,809 @@
                  <div class="nav-item" onclick="showScreen('settings')">
                      <div class="nav-icon">
                          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                             <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+              <path
+                d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+              />
+            </svg>
+          </div>
+          <span>Cuenta</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Mis Mediciones -->
+    <div id="my-measurements-screen" class="screen">
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('dashboard')">←</div>
+        </div>
+        <div class="header-center">
+          <h1>MIS MEDICIONES</h1>
+        </div>
+        <div class="header-right"></div>
+      </div>
+      <div class="workout-content">
+        <div class="measurements-container">
+          <div class="last-record-section">
+            <div class="last-record-info">
+              <span class="last-record-label">Último registro:</span>
+              <span class="last-record-date">01/04/2025</span>
+            </div>
+            <div class="delete-record-btn" onclick="deleteLastMeasurement()">
+              🗑️
+            </div>
+          </div>
+
+          <div class="measurements-list">
+            <div class="measurement-item" onclick="showMeasurementDetails('weight')">
+              <div class="measurement-info">
+                <span class="measurement-name">PESO</span>
+                <div class="measurement-value">
+                  <span class="value">58.0 kg</span>
+                  <span class="change-indicator">+58.0</span>
+                </div>
+              </div>
+              <div class="measurement-arrow">→</div>
+            </div>
+
+            <div class="measurement-item" onclick="showMeasurementDetails('height')">
+              <div class="measurement-info">
+                <span class="measurement-name">ALTURA</span>
+                <div class="measurement-value">
+                  <span class="value">170 cm</span>
+                </div>
+              </div>
+              <div class="measurement-arrow">→</div>
+            </div>
+
+            <div class="measurement-item" onclick="showMeasurementDetails('fat')">
+              <div class="measurement-info">
+                <span class="measurement-name">GRASA</span>
+                <div class="measurement-value">
+                  <span class="value">14.4 %</span>
+                </div>
+              </div>
+              <div class="measurement-arrow">→</div>
+            </div>
+
+            <div class="measurement-item" onclick="showMeasurementDetails('muscle')">
+              <div class="measurement-info">
+                <span class="measurement-name">MASA MUSCULAR</span>
+                <div class="measurement-value">
+                  <span class="value">47.3 kg</span>
+                </div>
+              </div>
+              <div class="measurement-arrow">→</div>
+            </div>
+          </div>
+
+          <div class="measurements-actions">
+            <button class="action-btn outline-btn" onclick="showNewMeasurementRecord()">
+              NUEVO REGISTRO MANUAL
+            </button>
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="showScreen('dashboard')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+          </div>
+          <span>Inicio</span>
+        </div>
+        <div class="nav-item" onclick="showScreen('qr')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"
+              />
+            </svg>
+          </div>
+          <span>QR</span>
+        </div>
+        <div class="nav-item active" onclick="showScreen('settings')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+              />
+            </svg>
+          </div>
+          <span>Cuenta</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Pesaje -->
+    <div id="weight-screen" class="screen">
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('dashboard')">←</div>
+        </div>
+        <div class="header-center">
+          <h1>TU PESAJE</h1>
+        </div>
+        <div class="header-right"></div>
+      </div>
+      <div class="workout-content">
+        <div class="weight-container">
+          <div class="last-record-section">
+            <div class="last-record-info">
+              <span class="last-record-label">Último registro:</span>
+              <span class="last-record-date">01/04/2025</span>
+            </div>
+            <div class="delete-record-btn" onclick="deleteLastWeightRecord()">
+              🗑️
+            </div>
+          </div>
+
+          <div class="weight-list">
+            <div class="weight-item" onclick="showWeightDetails('weight')">
+              <div class="weight-info">
+                <span class="weight-name">PESO</span>
+                <div class="weight-value">
+                  <span class="value">58.0 kg</span>
+                  <span class="change-indicator">+58.0</span>
+                </div>
+              </div>
+              <div class="weight-arrow">→</div>
+            </div>
+
+            <div class="weight-item" onclick="showWeightDetails('height')">
+              <div class="weight-info">
+                <span class="weight-name">ALTURA</span>
+                <div class="weight-value">
+                  <span class="value">170 cm</span>
+                </div>
+              </div>
+              <div class="weight-arrow">→</div>
+            </div>
+
+            <div class="weight-item" onclick="showWeightDetails('fat')">
+              <div class="weight-info">
+                <span class="weight-name">GRASA</span>
+                <div class="weight-value">
+                  <span class="value">14.4 %</span>
+                </div>
+              </div>
+              <div class="weight-arrow">→</div>
+            </div>
+
+            <div class="weight-item" onclick="showWeightDetails('muscle')">
+              <div class="weight-info">
+                <span class="weight-name">MASA MUSCULAR</span>
+                <div class="weight-value">
+                  <span class="value">47.3 kg</span>
+                </div>
+              </div>
+              <div class="weight-arrow">→</div>
+            </div>
+          </div>
+
+          <div class="weight-actions">
+            <button class="action-btn solid-btn" onclick="showNewWeightRecord()">
+              NUEVO REGISTRO
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="showScreen('dashboard')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+          </div>
+          <span>Inicio</span>
+        </div>
+        <div class="nav-item" onclick="showScreen('qr')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"
+              />
+            </svg>
+          </div>
+          <span>QR</span>
+        </div>
+        <div class="nav-item active" onclick="showScreen('settings')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+              />
+            </svg>
+          </div>
+          <span>Cuenta</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Nuevo Registro Manual -->
+    <div id="new-weight-record-screen" class="screen">
+      <div class="manual-record-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('my-measurements')">←</div>
+        </div>
+        <div class="header-center">
+          <h1>NUEVO REGISTRO MANUAL</h1>
+        </div>
+        <div class="header-right"></div>
+      </div>
+      <div class="manual-record-content">
+        <div class="manual-record-container">
+          <form class="manual-record-form">
+            <div class="form-field">
+              <label for="weight-input">Peso (kg) *</label>
+              <input 
+                type="number" 
+                id="weight-input" 
+                name="weight" 
+                placeholder="0,0" 
+                step="0.1" 
+                min="0" 
+                required
+                class="manual-input"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="height-input">Altura (cm) *</label>
+              <input 
+                type="number" 
+                id="height-input" 
+                name="height" 
+                placeholder="000" 
+                min="0" 
+                required
+                class="manual-input"
+              />
+            </div>
+
+            <div class="form-field">
+              <div class="field-header">
+                <label for="fat-input">Grasa (%)</label>
+                <div class="help-icon" onclick="showWeightHelp('fat')">?</div>
+              </div>
+              <input 
+                type="number" 
+                id="fat-input" 
+                name="fat" 
+                placeholder="0,0" 
+                step="0.1" 
+                min="0"
+                class="manual-input"
+              />
+              <span class="optional-text">(opcional)</span>
+            </div>
+
+            <div class="form-field">
+              <div class="field-header">
+                <label for="muscle-input">Masa muscular (kg)</label>
+                <div class="help-icon" onclick="showWeightHelp('muscle')">?</div>
+              </div>
+              <input 
+                type="number" 
+                id="muscle-input" 
+                name="muscle" 
+                placeholder="0,0" 
+                step="0.1" 
+                min="0"
+                class="manual-input"
+              />
+              <span class="optional-text">(opcional)</span>
+            </div>
+
+            <button type="submit" class="manual-save-btn" onclick="saveWeightRecord(event)">
+              GUARDAR
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Documentos -->
+    <div id="documents-screen" class="screen">
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('settings')">←</div>
+        </div>
+        <div class="header-center">
+          <h1>📄 Documentos</h1>
+        </div>
+        <div class="header-right"></div>
+      </div>
+      <div class="workout-content">
+        <div class="settings-menu">
+          <div class="settings-item" onclick="showScreen('terms')">
+            <div class="item-icon">📋</div>
+            <span>Términos de uso</span>
+            <div class="arrow">></div>
+          </div>
+          <div class="settings-item" onclick="showScreen('privacy')">
+            <div class="item-icon">🔒</div>
+            <span>Aviso de privacidad</span>
+            <div class="arrow">></div>
+          </div>
+          <div class="settings-item" onclick="showScreen('rules')">
+            <div class="item-icon">📜</div>
+            <span>Reglas del gimnasio</span>
+            <div class="arrow">></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="showScreen('dashboard')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+          </div>
+          <span>Inicio</span>
+        </div>
+        <div class="nav-item" onclick="showScreen('qr')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"
+              />
+            </svg>
+          </div>
+          <span>QR</span>
+        </div>
+        <div class="nav-item active" onclick="showScreen('settings')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+              />
+            </svg>
+          </div>
+          <span>Cuenta</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Términos de Uso -->
+    <div id="terms-screen" class="screen">
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('documents')">←</div>
+        </div>
+        <div class="header-center">
+          <h1>📋 Términos de Uso</h1>
+        </div>
+        <div class="header-right"></div>
+      </div>
+      <div class="account-content">
+        <div class="document-content">
+          <h2 style="color: #ff6b6b; font-size: 20px; margin-bottom: 15px">
+            TÉRMINOS Y CONDICIONES DE USO
+          </h2>
+          <p style="color: #666; font-size: 12px; margin-bottom: 20px">
+            <strong>Actualización:</strong> 18 de marzo de 2024
+          </p>
+
+          <p>
+            Los presentes "Términos de Uso" definen las principales reglas para
+            quienes descargan, acceden y utilizan la aplicación desarrollada por
+            "GymApp - Tu Gimnasio Digital", incluyendo su RUC y dirección en
+            Ecuador.
+          </p>
+
+          <p>
+            Al descargar, acceder y utilizar la aplicación GymApp, debes
+            observar y cumplir íntegramente estos Términos de Uso. No debes
+            descargar ni utilizar la plataforma si no aceptas alguna de las
+            condiciones establecidas.
+          </p>
+
+          <h3 style="color: #333; font-size: 16px; margin: 20px 0 10px 0">
+            Terminología
+          </h3>
+          <ul>
+            <li>
+              <strong>"Tú" y "tu":</strong> Se refiere al usuario, un estudiante
+              debidamente registrado en la red de gimnasios GymApp.
+            </li>
+            <li>
+              <strong>"GymApp", "Nosotros", "nuestro":</strong> Se refiere a
+              GymApp y todo lo relacionado con él.
+            </li>
+            <li>
+              <strong>"Aplicación":</strong> Se refiere a la aplicación GymApp.
+            </li>
+          </ul>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            1. FUNCIONALIDADES DE LA APLICACIÓN
+          </h3>
+          <p>
+            <strong>1.1. Funcionalidades:</strong> La aplicación tiene los
+            siguientes propósitos:
+          </p>
+          <ul>
+            <li>
+              Presentar información sobre GymApp, su red de gimnasios, horarios
+              de funcionamiento, habilitar reservas y promocionar ofertas.
+            </li>
+            <li>
+              Proporcionar entrenamientos personalizados o automatizados, clases
+              en línea (simultáneas o no).
+            </li>
+            <li>
+              Proporcionar un espacio adecuado para que los usuarios registren
+              sus objetivos, evolución, frecuencia y compromiso.
+            </li>
+          </ul>
+
+          <p>
+            <strong>1.1.1. Cláusula "As Is":</strong> La aplicación y sus
+            funcionalidades se ofrecen "tal como están" y GymApp se reserva el
+            derecho de mejorarla y/o actualizarla.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            2. REGISTRO Y USO ADECUADO DE LA APLICACIÓN
+          </h3>
+          <p>
+            <strong>2.1. Uso Restringido:</strong> El uso de la aplicación está
+            restringido a estudiantes debidamente registrados, requiriendo datos
+            de inicio de sesión y un código de validación recibido para el
+            acceso.
+          </p>
+
+          <p>
+            <strong>2.1.1. Datos No Transferibles:</strong> Los datos de inicio
+            de sesión son personales y no transferibles, prohibiendo su
+            transferencia o venta a terceros.
+          </p>
+
+          <p><strong>Contacto:</strong> legal@gymapp.com</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Aviso de Privacidad -->
+    <div id="privacy-screen" class="screen">
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('documents')">←</div>
+        </div>
+        <div class="header-center">
+          <h1>🔒 Aviso de Privacidad</h1>
+        </div>
+        <div class="header-right"></div>
+      </div>
+      <div class="account-content">
+        <div class="document-content">
+          <h2 style="color: #333; font-size: 20px; margin-bottom: 15px">
+            POLÍTICA DE TRATAMIENTO DE DATOS PERSONALES
+          </h2>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            1. RESUMEN EJECUTIVO
+          </h3>
+          <p>
+            WELLNESSGRP S.A. se compromete con la protección de datos personales
+            en cumplimiento de la normativa ecuatoriana, garantizando la
+            seguridad y confidencialidad de los datos personales a través de
+            medidas técnicas y organizacionales.
+          </p>
+
+          <p>
+            WELLNESSGRP S.A. utiliza los datos personales para comunicación,
+            facturación, correspondencia, mensajes, certificados, prestación de
+            servicios/productos, evaluación, mejora de la calidad del servicio y
+            cumplimiento de obligaciones contractuales.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            2. DIRIGIDA A
+          </h3>
+          <p>
+            Todos los contratistas, colaboradores, proveedores o clientes
+            (usuarios) de WELLNESSGRP S.A.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            3. OBJETIVO
+          </h3>
+          <p>
+            Esta política establece los términos, condiciones y finalidades para
+            la recolección, almacenamiento, uso, circulación, supresión y
+            tratamiento de datos por parte de WELLNESSGRP S.A. También cubre las
+            condiciones de seguridad y confidencialidad y los canales de
+            comunicación para que los titulares de datos ejerzan sus derechos.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            OBJETIVOS ESPECÍFICOS
+          </h3>
+          <ul>
+            <li>Minimizar al mínimo el tratamiento de datos.</li>
+            <li>Respetar la privacidad de la información que es manejada.</li>
+            <li>
+              Salvaguardar la información y la efectiva limitación de su uso
+              conforme a lo previsto en las disposiciones legales.
+            </li>
+            <li>
+              Cumplir las exigencias legales en materia de protección de datos.
+            </li>
+            <li>
+              Garantizar la confidencialidad sobre secretos técnicos,
+              comerciales, administrativos y estratégicos.
+            </li>
+            <li>
+              Velar por que la información conocida, intercambiada, facilitada o
+              creada en desarrollo de los vínculos contractuales civiles o
+              laborales, sea mantenida en estricta confidencialidad.
+            </li>
+          </ul>
+
+          <p><strong>Contacto:</strong> privacidad@gymapp.com</p>
+          <p><strong>Última actualización:</strong> 18 de marzo de 2024</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Reglas del Gimnasio -->
+    <div id="rules-screen" class="screen">
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('documents')">←</div>
+        </div>
+        <div class="header-center">
+          <h1>📜 Reglas del Gimnasio</h1>
+        </div>
+        <div class="header-right"></div>
+      </div>
+      <div class="account-content">
+        <div class="document-content">
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            1. HIGIENE PERSONAL
+          </h3>
+          <ul>
+            <li>Usar ropa deportiva limpia y apropiada</li>
+            <li>Llevar toalla para limpiar el equipo después de usarlo</li>
+            <li>Mantener buena higiene personal</li>
+            <li>Usar calzado deportivo adecuado</li>
+          </ul>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            2. USO DEL EQUIPO
+          </h3>
+          <ul>
+            <li>Devolver el equipo a su lugar después de usarlo</li>
+            <li>No dejar pesas en el suelo</li>
+            <li>Reportar equipos dañados al personal</li>
+            <li>Respetar el tiempo límite en equipos ocupados</li>
+            <li>No usar equipos si no sabes cómo funcionan</li>
+          </ul>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            3. COMPORTAMIENTO
+          </h3>
+          <ul>
+            <li>Respetar a otros miembros</li>
+            <li>Mantener un volumen de voz apropiado</li>
+            <li>No usar teléfonos en áreas de entrenamiento</li>
+            <li>No consumir alimentos en el área de entrenamiento</li>
+            <li>Guarda tus pertenencias en los casilleros</li>
+          </ul>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            4. SEGURIDAD
+          </h3>
+          <ul>
+            <li>Usar el equipo correctamente</li>
+            <li>Pedir ayuda si no sabes cómo usar algo</li>
+            <li>Seguir las instrucciones del personal</li>
+            <li>Reporta cualquier problema o lesión</li>
+          </ul>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            5. HORARIOS
+          </h3>
+          <ul>
+            <li>Respetar los horarios de apertura y cierre</li>
+            <li>Salir del gimnasio al cerrar</li>
+            <li>
+              <strong>Horarios:</strong> Lunes a Domingo 5:00 AM - 11:00 PM
+            </li>
+          </ul>
+
+          <p><strong>Contacto:</strong> administracion@gymapp.com</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Datos Personales -->
+    <div id="personal-data-screen" class="screen">
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('settings')">←</div>
+        </div>
+        <div class="header-center">
+          <h1>👤 Datos Personales</h1>
+        </div>
+        <div class="header-right"></div>
+      </div>
+      <div class="workout-content">
+        <div class="document-content">
+          <div class="form-group">
+            <label>Nombre:</label>
+            <input type="text" value="Josue Pérez" readonly />
+          </div>
+          <div class="form-group">
+            <label>Cédula:</label>
+            <input type="text" value="1754772778" readonly />
+          </div>
+          <div class="form-group">
+            <label>Correo:</label>
+            <input type="email" value="josue.perez@email.com" readonly />
+          </div>
+          <div class="form-group">
+            <label>Teléfono:</label>
+            <input type="tel" value="0999999999" readonly />
+          </div>
+          <div class="form-group">
+            <label>Membresía:</label>
+            <input
+              type="text"
+              value="Membresía Mensual QT - Vence 10/09/2025"
+              readonly
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Estado:</label>
+            <input type="text" value="Activo" readonly style="color: #28a745" />
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="showScreen('dashboard')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+          </div>
+          <span>Inicio</span>
+        </div>
+        <div class="nav-item" onclick="showScreen('qr')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"
+              />
+            </svg>
+          </div>
+          <span>QR</span>
+        </div>
+        <div class="nav-item active" onclick="showScreen('settings')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+              />
+            </svg>
+          </div>
+          <span>Cuenta</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Preguntas Frecuentes -->
+    <div id="faq-screen" class="screen">
+      <div class="workout-header">
+        <div class="header-left">
+          <div class="back-arrow" onclick="showScreen('settings')">←</div>
+        </div>
+        <div class="header-center">
+          <h1>❓ Preguntas Frecuentes</h1>
+        </div>
+        <div class="header-right"></div>
+      </div>
+      <div class="workout-content">
+        <div class="document-content">
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            ¿Cómo cambio mi plan de membresía?
+          </h3>
+          <p>
+            Puedes cambiar tu plan en cualquier momento contactando al personal
+            del gimnasio o a través de la aplicación.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            ¿Qué pasa si pierdo mi código QR?
+          </h3>
+          <p>
+            No te preocupes, puedes generar un nuevo código QR desde la
+            aplicación en cualquier momento.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            ¿Puedo congelar mi membresía?
+          </h3>
+          <p>
+            Sí, puedes congelar tu membresía por hasta 3 meses por razones
+            médicas o de viaje.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            ¿Hay clases incluidas en mi plan?
+          </h3>
+          <p>
+            Sí, el plan Premium incluye acceso a todas las clases grupales sin
+            costo adicional.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            ¿Puedo traer invitados?
+          </h3>
+          <p>
+            Los planes Premium incluyen 2 invitados por mes. Consulta con el
+            personal para más detalles.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            ¿Cómo reporto un problema?
+          </h3>
+          <p>
+            Puedes reportar cualquier problema directamente al personal del
+            gimnasio o a través de la aplicación.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            ¿Cuáles son los horarios del gimnasio?
+          </h3>
+          <p>
+            El gimnasio está abierto de lunes a domingo de 5:00 AM a 11:00 PM.
+          </p>
+
+          <h3 style="color: #ff6b6b; font-size: 16px; margin: 20px 0 10px 0">
+            ¿Puedo cancelar mi membresía?
+          </h3>
+          <p>
+            Sí, puedes cancelar tu membresía con 30 días de anticipación.
+            Contacta al personal para más información.
+          </p>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="showScreen('dashboard')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+          </div>
+          <span>Inicio</span>
+        </div>
+        <div class="nav-item" onclick="showScreen('qr')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"
+              />
+            </svg>
+          </div>
+          <span>QR</span>
+        </div>
+        <div class="nav-item active" onclick="showScreen('settings')">
+          <div class="nav-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+              />
                          </svg>
                      </div>
                      <span>Cuenta</span>
@@ -1994,7 +5628,9 @@
                 <h1>📊 Registro de Entrada/Salida</h1>
             </div>
             <div class="main-content">
-                <button class="btn back-btn" onclick="showScreen('dashboard')">← Volver</button>
+        <button class="btn back-btn" onclick="showScreen('dashboard')">
+          ← Volver
+        </button>
                 <div class="entry-log">
                     <h3>Historial de Entradas</h3>
                     <div class="log-entry">
@@ -2034,37 +5670,20 @@
          <div id="settings-screen" class="screen">
              <div class="account-header">
                  <h1>Josue</h1>
-                 <p class="matricula">Matricula 1754772778</p>
-                 <p class="plan">PLAN Premium</p>
              </div>
              <div class="account-content">
                  <div class="settings-menu">
-                     <div class="settings-item" onclick="showModal('personal-data')">
+          <div class="settings-item" onclick="showScreen('personal-data')">
                          <div class="item-icon">👤</div>
                          <span>Datos personales</span>
                          <div class="arrow">></div>
                      </div>
-                     <div class="settings-item" onclick="showModal('terms')">
-                         <div class="item-icon">📋</div>
-                         <span>Términos de uso</span>
-                         <div class="arrow">></div>
-                     </div>
-                     <div class="settings-item" onclick="showModal('privacy')">
-                         <div class="item-icon">🔒</div>
-                         <span>Aviso de privacidad</span>
-                         <div class="arrow">></div>
-                     </div>
-                     <div class="settings-item" onclick="showModal('gym-rules')">
-                         <div class="item-icon">📜</div>
-                         <span>Reglas del gimnasio</span>
-                         <div class="arrow">></div>
-                     </div>
-                     <div class="settings-item" onclick="showModal('faq')">
+          <div class="settings-item" onclick="showScreen('faq')">
                          <div class="item-icon">❓</div>
                          <span>Preguntas frecuentes</span>
                          <div class="arrow">></div>
                      </div>
-                     <div class="settings-item" onclick="showModal('documents')">
+          <div class="settings-item" onclick="showScreen('documents')">
                          <div class="item-icon">📄</div>
                          <span>Documentos</span>
                          <div class="arrow">></div>
@@ -2081,7 +5700,7 @@
                  <div class="nav-item" onclick="showScreen('dashboard')">
                      <div class="nav-icon">
                          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
                          </svg>
                      </div>
                      <span>Inicio</span>
@@ -2089,7 +5708,9 @@
                  <div class="nav-item" onclick="showScreen('qr')">
                      <div class="nav-icon">
                          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                             <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"/>
+              <path
+                d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3z"
+              />
                          </svg>
                      </div>
                      <span>QR</span>
@@ -2097,10 +5718,117 @@
                  <div class="nav-item active" onclick="showScreen('settings')">
                      <div class="nav-icon">
                          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                             <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+              <path
+                d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+              />
                          </svg>
                      </div>
                      <span>Cuenta</span>
+        </div>
+      </div>
+    </div>
+    <!-- Pantalla de Éxito Semanal -->
+    <!-- Pantalla de Éxito Semanal -->
+    <div id="success-screen" class="screen">
+      <div class="success-screen">
+        <div class="success-header">
+          <div class="kettlebell-icon">🏋️</div>
+          <h1 class="success-title">¡Meta semanal alcanzada!</h1>
+        </div>
+
+        <div class="weekly-progress-card">
+          <div class="progress-header">
+            <span class="progress-label">Meta semanal</span>
+            <span class="progress-count">4 de 5 días</span>
+          </div>
+
+          <div class="week-days">
+            <div class="day-label">L</div>
+            <div class="day-label">M</div>
+            <div class="day-label">M</div>
+            <div class="day-label">J</div>
+            <div class="day-label">V</div>
+            <div class="day-label">S</div>
+            <div class="day-label">D</div>
+          </div>
+
+          <div class="week-circles">
+            <div class="day-circle completed">✓</div>
+            <div class="day-circle completed">✓</div>
+            <div class="day-circle completed">✓</div>
+            <div class="day-circle completed">✓</div>
+            <div class="day-circle current">08</div>
+            <div class="day-circle pending">09</div>
+            <div class="day-circle pending">10</div>
+          </div>
+        </div>
+
+        <div class="streak-section">
+          <div class="streak-container">
+            <div class="flame-icon">🔥</div>
+            <div class="streak-number">10</div>
+            <div class="info-icon">ℹ️</div>
+          </div>
+          <div class="streak-text">semanas consecutivas de entrenamiento</div>
+          <div class="streak-record">Tu récord 17 semanas</div>
+        </div>
+
+        <div class="success-buttons">
+          <a href="#" class="go-home-link" onclick="showScreen('dashboard')"
+            >Ir al inicio</a
+          >
+          <button class="share-button" onclick="shareSuccess()">
+            <span class="share-icon">📤</span>
+            Para compartir
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmación para Finalizar Entrenamiento -->
+    <div id="finish-workout-modal" class="finish-workout-modal">
+      <div class="finish-workout-modal-content">
+        <h2>Terminar entrenamiento</h2>
+        <p>
+          Tienes ejercicios que todavía no han sido marcados, ¿quieres terminar
+          el entrenamiento de todos modos?<br /><br />(recuerda: tu progreso
+          seguirá siendo contado)
+        </p>
+        <button class="btn btn-confirm" onclick="confirmFinishWorkout()">
+          CONFIRMAR
+        </button>
+        <button class="btn btn-cancel" onclick="closeFinishWorkoutModal()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal de Instrucciones QR -->
+    <div id="qr-instructions-modal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('qr-instructions')"
+          >&times;</span
+        >
+        <h2>📱 Instrucciones de Uso</h2>
+        <div class="instruction-item">
+          <div class="instruction-icon">📱</div>
+          <div class="instruction-text">
+            <h4>1. Acerca tu teléfono</h4>
+            <p>Muestra el código QR al personal de recepción</p>
+          </div>
+        </div>
+        <div class="instruction-item">
+          <div class="instruction-icon">✅</div>
+          <div class="instruction-text">
+            <h4>2. Verificación</h4>
+            <p>El personal escaneará tu código para verificar tu membresía</p>
+          </div>
+        </div>
+        <div class="instruction-item">
+          <div class="instruction-icon">🚪</div>
+          <div class="instruction-text">
+            <h4>3. Acceso</h4>
+            <p>Una vez verificado, podrás ingresar al gimnasio</p>
                  </div>
              </div>
          </div>
@@ -2113,23 +5841,27 @@
             <h2>👤 Datos Personales</h2>
             <div class="form-group">
                 <label>Nombre:</label>
-                <input type="text" value="Juan Pérez" readonly>
+          <input type="text" value="Juan Pérez" readonly />
             </div>
             <div class="form-group">
                 <label>Cédula:</label>
-                <input type="text" value="1754772778" readonly>
+          <input type="text" value="1754772778" readonly />
             </div>
             <div class="form-group">
                 <label>Correo:</label>
-                <input type="email" value="juan.perez@email.com" readonly>
+          <input type="email" value="juan.perez@email.com" readonly />
             </div>
             <div class="form-group">
                 <label>Teléfono:</label>
-                <input type="tel" value="+57 300 123 4567" readonly>
+          <input type="tel" value="+57 300 123 4567" readonly />
             </div>
             <div class="form-group">
                 <label>Membresía:</label>
-                <input type="text" value="Plan Premium - Vence 15/01/2024" readonly>
+          <input
+            type="text"
+            value="Membresía Mensual QT - Vence 10/09/2025"
+            readonly
+          />
             </div>
         </div>
     </div>
@@ -2189,28 +5921,38 @@
             <span class="close" onclick="closeModal('gym-rules')">&times;</span>
             <h2>📜 Reglas del Gimnasio</h2>
             <h4>1. Higiene Personal</h4>
-            <p>• Usar ropa deportiva limpia y apropiada<br>
-            • Llevar toalla para limpiar el equipo después de usarlo<br>
-            • Mantener buena higiene personal</p>
+        <p>
+          • Usar ropa deportiva limpia y apropiada<br />
+          • Llevar toalla para limpiar el equipo después de usarlo<br />
+          • Mantener buena higiene personal
+        </p>
             
             <h4>2. Uso del Equipo</h4>
-            <p>• Devolver el equipo a su lugar después de usarlo<br>
-            • No dejar pesas en el suelo<br>
-            • Reportar equipos dañados al personal</p>
+        <p>
+          • Devolver el equipo a su lugar después de usarlo<br />
+          • No dejar pesas en el suelo<br />
+          • Reportar equipos dañados al personal
+        </p>
             
             <h4>3. Comportamiento</h4>
-            <p>• Respetar a otros miembros<br>
-            • Mantener un volumen de voz apropiado<br>
-            • No usar teléfonos en áreas de entrenamiento</p>
+        <p>
+          • Respetar a otros miembros<br />
+          • Mantener un volumen de voz apropiado<br />
+          • No usar teléfonos en áreas de entrenamiento
+        </p>
             
             <h4>4. Seguridad</h4>
-            <p>• Usar el equipo correctamente<br>
-            • Pedir ayuda si no sabes cómo usar algo<br>
-            • Seguir las instrucciones del personal</p>
+        <p>
+          • Usar el equipo correctamente<br />
+          • Pedir ayuda si no sabes cómo usar algo<br />
+          • Seguir las instrucciones del personal
+        </p>
             
             <h4>5. Horarios</h4>
-            <p>• Respetar los horarios de apertura y cierre<br>
-            • Salir del gimnasio al cerrar</p>
+        <p>
+          • Respetar los horarios de apertura y cierre<br />
+          • Salir del gimnasio al cerrar
+        </p>
         </div>
     </div>
 
@@ -2220,23 +5962,23 @@
             <h2>💳 Datos de Pago</h2>
             <div class="form-group">
                 <label>Método de Pago:</label>
-                <input type="text" value="Tarjeta de Crédito" readonly>
+          <input type="text" value="Tarjeta de Crédito" readonly />
             </div>
             <div class="form-group">
                 <label>Número de Tarjeta:</label>
-                <input type="text" value="**** **** **** 1234" readonly>
+          <input type="text" value="**** **** **** 1234" readonly />
             </div>
             <div class="form-group">
                 <label>Plan Actual:</label>
-                <input type="text" value="Premium - $45.000/mes" readonly>
+          <input type="text" value="Premium - $45.000/mes" readonly />
             </div>
             <div class="form-group">
                 <label>Próximo Pago:</label>
-                <input type="text" value="15 de Enero, 2024" readonly>
+          <input type="text" value="15 de Enero, 2024" readonly />
             </div>
             <div class="form-group">
                 <label>Estado:</label>
-                <input type="text" value="Activo" readonly style="color: #28a745;">
+          <input type="text" value="Activo" readonly style="color: #28a745" />
             </div>
         </div>
     </div>
@@ -2247,22 +5989,40 @@
             <h2>❓ Preguntas Frecuentes</h2>
             
             <h4>¿Cómo cambio mi plan de membresía?</h4>
-            <p>Puedes cambiar tu plan en cualquier momento contactando al personal del gimnasio o a través de la aplicación.</p>
+        <p>
+          Puedes cambiar tu plan en cualquier momento contactando al personal
+          del gimnasio o a través de la aplicación.
+        </p>
             
             <h4>¿Qué pasa si pierdo mi código QR?</h4>
-            <p>No te preocupes, puedes generar un nuevo código QR desde la aplicación en cualquier momento.</p>
+        <p>
+          No te preocupes, puedes generar un nuevo código QR desde la aplicación
+          en cualquier momento.
+        </p>
             
             <h4>¿Puedo congelar mi membresía?</h4>
-            <p>Sí, puedes congelar tu membresía por hasta 3 meses por razones médicas o de viaje.</p>
+        <p>
+          Sí, puedes congelar tu membresía por hasta 3 meses por razones médicas
+          o de viaje.
+        </p>
             
             <h4>¿Hay clases incluidas en mi plan?</h4>
-            <p>Sí, el plan Premium incluye acceso a todas las clases grupales sin costo adicional.</p>
+        <p>
+          Sí, el plan Premium incluye acceso a todas las clases grupales sin
+          costo adicional.
+        </p>
             
             <h4>¿Puedo traer invitados?</h4>
-            <p>Los planes Premium incluyen 2 invitados por mes. Consulta con el personal para más detalles.</p>
+        <p>
+          Los planes Premium incluyen 2 invitados por mes. Consulta con el
+          personal para más detalles.
+        </p>
             
             <h4>¿Cómo reporto un problema?</h4>
-            <p>Puedes reportar cualquier problema directamente al personal del gimnasio o a través de la aplicación.</p>
+        <p>
+          Puedes reportar cualquier problema directamente al personal del
+          gimnasio o a través de la aplicación.
+        </p>
         </div>
     </div>
 
@@ -2272,121 +6032,163 @@
             <h2>📄 Documentos</h2>
             
             <div class="document-item">
-                <h4>📋 Contrato de Membresía</h4>
-                <p>Documento firmado el 15 de Diciembre, 2023</p>
-                <button class="btn btn-secondary">Descargar PDF</button>
+          <h4>📋 Términos de Uso</h4>
+          <p>Al usar esta aplicación, aceptas los siguientes términos:</p>
+          <ul>
+            <li>Uso responsable de las instalaciones del gimnasio</li>
+            <li>Respeto hacia otros usuarios y personal</li>
+            <li>Cumplimiento de las reglas de seguridad</li>
+            <li>Pago puntual de la membresía</li>
+            <li>Notificación de cambios en datos personales</li>
+          </ul>
+          <p><strong>Última actualización:</strong> 1 de Diciembre, 2023</p>
             </div>
             
             <div class="document-item">
-                <h4>📄 Facturas</h4>
-                <p>Historial de pagos y facturas</p>
-                <button class="btn btn-secondary">Ver Historial</button>
+          <h4>🔒 Aviso de Privacidad</h4>
+          <p>Tu privacidad es importante para nosotros:</p>
+          <ul>
+            <li>Recopilamos solo información necesaria para el servicio</li>
+            <li>No compartimos datos con terceros sin tu consentimiento</li>
+            <li>Protegemos tu información con medidas de seguridad</li>
+            <li>Puedes solicitar acceso, corrección o eliminación de datos</li>
+            <li>Usamos cookies para mejorar tu experiencia</li>
+          </ul>
+          <p><strong>Contacto:</strong> privacidad@gymapp.com</p>
             </div>
             
             <div class="document-item">
-                <h4>📊 Reportes de Entrenamiento</h4>
-                <p>Progreso y estadísticas de entrenamiento</p>
-                <button class="btn btn-secondary">Ver Reportes</button>
-            </div>
-            
-            <div class="document-item">
-                <h4>📝 Certificados</h4>
-                <p>Certificados de participación en programas especiales</p>
-                <button class="btn btn-secondary">Ver Certificados</button>
+          <h4>📜 Reglas del Gimnasio</h4>
+          <ol>
+            <li>Limpia el equipo después de usarlo</li>
+            <li>Respeta el tiempo límite en equipos ocupados</li>
+            <li>Usa ropa deportiva apropiada</li>
+            <li>No uses teléfonos en áreas de entrenamiento</li>
+            <li>Guarda tus pertenencias en los casilleros</li>
+            <li>No consumas alimentos en el área de entrenamiento</li>
+            <li>Respeta las indicaciones del personal</li>
+            <li>Reporta cualquier problema o lesión</li>
+          </ol>
+          <p><strong>Horarios:</strong> Lunes a Domingo 5:00 AM - 11:00 PM</p>
             </div>
         </div>
     </div>
 
     <script>
         // Variables globales
-        let currentScreen = 'main';
+      let currentScreen = "main";
         let currentDate = new Date();
         let completedExercises = 0;
-        let totalExercises = 6;
+      let totalExercises = 4;
+
+      // Función para mostrar opciones de inicio
+      function showStartOptions() {
+        document.getElementById("secondary-buttons").style.display = "flex";
+        document.querySelector(".primary-action").style.display = "none";
+      }
 
         // Función para cambiar pantallas
         function showScreen(screenId) {
             // Ocultar todas las pantallas
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
+        document.querySelectorAll(".screen").forEach((screen) => {
+          screen.classList.remove("active");
             });
             
             // Mostrar la pantalla seleccionada
-            document.getElementById(screenId + '-screen').classList.add('active');
+        const targetScreen = document.getElementById(screenId + "-screen");
+        if (targetScreen) {
+          targetScreen.classList.add("active");
             currentScreen = screenId;
             
             // Inicializar elementos específicos de cada pantalla
-            if (screenId === 'qr') {
+          if (screenId === "qr") {
                 generateQR();
-            } else if (screenId === 'workout') {
+          } else if (screenId === "workout") {
                 generateCalendar();
-            } else if (screenId === 'calendar-detail') {
+          } else if (screenId === "calendar-detail") {
                 generateDetailCalendar();
+          } else if (screenId === "exercise-detail") {
+            // Reiniciar contador de ejercicios cuando se entra a la pantalla
+            completedExercises = 0;
+          }
+        } else {
+          console.error("Pantalla no encontrada:", screenId + "-screen");
+          // Intentar mostrar la pantalla de documentos como fallback
+          const documentsScreen = document.getElementById("documents-screen");
+          if (documentsScreen) {
+            documentsScreen.classList.add("active");
+            currentScreen = "documents";
+          }
             }
         }
 
         // Función para validar cédula
         function validateCedula() {
-            const cedula = document.getElementById('cedula').value;
+        const cedula = document.getElementById("cedula").value;
             
             if (!cedula) {
-                alert('Por favor ingresa tu cédula');
+          alert("Por favor ingresa tu cédula");
                 return;
             }
             
             // Simular verificación de usuario
-            if (cedula === '1754772778') {
-                showScreen('email-verification');
-                document.getElementById('login-error').style.display = 'none';
+        if (cedula === "1754772778") {
+          showScreen("email-verification");
+          document.getElementById("login-error").style.display = "none";
             } else {
-                document.getElementById('login-error').style.display = 'block';
+          document.getElementById("login-error").style.display = "block";
             }
         }
 
         // Función para reintentar login
         function retryLogin() {
-            document.getElementById('cedula').value = '1754772778';
-            document.getElementById('login-error').style.display = 'none';
+        document.getElementById("cedula").value = "1754772778";
+        document.getElementById("login-error").style.display = "none";
         }
 
         // Función para verificar código
         function verifyCode() {
-            const code = document.getElementById('verification-code').value;
+        const code = document.getElementById("verification-code").value;
             
-            if (code === '123456') {
-                showScreen('dashboard');
+        if (code === "123456") {
+          showScreen("dashboard");
                 // Guardar estado de login
-                localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem("isLoggedIn", "true");
             } else {
-                alert('Código incorrecto. Intenta de nuevo.');
+          alert("Código incorrecto. Intenta de nuevo.");
             }
         }
 
         // Función para generar QR
         function generateQR() {
-            const qrContainer = document.getElementById('qr-code');
+        const qrContainer = document.getElementById("qr-code");
             if (!qrContainer) return;
             
-            qrContainer.innerHTML = '';
+        qrContainer.innerHTML = "";
             
             // Datos simples para el QR
-            const qrData = '1754772778-Josue-Premium-GymApp';
+        const qrData = "1754772778-Josue-Premium-GymApp";
             
             // Generar QR con la librería
-            if (typeof QRCode !== 'undefined') {
-                QRCode.toCanvas(qrContainer, qrData, {
+        if (typeof QRCode !== "undefined") {
+          QRCode.toCanvas(
+            qrContainer,
+            qrData,
+            {
                     width: 200,
                     height: 200,
                     margin: 2,
                     color: {
-                        dark: '#000000',
-                        light: '#FFFFFF'
-                    }
-                }, function (error) {
+                dark: "#000000",
+                light: "#FFFFFF",
+              },
+            },
+            function (error) {
                     if (error) {
                         showQRFallback(qrContainer);
                     }
-                });
+            }
+          );
             } else {
                 showQRFallback(qrContainer);
             }
@@ -2409,28 +6211,28 @@
 
         // Función para generar el calendario detallado
         function generateDetailCalendar() {
-            const calendarGrid = document.getElementById('calendar-detail-grid');
+        const calendarGrid = document.getElementById("calendar-detail-grid");
             if (!calendarGrid) return;
             
-            calendarGrid.innerHTML = '';
+        calendarGrid.innerHTML = "";
             
             // Días con entrenamiento (sin etiquetas)
             const trainingDays = [1, 4, 5, 6, 7, 8];
             
             // Generar días del calendario
             for (let day = 1; day <= 31; day++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
-                dayElement.textContent = day.toString().padStart(2, '0');
+          const dayElement = document.createElement("div");
+          dayElement.className = "calendar-day";
+          dayElement.textContent = day.toString().padStart(2, "0");
                 
                 // Marcar días con entrenamiento (solo círculo amarillo, sin etiqueta)
                 if (trainingDays.includes(day)) {
-                    dayElement.classList.add('completed');
+            dayElement.classList.add("completed");
                 }
                 
                 // Marcar día actual (8 de agosto)
                 if (day === 8) {
-                    dayElement.classList.add('current');
+            dayElement.classList.add("current");
                 }
                 
                 calendarGrid.appendChild(dayElement);
@@ -2439,46 +6241,49 @@
 
         // Función para generar calendario
         function generateCalendar() {
-            const calendarGrid = document.getElementById('calendar-grid');
-            const currentMonthElement = document.getElementById('current-month');
+        const calendarGrid = document.getElementById("calendar-grid");
+        const currentMonthElement = document.getElementById("current-month");
             
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             
-            currentMonthElement.textContent = currentDate.toLocaleDateString('es-ES', {
-                month: 'long',
-                year: 'numeric'
-            });
+        currentMonthElement.textContent = currentDate.toLocaleDateString(
+          "es-ES",
+          {
+            month: "long",
+            year: "numeric",
+          }
+        );
             
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
             const startDate = new Date(firstDay);
             startDate.setDate(startDate.getDate() - firstDay.getDay());
             
-            calendarGrid.innerHTML = '';
+        calendarGrid.innerHTML = "";
             
             // Generar días del calendario
             for (let i = 0; i < 42; i++) {
                 const date = new Date(startDate);
                 date.setDate(startDate.getDate() + i);
                 
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
+          const dayElement = document.createElement("div");
+          dayElement.className = "calendar-day";
                 dayElement.textContent = date.getDate();
                 
                 // Marcar días completados (simulado)
                 if (date.getDate() % 3 === 0 && date.getMonth() === month) {
-                    dayElement.classList.add('completed');
+            dayElement.classList.add("completed");
                 }
                 
                 // Marcar día actual
                 if (date.toDateString() === new Date().toDateString()) {
-                    dayElement.classList.add('today');
+            dayElement.classList.add("today");
                 }
                 
                 // Marcar días de otros meses
                 if (date.getMonth() !== month) {
-                    dayElement.classList.add('other-month');
+            dayElement.classList.add("other-month");
                 }
                 
                 calendarGrid.appendChild(dayElement);
@@ -2492,15 +6297,21 @@
             } else {
                 completedExercises--;
             }
+
+        console.log(
+          "Ejercicios completados:",
+          completedExercises,
+          "de",
+          totalExercises
+        );
             
             // Verificar si todos los ejercicios están completados
             if (completedExercises === totalExercises) {
-                alert('¡Entrenamiento completado! 🎉');
-                // Marcar el día como completado en el calendario
-                const today = document.querySelector('.calendar-day.today');
-                if (today) {
-                    today.classList.add('completed');
-                }
+          console.log(
+            "¡Todos los ejercicios completados! Mostrando pantalla de éxito..."
+          );
+          // Mostrar la pantalla de meta semanal en lugar del alert
+          showScreen("success");
             }
         }
 
@@ -2517,44 +6328,260 @@
 
         // Funciones para modales
         function showModal(modalId) {
-            document.getElementById(modalId + '-modal').style.display = 'block';
+        document.getElementById(modalId + "-modal").classList.add("show");
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId + '-modal').style.display = 'none';
+        document.getElementById(modalId + "-modal").classList.remove("show");
+      }
+
+      // Función para mostrar modal de instrucciones QR
+            function showQRInstructionsModal() {
+        document.getElementById("qr-instructions-modal").classList.add("show");
+      }
+
+      function showNewWeightRecord() {
+        showScreen('new-weight-record-screen');
+      }
+
+      function showWeightDetails(weightType) {
+        console.log("Mostrando detalles de:", weightType);
+        alert("Funcionalidad de historial de " + weightType + " en desarrollo");
+      }
+
+      function deleteLastWeightRecord() {
+        if (confirm("¿Estás seguro de que quieres eliminar el último registro?")) {
+          console.log("Eliminando último registro de pesaje");
+          alert("Último registro eliminado");
         }
+      }
+
+      function showWeightHelp(fieldType) {
+        let message = '';
+        switch(fieldType) {
+          case 'fat':
+            message = 'El porcentaje de grasa corporal es una medida de la cantidad de grasa en tu cuerpo en relación con tu peso total.';
+            break;
+          case 'muscle':
+            message = 'La masa muscular se refiere al peso total de los músculos en tu cuerpo.';
+            break;
+          default:
+            message = 'Información de ayuda no disponible.';
+        }
+        alert(message);
+      }
+
+      function saveWeightRecord(event) {
+        event.preventDefault();
+        
+        const weight = document.getElementById('weight-input').value;
+        const height = document.getElementById('height-input').value;
+        const fat = document.getElementById('fat-input').value;
+        const muscle = document.getElementById('muscle-input').value;
+
+        // Validar campos requeridos
+        if (!weight || !height) {
+          alert('Por favor completa los campos obligatorios (Peso y Altura)');
+          return;
+        }
+
+        // Validar que los valores sean positivos
+        if (weight <= 0 || height <= 0) {
+          alert('Los valores deben ser mayores a 0');
+          return;
+        }
+
+        // Crear objeto con los datos
+        const recordData = {
+          weight: parseFloat(weight),
+          height: parseInt(height),
+          fat: fat ? parseFloat(fat) : null,
+          muscle: muscle ? parseFloat(muscle) : null,
+          date: new Date().toISOString().split('T')[0]
+        };
+
+        console.log('Guardando registro de pesaje:', recordData);
+        
+        // Aquí se puede implementar la lógica para guardar en localStorage o enviar al servidor
+        alert('Registro guardado exitosamente');
+        
+        // Regresar a la pantalla de mediciones
+        showScreen('my-measurements');
+      }
+
+      // Funciones para la nueva pantalla de mediciones
+      function showNewMeasurementRecord() {
+        console.log('=== NAVEGANDO A NUEVO REGISTRO MANUAL ===');
+        
+        // Ocultar todas las pantallas
+        const allScreens = document.querySelectorAll(".screen");
+        allScreens.forEach((screen) => {
+          screen.classList.remove("active");
+        });
+        
+        // Mostrar la pantalla de nuevo registro manual
+        const targetScreen = document.getElementById('new-weight-record-screen');
+        if (targetScreen) {
+          targetScreen.classList.add("active");
+          console.log('✅ Pantalla new-weight-record-screen activada');
+        } else {
+          console.error('❌ No se encontró la pantalla new-weight-record-screen');
+          alert('Error: No se pudo cargar la pantalla de nuevo registro');
+        }
+      }
+
+      function showMeasurementDetails(measurementType) {
+        console.log("Mostrando detalles de:", measurementType);
+        alert("Funcionalidad de historial de " + measurementType + " en desarrollo");
+      }
+
+      function deleteLastMeasurement() {
+        if (confirm("¿Estás seguro de que quieres eliminar el último registro?")) {
+          console.log("Eliminando último registro de mediciones");
+          alert("Último registro eliminado");
+        }
+      }
+
+      function performBioimpedance() {
+        console.log("Iniciando bioimpedancia");
+        alert("Funcionalidad de bioimpedancia en desarrollo");
+      }
+
+      // Función de prueba para debuggear la navegación de mediciones
+      function testMeasurementNavigation() {
+        console.log('🧪 PRUEBA DE NAVEGACIÓN DE MEDICIONES');
+        
+        // Verificar que el botón existe
+        const button = document.querySelector('button[onclick="showNewMeasurementRecord()"]');
+        console.log('Botón NUEVO REGISTRO MANUAL encontrado:', button);
+        
+        // Verificar que las pantallas existen
+        const measurementsScreen = document.getElementById('my-measurements-screen');
+        const newRecordScreen = document.getElementById('new-weight-record-screen');
+        console.log('Pantalla my-measurements-screen encontrada:', measurementsScreen);
+        console.log('Pantalla new-weight-record-screen encontrada:', newRecordScreen);
+        
+        // Verificar el estado actual
+        const activeScreen = document.querySelector('.screen.active');
+        console.log('Pantalla activa actual:', activeScreen ? activeScreen.id : 'ninguna');
+        
+        // Probar navegación
+        console.log('Probando navegación a new-weight-record-screen...');
+        showNewMeasurementRecord();
+        
+        setTimeout(() => {
+          const newActiveScreen = document.querySelector('.screen.active');
+          console.log('Pantalla activa después de new-weight-record-screen:', newActiveScreen ? newActiveScreen.id : 'ninguna');
+          
+          if (newActiveScreen && newActiveScreen.id === 'new-weight-record-screen') {
+            console.log('✅ NAVEGACIÓN EXITOSA - Pantalla correcta activada');
+          } else {
+            console.error('❌ ERROR - Pantalla incorrecta activada');
+          }
+        }, 100);
+      }
+
+      // Función de prueba para debuggear la navegación de pesaje
+      function testWeightNavigation() {
+        console.log('🧪 PRUEBA DE NAVEGACIÓN DE PESAJE');
+        
+        // Verificar que el botón existe
+        const button = document.querySelector('button[onclick="showNewWeightRecord()"]');
+        console.log('Botón NUEVO REGISTRO encontrado:', button);
+        
+        // Verificar que las pantallas existen
+        const weightScreen = document.getElementById('weight-screen');
+        const newWeightScreen = document.getElementById('new-weight-record-screen');
+        console.log('Pantalla weight-screen encontrada:', weightScreen);
+        console.log('Pantalla new-weight-record-screen encontrada:', newWeightScreen);
+        
+        // Verificar el estado actual
+        const activeScreen = document.querySelector('.screen.active');
+        console.log('Pantalla activa actual:', activeScreen ? activeScreen.id : 'ninguna');
+        
+        // Probar navegación
+        console.log('Probando navegación a weight-screen...');
+        showScreen('weight-screen');
+        
+        setTimeout(() => {
+          const newActiveScreen = document.querySelector('.screen.active');
+          console.log('Pantalla activa después de weight-screen:', newActiveScreen ? newActiveScreen.id : 'ninguna');
+        }, 100);
+      }
 
         // Función de logout
         function logout() {
-            if (confirm('¿Estás seguro de que quieres salir de la aplicación?')) {
-                localStorage.removeItem('isLoggedIn');
-                showScreen('main');
+        if (confirm("¿Estás seguro de que quieres salir de la aplicación?")) {
+          localStorage.removeItem("isLoggedIn");
+          showScreen("main");
+        }
+      }
+
+      // Funciones para el modal de finalizar entrenamiento
+      function showFinishWorkoutModal() {
+        document.getElementById("finish-workout-modal").classList.add("show");
+      }
+
+      function closeFinishWorkoutModal() {
+        document
+          .getElementById("finish-workout-modal")
+          .classList.remove("show");
+      }
+
+      function confirmFinishWorkout() {
+        closeFinishWorkoutModal();
+        showScreen("success");
+      }
+
+      // Función para compartir éxito
+      function shareSuccess() {
+        if (navigator.share) {
+          navigator.share({
+            title: "¡Meta semanal alcanzada!",
+            text: "He completado mi meta semanal de entrenamiento en GymApp 🏋️",
+            url: window.location.href,
+          });
+        } else {
+          // Fallback para navegadores que no soportan Web Share API
+          const text =
+            "¡Meta semanal alcanzada! He completado mi meta semanal de entrenamiento en GymApp 🏋️";
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+              alert("¡Texto copiado al portapapeles!");
+            });
+          } else {
+            alert("¡Meta semanal alcanzada! 🎉");
+          }
             }
         }
 
         // Cerrar modales al hacer clic fuera de ellos
-        window.onclick = function(event) {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
+      window.onclick = function (event) {
+        const modals = document.querySelectorAll(".modal");
+        modals.forEach((modal) => {
                 if (event.target === modal) {
-                    modal.style.display = 'none';
+            modal.classList.remove("show");
                 }
             });
+
+        // Cerrar modal de finalizar entrenamiento
+        const finishModal = document.getElementById("finish-workout-modal");
+        if (event.target === finishModal) {
+          finishModal.classList.remove("show");
         }
+      };
 
         // Verificar si el usuario ya está logueado al cargar la página
-        window.onload = function() {
-            if (localStorage.getItem('isLoggedIn') === 'true') {
-                showScreen('dashboard');
+      window.onload = function () {
+        if (localStorage.getItem("isLoggedIn") === "true") {
+          showScreen("dashboard");
             }
             
             // Generar QR inicial si estamos en la pantalla de QR
-            if (currentScreen === 'qr') {
+        if (currentScreen === "qr") {
                 setTimeout(generateQR, 100);
             }
-        }
-
-
+      };
     </script>
 </body>
 </html>
