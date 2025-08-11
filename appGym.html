@@ -2183,6 +2183,173 @@
         transform: translateY(0);
       }
 
+      /* Estilos para la pantalla de detalle del ejercicio */
+      .exercise-detail-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 25px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .exercise-detail-header .header-left,
+      .exercise-detail-header .header-right {
+        flex: 1;
+      }
+
+      .exercise-detail-header .header-center {
+        flex: 2;
+        text-align: center;
+      }
+
+      .exercise-detail-header h1 {
+        font-size: 20px;
+        font-weight: 800;
+        color: white;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .exercise-detail-header .back-arrow {
+        font-size: 28px;
+        color: white;
+        cursor: pointer;
+        padding: 12px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .exercise-detail-header .back-arrow:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+
+      .exercise-detail-content {
+        background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: calc(100vh - 80px);
+        padding: 0;
+        position: relative;
+      }
+
+      .exercise-detail-image {
+        width: 100%;
+        height: 350px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      }
+
+      .exercise-detail-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%);
+        z-index: 1;
+      }
+
+      .exercise-detail-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+      }
+
+      .exercise-detail-image:hover img {
+        transform: scale(1.05);
+      }
+
+      .exercise-detail-info {
+        padding: 30px 25px;
+        background: white;
+        margin: -20px 20px 20px 20px;
+        border-radius: 25px 25px 0 0;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .exercise-detail-info h2 {
+        font-size: 28px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 30px;
+        line-height: 1.4;
+        text-align: center;
+        text-shadow: none;
+      }
+
+      .exercise-detail-sets {
+        margin-top: 40px;
+      }
+
+      .sets-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .sets-box::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+      }
+
+      @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+      }
+
+      .sets-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .sets-value {
+        font-size: 32px;
+        font-weight: 900;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 2;
+      }
+
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -4627,7 +4794,7 @@
                 </div>
                 
                 <div class="exercise-list">
-                    <div class="exercise-item">
+                    <div class="exercise-item" onclick="showExerciseDetail('cardio')">
             <input
               type="checkbox"
               class="exercise-checkbox"
@@ -4643,7 +4810,7 @@
                         <div class="exercise-arrow">→</div>
                     </div>
                     
-                    <div class="exercise-item">
+                    <div class="exercise-item" onclick="showExerciseDetail('mariposa')">
             <input
               type="checkbox"
               class="exercise-checkbox"
@@ -4661,7 +4828,7 @@
                         <div class="exercise-arrow">→</div>
                     </div>
                     
-                    <div class="exercise-item">
+                    <div class="exercise-item" onclick="showExerciseDetail('rodilla')">
             <input
               type="checkbox"
               class="exercise-checkbox"
@@ -4679,7 +4846,7 @@
                         <div class="exercise-arrow">→</div>
                     </div>
                     
-                    <div class="exercise-item">
+                    <div class="exercise-item" onclick="showExerciseDetail('tronco')">
             <input
               type="checkbox"
               class="exercise-checkbox"
@@ -4702,6 +4869,36 @@
           <button class="finish-btn" onclick="showFinishWorkoutModal()">
             Finalizar entrenamiento
           </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Detalle del Ejercicio -->
+        <div id="exercise-detail-view-screen" class="screen">
+            <div class="exercise-detail-header">
+                <div class="header-left">
+                    <div class="back-arrow" onclick="showScreen('exercise-detail')">←</div>
+                </div>
+                <div class="header-center">
+                    <h1>Entrenamiento E</h1>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="exercise-detail-content">
+                <div class="exercise-detail-image">
+                    <img id="exercise-detail-img" src="" alt="Ejercicio" />
+                </div>
+                
+                <div class="exercise-detail-info">
+                    <h2 id="exercise-detail-title">Acostado Pierna Flexionada(1/2 Mariposa)</h2>
+                    
+                    <div class="exercise-detail-sets">
+                        <div class="sets-box">
+                            <div class="sets-title">Series y Repeticiones</div>
+                            <div class="sets-value" id="exercise-detail-sets">3x 8 a 10</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -6445,6 +6642,59 @@
       function performBioimpedance() {
         console.log("Iniciando bioimpedancia");
         alert("Funcionalidad de bioimpedancia en desarrollo");
+      }
+
+      // Función para mostrar el detalle del ejercicio
+      function showExerciseDetail(exerciseType) {
+        console.log('Mostrando detalle del ejercicio:', exerciseType);
+        
+        // Ocultar todas las pantallas
+        const allScreens = document.querySelectorAll(".screen");
+        allScreens.forEach((screen) => {
+          screen.classList.remove("active");
+        });
+        
+        // Mostrar la pantalla de detalle
+        const detailScreen = document.getElementById('exercise-detail-view-screen');
+        if (detailScreen) {
+          detailScreen.classList.add("active");
+          
+          // Configurar el contenido según el tipo de ejercicio
+          configureExerciseDetail(exerciseType);
+        }
+      }
+
+      // Función para configurar el contenido del ejercicio
+      function configureExerciseDetail(exerciseType) {
+        const exerciseData = {
+          'cardio': {
+            title: 'Cardio - Escalera',
+            sets: '30 min',
+            image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop'
+          },
+          'mariposa': {
+            title: 'Acostado Pierna Flexionada(1/2 Mariposa)',
+            sets: '3x 8 a 10',
+            image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop'
+          },
+          'rodilla': {
+            title: 'Flexión De Rodilla Con Apoyo Unilateral',
+            sets: '3x 8 a 10',
+            image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop'
+          },
+          'tronco': {
+            title: 'Rotación Del Tronco Con Elevación De Pierna',
+            sets: '3x 8 a 10',
+            image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop'
+          }
+        };
+
+        const data = exerciseData[exerciseType] || exerciseData['mariposa'];
+        
+        // Actualizar el contenido
+        document.getElementById('exercise-detail-title').textContent = data.title;
+        document.getElementById('exercise-detail-sets').textContent = data.sets;
+        document.getElementById('exercise-detail-img').src = data.image;
       }
 
       // Función de prueba para debuggear la navegación de mediciones
