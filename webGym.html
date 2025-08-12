@@ -1,0 +1,3312 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Gym • Dashboard</title>
+    <style>
+      :root {
+        --bg: #f5f5f5; /* Fondo gris claro */
+        --panel: #f0f0f0; /* Panel gris medio */
+        --muted: #e8e8e8; /* Elementos secundarios gris medio */
+        --text: #000000; /* Texto principal negro puro */
+        --sub: #000000; /* Texto secundario negro puro */
+        --brand: #da83e0; /* Rosa/magenta principal */
+        --accent: #da83e0; /* Acentos en rosa */
+        --warn: #ffa726; /* Naranja para advertencias */
+        --danger: #ef5350; /* Rojo para errores */
+        --ok: #66bb6a; /* Verde para éxito */
+        --card: #ffffff; /* Tarjetas blancas */
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        --radius: 8px;
+        --gradient: linear-gradient(135deg, #da83e0 0%, #c973cf 100%);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f5f5f5;
+        color: var(--text);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+      }
+      a {
+        color: var(--text);
+        text-decoration: none;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .btn {
+        border: 0;
+        cursor: pointer;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        background: #333333;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        font-size: 0.9rem;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        background: #222222;
+      }
+      .btn.primary {
+        background: var(--gradient);
+        color: white;
+        font-weight: 700;
+      }
+      .btn.primary:hover {
+        background: linear-gradient(135deg, #c973cf 0%, #b863b5 100%);
+      }
+      .btn.success {
+        background: var(--ok);
+        color: white;
+      }
+      .btn.warn {
+        background: var(--warn);
+        color: white;
+      }
+      .btn.danger {
+        background: var(--danger);
+        color: white;
+      }
+      .btn.ghost {
+        background: transparent;
+        border: 2px solid var(--brand);
+        color: var(--text);
+      }
+      .btn.ghost:hover {
+        background: var(--brand);
+        color: white;
+      }
+      .pill {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        background: #e0e0e0;
+        color: var(--text);
+        border: 1px solid #d0d0d0;
+        font-weight: 500;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        min-height: 100dvh;
+        width: 100vw;
+      }
+      .sidebar {
+        background: rgba(240, 240, 240, 0.95);
+        backdrop-filter: blur(20px);
+        border-right: 1px solid #d0d0d0;
+        padding: 1rem;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100dvh;
+        width: 240px;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+        transition: all 0.3s ease;
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+        width: 240px;
+      }
+      .sidebar.closed {
+        width: 60px;
+        padding: 0.5rem;
+        transform: translateX(0);
+      }
+      .sidebar.closed .brand {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .sidebar.closed .brand .logo {
+        width: 40px;
+        height: 40px;
+      }
+      .sidebar.closed .brand .logo img {
+        width: 40px !important;
+        height: 40px !important;
+      }
+      .sidebar.closed nav,
+      .sidebar.closed .sep,
+      .sidebar.closed .btn {
+        display: none;
+      }
+      .sidebar.closed .menu-toggle {
+        display: flex;
+      }
+      .menu-toggle {
+        background: none;
+        border: none;
+        color: var(--text);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .menu-toggle:hover {
+        background: rgba(218, 131, 224, 0.1);
+        color: var(--brand);
+      }
+      .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        pointer-events: none;
+      }
+      .sidebar-overlay.open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--muted);
+      }
+      .brand .logo {
+        width: 200px;
+        height: 50px;
+        border-radius: 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: white;
+        font-size: 1.2rem;
+        box-shadow: 0 8px 24px rgba(218, 131, 224, 0.014);
+      }
+      .brand h1 {
+        font-size: 1.3rem;
+        margin: 0;
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+      }
+      nav {
+        display: grid;
+        gap: 0.5rem;
+      }
+      nav button {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 0.5rem;
+      }
+      nav button:hover {
+        background: rgba(218, 131, 224, 0.1);
+        border-color: var(--brand);
+      }
+      .content {
+        padding: 2rem;
+        background: #f5f5f5;
+        margin-left: 60px;
+        transition: margin-left 0.3s ease;
+        width: calc(100vw - 60px);
+      }
+      .sidebar.open + .content {
+        margin-left: 60px;
+        width: calc(100vw - 60px);
+      }
+      @media (min-width: 768px) {
+        .sidebar {
+          position: sticky;
+          transform: translateX(0);
+          width: auto;
+        }
+        .content {
+          margin-left: 0;
+          width: 100%;
+        }
+        .sidebar .menu-toggle {
+          display: none;
+        }
+      }
+      .sidebar .menu-toggle:hover {
+        background: rgba(218, 131, 224, 0.1);
+        color: var(--brand);
+      }
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        background: #f0f0f0;
+        border-radius: var(--radius);
+        border: 1px solid #d0d0d0;
+        box-shadow: var(--shadow);
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid #e0e0e0;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        transition: all 0.2s ease;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: var(--brand);
+        background: #f8f8f8;
+      }
+      .grid {
+        display: grid;
+        gap: 1.5rem;
+      }
+      .grid.cols-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .grid.cols-2.qr-layout {
+        grid-template-columns: 0.6fr 1.4fr;
+      }
+      .grid.cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .grid.cols-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .grid.cols-5 {
+        grid-template-columns: repeat(5, 1fr);
+      }
+      @media (max-width: 1100px) {
+        .grid.cols-3,
+        .grid.cols-4,
+        .grid.cols-5 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 800px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: static;
+          height: auto;
+        }
+        .grid.cols-2,
+        .grid.cols-3,
+        .grid.cols-4,
+        .grid.cols-5 {
+          grid-template-columns: 1fr;
+        }
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--panel);
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+      }
+      th,
+      td {
+        padding: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+        text-align: left;
+        font-size: 0.95rem;
+      }
+      thead th {
+        font-size: 0.85rem;
+        color: var(--text);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        background: #e0e0e0;
+      }
+      tbody tr:hover {
+        background: rgba(218, 131, 224, 0.08);
+      }
+      .input,
+      .select,
+      .date {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        background: #e8e8e8;
+        color: var(--text);
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+      }
+      .input:focus,
+      .select:focus,
+      .date:focus {
+        outline: none;
+        border-color: var(--brand);
+        background: #d8d8d8;
+        box-shadow: 0 0 0 3px rgba(218, 131, 224, 0.1);
+      }
+      .row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .kpi {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 16px;
+        background: var(--panel);
+        border: 2px solid var(--brand);
+        object-fit: cover;
+        box-shadow: 0 8px 24px rgba(218, 131, 224, 0.2);
+      }
+      .section-title {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        color: var(--text);
+        font-weight: 700;
+      }
+      .section-title::before {
+        content: "";
+        width: 4px;
+        height: 24px;
+        background: var(--gradient);
+        border-radius: 2px;
+      }
+      .muted {
+        color: var(--sub);
+      }
+      .badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 999px;
+        border: 1px solid;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+      .tag-success {
+        background: rgba(102, 187, 106, 0.1);
+        color: #66bb6a;
+        border-color: #66bb6a;
+      }
+      .tag-warn {
+        background: rgba(255, 167, 38, 0.1);
+        color: #ffa726;
+        border-color: #ffa726;
+      }
+      .tag-danger {
+        background: rgba(239, 83, 80, 0.1);
+        color: #ef5350;
+        border-color: #ef5350;
+      }
+      .mini {
+        font-size: 0.9rem;
+      }
+      .toolbar {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .video {
+        width: 100%;
+        border-radius: 16px;
+        background: var(--panel);
+        min-height: 250px;
+        border: 2px solid var(--muted);
+      }
+      .footer {
+        padding: 2rem;
+        color: var(--sub);
+        text-align: center;
+        margin-top: 2rem;
+        border-top: 1px solid var(--muted);
+      }
+      .login {
+        max-width: 450px;
+        margin: 10vh auto;
+        padding: 2rem;
+        background: var(--card);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(218, 131, 224, 0.2);
+        border: 2px solid var(--brand);
+      }
+      .brand-lg {
+        justify-content: center;
+        margin-bottom: 2rem;
+      }
+      .brand-lg .logo {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .sep {
+        height: 2px;
+        background: var(--gradient);
+        margin: 1.5rem 0;
+        border-radius: 1px;
+      }
+
+      /* Efectos adicionales */
+      .card h4 {
+        color: var(--text);
+        margin: 0 0 1rem 0;
+        font-weight: 600;
+      }
+
+      /* Animaciones */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .card {
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      /* Scrollbar personalizado */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #e8e8e8;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #c0c0c0;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- LOGIN -->
+    <section id="loginView" class="login card">
+      <div class="brand brand-lg">
+        <div class="logo">
+          <img
+            src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTIiIGZpbGw9IiNEQTgzRTAiLz4KPHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIxNSIgeT0iMTUiPgo8cGF0aCBkPSJNMTUgNUgxMFYxNUg1VjIwSDEwVjMwSDE1VjIwSDIwVjE1SDE1VjVaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+"
+            alt="GYM Admin"
+            style="width: 60px; height: 60px; object-fit: contain"
+          />
+        </div>
+        <div>
+          <h1>Admin Gym</h1>
+          <div class="muted mini">Dashboard Moderno</div>
+        </div>
+      </div>
+      <h2
+        style="
+          text-align: center;
+          margin: 0.2rem 0 1rem;
+          color: var(--text);
+          font-weight: 700;
+        "
+      >
+        Panel de Administración
+      </h2>
+      <div class="row">
+        <input
+          id="loginEmail"
+          class="input"
+          type="email"
+          placeholder="Correo"
+          value="admin@gym.com"
+        />
+        <input
+          id="loginPass"
+          class="input"
+          type="password"
+          placeholder="Contraseña"
+          value="admin123"
+        />
+        <button class="btn primary" onclick="doLogin()">Ingresar</button>
+      </div>
+      <p class="muted mini" style="margin-top: 0.6rem">
+        Demo: <b>admin@gym.com</b> / <b>admin123</b>
+      </p>
+    </section>
+
+    <!-- APP LAYOUT -->
+    <section id="appView" class="hidden">
+      <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+      <div class="layout">
+        <aside class="sidebar closed">
+          <div class="brand">
+            <div class="logo">
+              <img
+                src="https://i.postimg.cc/gJ1CkzFn/imagen-2025-08-10-181755691-removebg-preview.png"
+                alt="GYM Admin"
+                style="width: 80px; height: 60px"
+              />
+            </div>
+            <button class="menu-toggle" onclick="toggleSidebar()">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 12H21M3 6H21M3 18H21"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <nav id="menu"></nav>
+          <div class="sep"></div>
+          <button class="btn ghost" onclick="logout()">Cerrar sesión</button>
+        </aside>
+
+        <main class="content">
+          <div class="topbar">
+            <div class="row kpi">
+              <span class="pill" id="todayInfo"></span>
+              <span class="pill"
+                >Sucursal: <span id="sucursalActual">Matriz</span></span
+              >
+            </div>
+            <div class="toolbar">
+              <input
+                id="globalSearch"
+                class="input"
+                placeholder="Buscar cliente por nombre, cédula o teléfono"
+                oninput="quickSearch(this.value)"
+              />
+            </div>
+          </div>
+
+          <!-- DASHBOARD TABS RENDER -->
+          <div id="viewRoot" class="grid"></div>
+
+          <footer class="footer muted mini">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                max-width: 1200px;
+                margin: 0 auto;
+              "
+            >
+              <div>Dashboard Gym • Sistema de Administración</div>
+              <div style="display: flex; gap: 1rem; align-items: center">
+                <span style="color: var(--text)">●</span>
+                <span>Datos locales</span>
+                <span style="color: var(--text)">●</span>
+                <span>Sin backend</span>
+              </div>
+            </div>
+          </footer>
+        </main>
+      </div>
+    </section>
+
+    <!-- Modal Nuevo Cargo -->
+    <div
+      id="modalCargo"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        class="modal-content"
+        style="
+          background: white;
+          border-radius: 12px;
+          padding: 1rem;
+          width: 90%;
+          max-width: 350px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+          "
+        >
+          <h3
+            style="
+              margin: 0;
+              color: var(--text);
+              font-size: 1.3rem;
+              font-weight: 700;
+            "
+          >
+            Nuevo Cargo
+          </h3>
+          <button
+            onclick="cerrarModalCargo()"
+            style="
+              background: none;
+              border: none;
+              font-size: 1.5rem;
+              cursor: pointer;
+              color: var(--sub);
+            "
+          >
+            &times;
+          </button>
+        </div>
+
+        <form id="formCargo">
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Fecha</label
+            >
+            <div style="display: flex; align-items: center; gap: 0.5rem">
+              <input
+                type="datetime-local"
+                id="cargoFecha"
+                style="
+                  flex: 1;
+                  padding: 0.8rem;
+                  border: 1px solid var(--muted);
+                  border-radius: 6px;
+                  background: white;
+                "
+              />
+              <button
+                type="button"
+                style="
+                  background: var(--panel);
+                  border: 1px solid var(--muted);
+                  border-radius: 6px;
+                  padding: 0.8rem;
+                  cursor: pointer;
+                "
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 3H21V7H3V3ZM3 9H21V21H3V9Z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Detalle</label
+            >
+            <input
+              type="text"
+              id="cargoDetalle"
+              placeholder="Ingrese los detalles del Cargo..."
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid var(--muted);
+                border-radius: 6px;
+                background: white;
+              "
+            />
+          </div>
+
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Monto</label
+            >
+            <div style="display: flex; align-items: center">
+              <button
+                type="button"
+                style="
+                  background: var(--panel);
+                  border: 1px solid var(--muted);
+                  border-right: none;
+                  border-radius: 6px 0 0 6px;
+                  padding: 0.8rem;
+                  font-weight: 600;
+                  color: var(--text);
+                "
+              >
+                $
+              </button>
+              <input
+                type="number"
+                id="cargoMonto"
+                placeholder="Ingrese el monto..."
+                step="0.01"
+                style="
+                  flex: 1;
+                  padding: 0.8rem;
+                  border: 1px solid var(--muted);
+                  border-radius: 0 6px 6px 0;
+                  background: white;
+                "
+              />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Sucursal</label
+            >
+            <select
+              id="cargoSucursal"
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid var(--muted);
+                border-radius: 6px;
+                background: white;
+              "
+            >
+              <option value="Matriz">Matriz</option>
+              <option value="Ponciano">Ponciano</option>
+              <option value="QT">QT</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1.5rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Notas</label
+            >
+            <textarea
+              id="cargoNotas"
+              placeholder="Detalle del Cargo"
+              rows="3"
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid var(--muted);
+                border-radius: 6px;
+                background: white;
+                resize: vertical;
+              "
+            ></textarea>
+          </div>
+
+          <div style="margin-bottom: 1.5rem">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                cursor: pointer;
+              "
+            >
+              <input
+                type="checkbox"
+                id="cargoRegistrarPago"
+                style="margin: 0"
+              />
+              <span style="color: var(--text)"
+                >Registrar un pago por el mismo monto.</span
+              >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style="color: var(--sub)"
+              >
+                <path
+                  d="M9.09 9C9.3251 8.33167 9.78918 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.30197 14.92 10C14.92 12 11.92 13 11.92 13M12 17H12.01"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem">
+            <button
+              type="button"
+              onclick="cerrarModalCargo()"
+              style="
+                background: var(--panel);
+                color: var(--text);
+                border: 1px solid var(--muted);
+                padding: 0.8rem 1.5rem;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+              "
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M18 6L6 18M6 6L18 18"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              style="
+                background: var(--ok);
+                color: white;
+                border: none;
+                padding: 0.8rem 1.5rem;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+              "
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M7 10L12 15M12 15L17 10M12 15V3"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Nuevo Pago -->
+    <div
+      id="modalPago"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        class="modal-content"
+        style="
+          background: white;
+          border-radius: 12px;
+          padding: 1rem;
+          width: 90%;
+          max-width: 350px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+          "
+        >
+          <h3
+            style="
+              margin: 0;
+              color: var(--text);
+              font-size: 1.3rem;
+              font-weight: 700;
+            "
+          >
+            Nuevo Pago
+          </h3>
+          <button
+            onclick="cerrarModalPago()"
+            style="
+              background: none;
+              border: none;
+              font-size: 1.5rem;
+              cursor: pointer;
+              color: var(--sub);
+            "
+          >
+            &times;
+          </button>
+        </div>
+
+        <form id="formPago">
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Fecha</label
+            >
+            <div style="display: flex; align-items: center; gap: 0.5rem">
+              <input
+                type="datetime-local"
+                id="pagoFecha"
+                style="
+                  flex: 1;
+                  padding: 0.8rem;
+                  border: 1px solid var(--muted);
+                  border-radius: 6px;
+                  background: white;
+                "
+              />
+              <button
+                type="button"
+                style="
+                  background: var(--panel);
+                  border: 1px solid var(--muted);
+                  border-radius: 6px;
+                  padding: 0.8rem;
+                  cursor: pointer;
+                "
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 3H21V7H3V3ZM3 9H21V21H3V9Z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Detalle</label
+            >
+            <input
+              type="text"
+              id="pagoDetalle"
+              placeholder="Ingrese los detalles del Pago..."
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid var(--muted);
+                border-radius: 6px;
+                background: white;
+              "
+            />
+          </div>
+
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Monto</label
+            >
+            <div style="display: flex; align-items: center">
+              <button
+                type="button"
+                style="
+                  background: var(--panel);
+                  border: 1px solid var(--muted);
+                  border-right: none;
+                  border-radius: 6px 0 0 6px;
+                  padding: 0.8rem;
+                  font-weight: 600;
+                  color: var(--text);
+                "
+              >
+                $
+              </button>
+              <input
+                type="number"
+                id="pagoMonto"
+                placeholder="Ingrese el monto..."
+                step="0.01"
+                style="
+                  flex: 1;
+                  padding: 0.8rem;
+                  border: 1px solid var(--muted);
+                  border-radius: 0 6px 6px 0;
+                  background: white;
+                "
+              />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Método de Pago</label
+            >
+            <select
+              id="pagoMetodo"
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid var(--muted);
+                border-radius: 6px;
+                background: white;
+              "
+            >
+              <option value="Efectivo">Efectivo</option>
+              <option value="Tarjeta">Tarjeta</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Depósito">Depósito</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Sucursal</label
+            >
+            <select
+              id="pagoSucursal"
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid var(--muted);
+                border-radius: 6px;
+                background: white;
+              "
+            >
+              <option value="Matriz">Matriz</option>
+              <option value="Ponciano">Ponciano</option>
+              <option value="QT">QT</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1.5rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Notas</label
+            >
+            <textarea
+              id="pagoNotas"
+              placeholder="Detalle del Pago"
+              rows="3"
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid var(--muted);
+                border-radius: 6px;
+                background: white;
+                resize: vertical;
+              "
+            ></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem">
+            <button
+              type="button"
+              onclick="cerrarModalPago()"
+              style="
+                background: var(--panel);
+                color: var(--text);
+                border: 1px solid var(--muted);
+                padding: 0.8rem 1.5rem;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+              "
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M18 6L6 18M6 6L18 18"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              style="
+                background: var(--ok);
+                color: white;
+                border: none;
+                padding: 0.8rem 1.5rem;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+              "
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M7 10L12 15M12 15L17 10M12 15V3"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Nueva Membresía -->
+    <div
+      id="modalMembresia"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        class="modal-content"
+        style="
+          background: white;
+          border-radius: 12px;
+          padding: 1rem;
+          width: 90%;
+          max-width: 350px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+          "
+        >
+          <h3
+            style="
+              margin: 0;
+              color: var(--text);
+              font-size: 1.3rem;
+              font-weight: 700;
+            "
+          >
+            Nueva Membresía
+          </h3>
+          <button
+            onclick="cerrarModalMembresia()"
+            style="
+              background: none;
+              border: none;
+              font-size: 1.5rem;
+              cursor: pointer;
+              color: var(--sub);
+            "
+          >
+            &times;
+          </button>
+        </div>
+
+        <form id="formMembresia">
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Actividad</label
+            >
+            <select
+              id="membresiaActividad"
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid var(--muted);
+                border-radius: 6px;
+                background: white;
+              "
+            >
+              <option value="">Seleccionar actividad...</option>
+              <option value="Plan Anual">Plan Anual</option>
+              <option value="Plan Mensual">Plan Mensual</option>
+              <option value="Plan Trimestral">Plan Trimestral</option>
+              <option value="Plan Semanal">Plan Semanal</option>
+              <option value="Plan Diario">Plan Diario</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Fecha de Inicio</label
+            >
+            <input
+              type="date"
+              id="membresiaFechaInicio"
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid var(--muted);
+                border-radius: 6px;
+                background: white;
+              "
+            />
+          </div>
+
+          <div style="margin-bottom: 1rem">
+            <label
+              style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text);
+                font-weight: 600;
+              "
+              >Descuento</label
+            >
+            <select
+              id="membresiaDescuento"
+              style="
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid var(--muted);
+                border-radius: 6px;
+                background: white;
+              "
+            >
+              <option value="">Seleccionar descuento...</option>
+              <option value="Todas">Todas</option>
+              <option value="Sin descuento">Sin descuento</option>
+              <option value="10%">10%</option>
+              <option value="20%">20%</option>
+              <option value="30%">30%</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1.5rem">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                cursor: pointer;
+                color: var(--text);
+                font-weight: 600;
+              "
+            >
+              <input
+                type="checkbox"
+                id="membresiaCambioApp"
+                style="width: 18px; height: 18px; margin: 0; cursor: pointer"
+              />
+              Cambio en la app
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem">
+            <button
+              type="button"
+              onclick="cerrarModalMembresia()"
+              style="
+                background: var(--panel);
+                color: var(--text);
+                border: 1px solid var(--muted);
+                padding: 0.8rem 1.5rem;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+              "
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M18 6L6 18M6 6L18 18"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              style="
+                background: var(--ok);
+                color: white;
+                border: none;
+                padding: 0.8rem 1.5rem;
+                border-radius: 6px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+              "
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 5V19M5 12H19"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Agregar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      /******************** STATE Y UTILIDADES ********************/
+      const EL = (sel) => document.querySelector(sel);
+      const NOW = () => new Date();
+      const fmtDate = (d) =>
+        new Date(d).toLocaleDateString("es-EC", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        });
+      const fmtTime = (d) =>
+        new Date(d).toLocaleTimeString("es-EC", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      const daysDiff = (a, b) =>
+        Math.ceil((new Date(a) - new Date(b)) / (1000 * 60 * 60 * 24));
+      const uuid = () => crypto.randomUUID();
+
+      const DB = {
+        load() {
+          const data = JSON.parse(localStorage.getItem("gymdb_v1") || "{}");
+          this.users = data.users || seedUsers();
+          this.memberships = data.memberships || seedMemberships();
+          this.attendance = data.attendance || []; // {id, clientId, type:'entrada'|'salida', at}
+          this.payments = data.payments || []; // {id, clientId, amount, bank, note, at, user}
+          this.settings = data.settings || {
+            sucursal: "Matriz",
+            theme: "dark",
+          };
+          save();
+        },
+        users: [],
+        memberships: [],
+        attendance: [],
+        payments: [],
+        settings: {},
+      };
+      const save = () =>
+        localStorage.setItem(
+          "gymdb_v1",
+          JSON.stringify({
+            users: DB.users,
+            memberships: DB.memberships,
+            attendance: DB.attendance,
+            payments: DB.payments,
+            settings: DB.settings,
+          })
+        );
+
+      function seedMemberships() {
+        return [
+          {
+            id: "m1",
+            nombre: "Mensual",
+            frecuencia: "30 días",
+            monto: 25,
+            sucursal: "Matriz",
+            detalle: "Acceso ilimitado 30 días",
+          },
+          {
+            id: "m2",
+            nombre: "Trimestral",
+            frecuencia: "90 días",
+            monto: 65,
+            sucursal: "Matriz",
+            detalle: "Ahorra 13%",
+          },
+          {
+            id: "m3",
+            nombre: "Anual",
+            frecuencia: "365 días",
+            monto: 220,
+            sucursal: "Norte",
+            detalle: "Mejor precio",
+          },
+        ];
+      }
+      function seedUsers() {
+        const now = NOW();
+        const d = (n) => new Date(now.getTime() - n * 86400000);
+        return [
+          {
+            id: "u1",
+            nombres: "María",
+            apellidos: "López",
+            cedula: "1102345678",
+            nacimiento: "1995-08-22",
+            email: "maria@mail.com",
+            telefono: "+593991112223",
+            direccion: "Av. Amazonas",
+            genero: "Mujer",
+            foto: "",
+            obraSocial: "IESS",
+            notas: "Prefiere mañanas",
+            tipo: "Cliente",
+            activo: true,
+            membresia: "m1",
+            inscritoPrimera: d(190),
+            membresiaInicio: d(20),
+            membresiaFin: d(-10),
+            saldo: 0,
+            ultimoIngreso: d(1),
+            creadoAt: d(2),
+          },
+          {
+            id: "u2",
+            nombres: "Juan",
+            apellidos: "Pérez",
+            cedula: "1712345678",
+            nacimiento: "1990-11-10",
+            email: "juan@mail.com",
+            telefono: "+593997778889",
+            direccion: "La Floresta",
+            genero: "Hombre",
+            foto: "",
+            obraSocial: "",
+            notas: "",
+            tipo: "Cliente",
+            activo: true,
+            membresia: "m2",
+            inscritoPrimera: d(400),
+            membresiaInicio: d(50),
+            membresiaFin: d(-40),
+            saldo: 10,
+            ultimoIngreso: d(45),
+            creadoAt: d(10),
+          },
+          {
+            id: "u3",
+            nombres: "Ana",
+            apellidos: "Gómez",
+            cedula: "0609876543",
+            nacimiento: "2000-08-05",
+            email: "ana@mail.com",
+            telefono: "+593995551111",
+            direccion: "Centro",
+            genero: "Mujer",
+            foto: "",
+            obraSocial: "Privada",
+            notas: "",
+            tipo: "Cliente",
+            activo: true,
+            membresia: "m1",
+            inscritoPrimera: d(10),
+            membresiaInicio: d(5),
+            membresiaFin: d(-25),
+            saldo: 0,
+            ultimoIngreso: d(0),
+            creadoAt: d(0),
+          },
+          {
+            id: "u4",
+            nombres: "Pedro",
+            apellidos: "Cedeño",
+            cedula: "0912345678",
+            nacimiento: "1988-08-29",
+            email: "pedro@mail.com",
+            telefono: "+593994443333",
+            direccion: "Sur",
+            genero: "Hombre",
+            foto: "",
+            obraSocial: "",
+            notas: "Requiere asesorías",
+            tipo: "Cliente",
+            activo: false,
+            membresia: "m1",
+            inscritoPrimera: d(800),
+            membresiaInicio: d(120),
+            membresiaFin: d(30),
+            saldo: 50,
+            ultimoIngreso: d(61),
+            creadoAt: d(120),
+          },
+        ];
+      }
+
+      /******************** AUTENTICACIÓN (DEMO) ********************/
+      function doLogin() {
+        const email = EL("#loginEmail").value.trim();
+        const pass = EL("#loginPass").value.trim();
+        if (email === "admin@gym.com" && pass === "admin123") {
+          sessionStorage.setItem("auth", "ok");
+          EL("#loginView").classList.add("hidden");
+          EL("#appView").classList.remove("hidden");
+          initApp();
+        } else {
+          alert("Credenciales incorrectas");
+        }
+      }
+      function logout() {
+        sessionStorage.removeItem("auth");
+        location.reload();
+      }
+
+      /******************** APP INIT ********************/
+      const SECTIONS = [
+        { id: "ingreso", label: "Ingreso de clientes" },
+        { id: "clientes", label: "Ver todos los clientes" },
+        { id: "caducar", label: "Membresías a caducar" },
+        { id: "nuevos", label: "Nuevos clientes" },
+        { id: "inactivos", label: "Clientes inactivos" },
+        { id: "deudores", label: "Deudores" },
+        { id: "cumples", label: "Cumpleaños" },
+        { id: "registro", label: "Registrar nuevo cliente" },
+        { id: "export", label: "Exportar datos" },
+        { id: "membresias", label: "Membresías" },
+        { id: "pagos", label: "Informe de pago" },
+        { id: "cambio", label: "Sección de cambio" },
+      ];
+      let active = "ingreso";
+      let currentClientDetail = null; // Para la vista detallada del cliente
+
+      function initApp() {
+        DB.load();
+        EL("#todayInfo").textContent = new Date().toLocaleString("es-EC", {
+          weekday: "long",
+          day: "2-digit",
+          month: "short",
+        });
+        EL("#sucursalActual").textContent = DB.settings.sucursal;
+        // Menu
+        const nav = EL("#menu");
+        nav.innerHTML = "";
+        SECTIONS.forEach((s) => {
+          const b = document.createElement("button");
+          b.className = "btn" + (active === s.id ? " primary" : "");
+          b.textContent = s.label;
+          b.onclick = () => {
+            active = s.id;
+            [...nav.children].forEach((x) => x.classList.remove("primary"));
+            b.classList.add("primary");
+            render();
+            closeSidebar(); // Cerrar sidebar cuando se hace clic en un elemento del menú
+          };
+          nav.appendChild(b);
+        });
+        render();
+      }
+
+      /******************** RENDER ************************/
+      function render() {
+        const root = EL("#viewRoot");
+        root.innerHTML = "";
+        if (active === "cliente-detalle" && currentClientDetail)
+          return renderClienteDetalle(root, currentClientDetail);
+        if (active === "ingreso") return renderIngreso(root);
+        if (active === "clientes") return renderClientes(root);
+        if (active === "caducar") return renderCaducar(root);
+        if (active === "nuevos") return renderNuevos(root);
+        if (active === "inactivos") return renderInactivos(root);
+        if (active === "deudores") return renderDeudores(root);
+        if (active === "cumples") return renderCumples(root);
+        if (active === "registro") return renderRegistro(root);
+        if (active === "export") return renderExport(root);
+        if (active === "membresias") return renderMembresias(root);
+        if (active === "pagos") return renderPagos(root);
+        if (active === "cambio") return renderCambio(root);
+      }
+
+      /******************** SECCIÓN 1: INGRESO ********************/
+      function renderIngreso(root) {
+        const wrap = document.createElement("div");
+        wrap.className = "grid cols-2 qr-layout";
+
+        // Col 1: Escáner
+        const c1 = document.createElement("div");
+        c1.className = "card";
+        c1.innerHTML = `
+    <h3 class="section-title">Escáner QR (cámara)</h3>
+    <video id="cam" class="video" playsinline></video>
+    <div class="row" style="margin-top:.6rem">
+      <button class="btn" onclick="startCam()">Iniciar cámara</button>
+      <button class="btn ghost" onclick="stopCam()">Detener</button>
+    </div>
+    <div class="row" style="margin-top:.6rem">
+      <input id="qrManual" class="input" placeholder="Pega o escribe código QR (fallback)" />
+      <button class="btn success" onclick="onScanManual()">Simular escaneo</button>
+    </div>
+    <p class="muted mini">Nota: prototipo sin decodificador de QR. Use el campo para simular el código (por ejemplo, cédula o ID).</p>
+  `;
+
+        // Col 2: Info del cliente con acciones rápidas
+        const c2 = document.createElement("div");
+        c2.className = "card";
+        c2.innerHTML = `
+    <h3 class="section-title">Información del cliente</h3>
+    <div id="infoCliente">
+      <div class="muted">Escanee un código o búsquelo abajo…</div>
+    </div>
+    <div class="sep"></div>
+    <div class="row">
+      <input class="input" id="searchIngreso" placeholder="Buscar por nombre o cédula" oninput="buscarIngreso(this.value)" />
+      <button class="btn" onclick="limpiarIngreso()">Limpiar</button>
+    </div>
+    <div id="resultIngreso" style="margin-top:.6rem"></div>
+    <div class="sep"></div>
+    <div class="row">
+      <button class="btn success" onclick="registrar('entrada')">Registrar entrada</button>
+      <button class="btn warn" onclick="registrar('salida')">Registrar salida</button>
+      <button class="btn" onclick="verAsistenciasHoy()">Ver asistencias de hoy</button>
+    </div>
+    <div id="asistenciasHoy" style="margin-top:1rem"></div>
+  `;
+
+        wrap.append(c1, c2);
+        root.append(wrap);
+      }
+
+      let mediaStream = null;
+      let currentClient = null;
+      function startCam() {
+        stopCam();
+        navigator.mediaDevices
+          ?.getUserMedia({ video: { facingMode: "environment" } })
+          .then((stream) => {
+            mediaStream = stream;
+            const v = EL("#cam");
+            v.srcObject = stream;
+            v.play();
+          })
+          .catch(() => alert("No se pudo acceder a la cámara"));
+      }
+      function stopCam() {
+        if (mediaStream) {
+          mediaStream.getTracks().forEach((t) => t.stop());
+          mediaStream = null;
+          EL("#cam").srcObject = null;
+        }
+      }
+      function onScanManual() {
+        const code = EL("#qrManual").value.trim();
+        if (!code) return alert("Ingrese un código");
+        const u = DB.users.find((x) => x.cedula === code || x.id === code);
+        if (!u) return alert("No se encontró cliente para ese código");
+        showCliente(u);
+      }
+      function buscarIngreso(q) {
+        q = q.toLowerCase();
+        const res = DB.users.filter(
+          (u) =>
+            (u.nombres + " " + u.apellidos).toLowerCase().includes(q) ||
+            u.cedula.includes(q)
+        );
+        const cont = EL("#resultIngreso");
+        cont.innerHTML = res
+          .slice(0, 10)
+          .map(
+            (
+              u
+            ) => `<div class="row" style="justify-content:space-between;align-items:center;margin:.3rem 0">
+    <div>${u.nombres} ${u.apellidos} <span class="muted mini">(${u.cedula})</span></div>
+    <button class="btn" onclick='showClienteById("${u.id}")'>Seleccionar</button>
+  </div>`
+          )
+          .join("");
+      }
+      function limpiarIngreso() {
+        currentClient = null;
+        EL("#infoCliente").innerHTML =
+          '<div class="muted">Escanee un código o búsquelo abajo…</div>';
+      }
+      function showClienteById(id) {
+        const u = DB.users.find((x) => x.id === id);
+        if (u) showCliente(u);
+      }
+      function showCliente(u) {
+        currentClient = u;
+        const m = DB.memberships.find((m) => m.id === u.membresia);
+        const diasRest = daysDiff(u.membresiaFin, NOW());
+        const estado =
+          diasRest < 0
+            ? `<span class='badge tag-danger'>Caducada hace ${Math.abs(
+                diasRest
+              )} días</span>`
+            : diasRest <= 5
+            ? `<span class='badge tag-warn'>${diasRest} días para caducar</span>`
+            : `<span class='badge tag-success'>Vigente (${diasRest} días)</span>`;
+        EL("#infoCliente").innerHTML = `
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1rem;">
+      <!-- Columna izquierda: Información del cliente -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+          <div style="font-weight: 700; font-size: 1.4rem; color: var(--text);">${
+            u.nombres
+          } ${u.apellidos}</div>
+          <div style="background: var(--warn); color: white; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.9rem; font-weight: 500;">Vence en ${diasRest} días</div>
+        </div>
+        
+        <!-- Información de perfil mejorada -->
+        <div style="background: var(--card); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; font-size: 0.95rem;">
+            <div>
+              <div class="muted mini" style="margin-bottom: 0.3rem; font-weight: 600; color: var(--sub);">Cédula</div>
+              <div style="color: var(--text); font-weight: 600; font-size: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--muted);">${
+                u.cedula
+              }</div>
+            </div>
+            <div>
+              <div class="muted mini" style="margin-bottom: 0.3rem; font-weight: 600; color: var(--sub);">Teléfono</div>
+              <div style="color: var(--text); font-weight: 600; font-size: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--muted);">${
+                u.telefono || "-"
+              }</div>
+            </div>
+            <div>
+              <div class="muted mini" style="margin-bottom: 0.3rem; font-weight: 600; color: var(--sub);">Email</div>
+              <div style="color: var(--text); font-weight: 600; font-size: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--muted);">${
+                u.email || "-"
+              }</div>
+            </div>
+            <div>
+              <div class="muted mini" style="margin-bottom: 0.3rem; font-weight: 600; color: var(--sub);">Género</div>
+              <div style="color: var(--text); font-weight: 600; font-size: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--muted);">${
+                u.genero || "-"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div class="muted mini" style="margin-bottom: 0.3rem; font-weight: 600; color: var(--sub);">Dirección</div>
+              <div style="color: var(--text); font-weight: 600; font-size: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--muted);">${
+                u.direccion || "-"
+              }</div>
+            </div>
+            <div>
+              <div class="muted mini" style="margin-bottom: 0.3rem; font-weight: 600; color: var(--sub);">Tipo de Usuario</div>
+              <div style="color: var(--text); font-weight: 600; font-size: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--muted);">${
+                u.tipoUsuario || "Cliente Regular"
+              }</div>
+            </div>
+          </div>
+        </div>
+        
+
+      </div>
+      
+      <!-- Columna derecha: Foto del cliente -->
+      <div style="text-align: center;">
+        <div style="font-weight: 600; color: var(--text); margin-bottom: 0.8rem; font-size: 1.1rem;">Foto del Cliente</div>
+        <img class="avatar" src="${
+          u.foto ||
+          "https://i.pinimg.com/1200x/18/46/68/1846687bddac97ce0d0c949348e3f74f.jpg"
+        }" alt="avatar" style="width: 280px; height: 310px; border-radius: 12px; object-fit: cover; border: 3px solid var(--brand); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);">
+        
+        <!-- Información de sucursal -->
+        <div style="margin-top: 1rem; padding: 0.8rem; background: var(--card); border-radius: 8px; border: 1px solid var(--muted);">
+          <div style="font-weight: 600; color: var(--text); margin-bottom: 0.3rem; font-size: 0.9rem;">Sucursal</div>
+          <div style="color: var(--brand); font-weight: 700; font-size: 1rem;">${
+            u.sucursal || DB.settings.sucursal || "Matriz"
+          }</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="client-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+      <div class="stat-card" style="background: var(--card); border: 2px solid var(--brand); border-radius: var(--radius); padding: 1rem; text-align: center;">
+        <div class="muted mini" style="margin-bottom: 0.5rem; font-size: 0.85rem;">Membresía</div>
+        <div style="color: var(--text); font-weight: 600; font-size: 1.1rem;">${
+          m?.nombre || "-"
+        }</div>
+        <div style="color: var(--sub); font-size: 0.85rem;">${
+          m?.frecuencia || ""
+        }</div>
+      </div>
+      <div class="stat-card" style="background: var(--card); border: 2px solid var(--brand); border-radius: var(--radius); padding: 1rem; text-align: center;">
+        <div class="muted mini" style="margin-bottom: 0.5rem; font-size: 0.85rem;">Saldo</div>
+        <div style="color: var(--text); font-weight: 600; font-size: 1.1rem;">$ ${
+          u.saldo?.toFixed(2) || "0.00"
+        }</div>
+        <div style="color: var(--sub); font-size: 0.85rem;">Disponible</div>
+      </div>
+    </div>
+    
+    <div class="client-dates" style="background: var(--card); border: 1px solid var(--muted); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem;">
+      <div style="font-weight: 600; color: var(--text); margin-bottom: 0.8rem; font-size: 0.95rem;">Información de Fechas</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div style="text-align: center;">
+          <div class="muted mini" style="margin-bottom: 0.3rem; font-size: 0.8rem;">Primera inscripción</div>
+          <div style="color: var(--text); font-weight: 500; font-size: 0.9rem;">${fmtDate(
+            u.inscritoPrimera
+          )}</div>
+        </div>
+        <div style="text-align: center;">
+          <div class="muted mini" style="margin-bottom: 0.3rem; font-size: 0.8rem;">Inicio membresía</div>
+          <div style="color: var(--text); font-weight: 500; font-size: 0.9rem;">${fmtDate(
+            u.membresiaInicio
+          )}</div>
+        </div>
+        <div style="text-align: center;">
+          <div class="muted mini" style="margin-bottom: 0.3rem; font-size: 0.8rem;">Fin membresía</div>
+          <div style="color: var(--text); font-weight: 500; font-size: 0.9rem;">${fmtDate(
+            u.membresiaFin
+          )}</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Botones de acción después de la información de fechas -->
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+      <button class="btn" style="padding: 0.6rem 1.5rem; font-size: 1rem; background: var(--brand); color: white; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(218, 131, 224, 0.3);" onclick='editarCliente("${
+        u.id
+      }")'>✏️ Editar</button>
+      <button class="btn" style="padding: 0.6rem 1.5rem; font-size: 1rem; background: var(--ok); color: white; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(102, 187, 106, 0.3);" onclick='abrirPagos("${
+        u.id
+      }")'>💰 Pagos</button>
+      <a class="btn" style="padding: 0.6rem 1.5rem; font-size: 1rem; background: #25D366; color: white; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3); text-decoration: none; display: inline-flex; align-items: center;" target="_blank" href="https://wa.me/${(
+        u.telefono || ""
+      ).replace(/\D/g, "")}?text=Hola%20${encodeURIComponent(
+          u.nombres
+        )}">📱 WhatsApp</a>
+    </div>`;
+      }
+      function registrar(type) {
+        if (!currentClient) return alert("Seleccione un cliente");
+        DB.attendance.push({
+          id: uuid(),
+          clientId: currentClient.id,
+          type,
+          at: new Date().toISOString(),
+        });
+        if (type === "entrada")
+          currentClient.ultimoIngreso = new Date().toISOString();
+        save();
+        alert("Registrado: " + type);
+        verAsistenciasHoy();
+      }
+      function verAsistenciasHoy() {
+        const box = EL("#asistenciasHoy");
+        if (!box) return;
+        const start = new Date();
+        start.setHours(0, 0, 0, 0);
+        const end = new Date();
+        end.setHours(23, 59, 59, 999);
+        const rows = DB.attendance
+          .filter((a) => new Date(a.at) >= start && new Date(a.at) <= end)
+          .map((a) => {
+            const u = DB.users.find((x) => x.id === a.clientId);
+            return `<tr><td>${fmtTime(a.at)}</td><td>${u?.nombres} ${
+              u?.apellidos
+            }</td><td>${a.type}</td></tr>`;
+          })
+          .join("");
+        box.innerHTML = `<table><thead><tr><th>Hora</th><th>Cliente</th><th>Tipo</th></tr></thead><tbody>${
+          rows || '<tr><td colspan=3 class="muted">Sin registros</td></tr>'
+        }</tbody></table>`;
+      }
+
+      /******************** SECCIÓN 2: CLIENTES ********************/
+      function renderClientes(root) {
+        const card = document.createElement("div");
+        card.className = "card";
+        const rows = DB.users
+          .map((u) => {
+            const mem = DB.memberships.find((m) => m.id === u.membresia);
+            const last = u.ultimoIngreso
+              ? fmtDate(u.ultimoIngreso) + " " + fmtTime(u.ultimoIngreso)
+              : "-";
+            return `<tr>
+      <td><b>${u.nombres} ${u.apellidos}</b><div class="muted mini">${
+              u.cedula
+            }</div></td>
+      <td>${mem?.nombre || "-"}</td>
+      <td>${last}</td>
+      <td>$ ${u.saldo?.toFixed(2) || "0.00"}</td>
+      <td class="row">
+        <button class="btn" onclick='abrirPagos("${u.id}")'>Ver pagos</button>
+        <button class="btn success" onclick='registrarPago("${
+          u.id
+        }")'>Registrar pago</button>
+        <a class="btn" target="_blank" href="https://wa.me/${(
+          u.telefono || ""
+        ).replace(/\D/g, "")}?text=Hola%20${encodeURIComponent(
+              u.nombres
+            )}">WhatsApp</a>
+      </td>
+    </tr>`;
+          })
+          .join("");
+        card.innerHTML = `
+    <h3 class="section-title">Todos los clientes</h3>
+    <table>
+      <thead><tr><th>Nombre</th><th>Membresía</th><th>Último ingreso</th><th>Saldo pendiente</th><th>Opciones</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+        root.append(card);
+      }
+
+      /******************** SECCIÓN 3: A CADUCAR ********************/
+      function renderCaducar(root) {
+        const caducados = [];
+        const porCaducar = [];
+        DB.users.forEach((u) => {
+          const d = daysDiff(u.membresiaFin, NOW());
+          if (d < 0) caducados.push(u);
+          else if (d <= 5) porCaducar.push(u);
+        });
+        const makeTable = (arr) =>
+          arr
+            .map((u) => {
+              const d = daysDiff(u.membresiaFin, NOW());
+              return `<tr>
+      <td>${u.nombres} ${u.apellidos} <span class="muted mini">(${
+                u.cedula
+              })</span></td>
+      <td>${fmtDate(u.membresiaFin)} ${
+                d < 0
+                  ? `<span class='badge tag-danger'>hace ${Math.abs(
+                      d
+                    )} días</span>`
+                  : `<span class='badge tag-warn'>${d} días</span>`
+              }</td>
+      <td class="row">
+        <button class="btn success" onclick='renovar("${
+          u.id
+        }")'>Registrar nuevo pago</button>
+        <button class="btn" onclick='activarQR("${
+          u.id
+        }")'>Activar app (QR)</button>
+      </td>
+    </tr>`;
+            })
+            .join("");
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+    <h3 class="section-title">Membresías a caducar y caducadas</h3>
+    <div class="grid cols-2">
+      <div class="card">
+        <h4>Caducadas</h4>
+        <table><thead><tr><th>Cliente</th><th>Fin</th><th>Acciones</th></tr></thead><tbody>${
+          makeTable(caducados) ||
+          '<tr><td colspan=3 class="muted">Nadie</td></tr>'
+        }</tbody></table>
+      </div>
+      <div class="card">
+        <h4>Por caducar (≤5 días)</h4>
+        <table><thead><tr><th>Cliente</th><th>Fin</th><th>Acciones</th></tr></thead><tbody>${
+          makeTable(porCaducar) ||
+          '<tr><td colspan=3 class="muted">Nadie</td></tr>'
+        }</tbody></table>
+      </div>
+    </div>`;
+        root.append(card);
+      }
+      function renovar(id) {
+        const u = DB.users.find((x) => x.id === id);
+        if (!u) return;
+        const mem = DB.memberships.find((m) => m.id === u.membresia);
+        const hoy = new Date();
+        u.membresiaInicio = hoy.toISOString();
+        const dias =
+          mem?.nombre === "Trimestral"
+            ? 90
+            : mem?.nombre === "Anual"
+            ? 365
+            : 30;
+        const fin = new Date(hoy.getTime() + dias * 86400000);
+        u.membresiaFin = fin.toISOString();
+        u.activo = true;
+        save();
+        alert("Membresía renovada");
+        render();
+      }
+      function activarQR(id) {
+        alert("QR activado para el cliente " + id + " (demo)");
+      }
+
+      /******************** SECCIÓN 4: NUEVOS CLIENTES ********************/
+      function renderNuevos(root) {
+        const arr = [...DB.users].sort(
+          (a, b) => new Date(b.creadoAt) - new Date(a.creadoAt)
+        );
+        const rows = arr
+          .map(
+            (u) => `<tr>
+    <td>${u.nombres} ${u.apellidos}</td>
+    <td>${fmtDate(u.creadoAt)} ${fmtTime(u.creadoAt)}</td>
+    <td>${DB.memberships.find((m) => m.id === u.membresia)?.nombre || "-"}</td>
+    <td>${DB.settings.sucursal}</td>
+  </tr>`
+          )
+          .join("");
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `<h3 class="section-title">Nuevos clientes</h3>
+    <table><thead><tr><th>Nombres y apellidos</th><th>Creado</th><th>Membresía</th><th>Sucursal</th></tr></thead><tbody>${rows}</tbody></table>`;
+        root.append(card);
+      }
+
+      /******************** SECCIÓN 5: INACTIVOS ********************/
+      function renderInactivos(root) {
+        const cut = new Date();
+        cut.setDate(cut.getDate() - 30);
+        const arr = DB.users.filter(
+          (u) =>
+            (!u.ultimoIngreso || new Date(u.ultimoIngreso) < cut) &&
+            new Date(u.membresiaFin) >= new Date()
+        );
+        const rows = arr
+          .map(
+            (u) => `<tr>
+    <td>${u.nombres} ${u.apellidos}</td>
+    <td>${DB.memberships.find((m) => m.id === u.membresia)?.nombre || "-"}</td>
+    <td>${u.ultimoIngreso ? fmtDate(u.ultimoIngreso) : "-"}</td>
+    <td class="row">
+      <a class="btn" target="_blank" href="https://wa.me/${(
+        u.telefono || ""
+      ).replace(/\D/g, "")}?text=Hola%20${encodeURIComponent(
+              u.nombres
+            )}">WhatsApp</a>
+      <button class="btn" onclick='abrirCuenta("${
+        u.id
+      }")'>Ver su cuenta</button>
+      <button class="btn success" onclick='registrarPago("${
+        u.id
+      }")'>Registrar pago</button>
+      <button class="btn warn" onclick='showClienteById("${
+        u.id
+      }");active="ingreso";render()'>Registrar asistencia</button>
+    </td>
+  </tr>`
+          )
+          .join("");
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `<h3 class="section-title">Clientes inactivos (≥30 días sin venir)</h3>
+  <table><thead><tr><th>Cliente</th><th>Membresía</th><th>Último ingreso</th><th>Opciones</th></tr></thead><tbody>${
+    rows || '<tr><td colspan=4 class="muted">No hay</td></tr>'
+  }</tbody></table>`;
+        root.append(card);
+      }
+
+      /******************** SECCIÓN 6: DEUDORES ********************/
+      function renderDeudores(root) {
+        const arr = DB.users.filter((u) => (u.saldo || 0) > 0);
+        const rows = arr
+          .map(
+            (u) => `<tr>
+    <td>${u.nombres} ${u.apellidos}</td>
+    <td>${DB.memberships.find((m) => m.id === u.membresia)?.nombre || "-"}</td>
+    <td>${u.ultimoIngreso ? fmtDate(u.ultimoIngreso) : "-"}</td>
+    <td>$ ${u.saldo.toFixed(2)}</td>
+    <td class="row">
+      <a class="btn" target="_blank" href="https://wa.me/${(
+        u.telefono || ""
+      ).replace(/\D/g, "")}?text=Hola%20${encodeURIComponent(
+              u.nombres
+            )}">WhatsApp</a>
+      <button class="btn" onclick='abrirCuenta("${
+        u.id
+      }")'>Ver su cuenta</button>
+      <button class="btn success" onclick='registrarPago("${
+        u.id
+      }")'>Registrar pago</button>
+      <button class="btn warn" onclick='showClienteById("${
+        u.id
+      }");active="ingreso";render()'>Registrar asistencia</button>
+    </td>
+  </tr>`
+          )
+          .join("");
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `<h3 class="section-title">Deudores</h3>
+  <table><thead><tr><th>Cliente</th><th>Membresía</th><th>Último ingreso</th><th>Saldo a deber</th><th>Opciones</th></tr></thead><tbody>${
+    rows || '<tr><td colspan=5 class="muted">No hay</td></tr>'
+  }</tbody></table>`;
+        root.append(card);
+      }
+
+      /******************** SECCIÓN 7: CUMPLEAÑOS ********************/
+      function renderCumples(root) {
+        const m = new Date().getMonth();
+        const arr = DB.users
+          .filter((u) => new Date(u.nacimiento).getMonth() === m)
+          .sort(
+            (a, b) =>
+              new Date(a.nacimiento).getDate() -
+              new Date(b.nacimiento).getDate()
+          );
+        const rows = arr
+          .map(
+            (u) =>
+              `<tr><td>${fmtDate(u.nacimiento)}</td><td>${u.nombres} ${
+                u.apellidos
+              }</td></tr>`
+          )
+          .join("");
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `<h3 class="section-title">Cumpleaños de este mes</h3>
+    <table><thead><tr><th>Fecha</th><th>Persona</th></tr></thead><tbody>${
+      rows || '<tr><td colspan=2 class="muted">Nadie cumple este mes</td></tr>'
+    }</tbody></table>`;
+        root.append(card);
+      }
+
+      /******************** SECCIÓN 8: REGISTRAR NUEVO CLIENTE ********************/
+      function renderRegistro(root) {
+        const card = document.createElement("div");
+        card.className = "card";
+        const memOpts = DB.memberships
+          .map(
+            (m) => `<option value="${m.id}">${m.nombre} – $${m.monto}</option>`
+          )
+          .join("");
+        card.innerHTML = `
+    <h3 class="section-title">Registrar un nuevo cliente</h3>
+    <div class="grid cols-2">
+      <div class="grid cols-2">
+        <input id="r_nombres" class="input" placeholder="Nombres" />
+        <input id="r_apellidos" class="input" placeholder="Apellidos" />
+        <input id="r_cedula" class="input" placeholder="Cédula" />
+        <input id="r_nac" class="date" type="date" placeholder="Fecha de nacimiento" />
+        <input id="r_email" class="input" placeholder="Email" />
+        <input id="r_tel" class="input" placeholder="Teléfono" />
+        <input id="r_dir" class="input" placeholder="Dirección" />
+        <select id="r_gen" class="select"><option>Hombre</option><option>Mujer</option></select>
+        <input id="r_foto" class="input" placeholder="URL Foto (opcional)" />
+        <input id="r_obra" class="input" placeholder="Obra Social" />
+        <input id="r_notas" class="input" placeholder="Notas" />
+        <select id="r_tipo" class="select" onchange="toggleCreds()"><option>Cliente</option><option>Empleado</option><option>Ingreso</option><option>Administrador</option></select>
+        <select id="r_mem" class="select">${memOpts}</select>
+      </div>
+      <div id="credBox" class="card" style="display:none">
+        <h4>Credenciales</h4>
+        <div class="grid cols-2">
+          <input id="r_clave" class="input" placeholder="Clave" />
+          <select id="r_activo" class="select"><option>si</option><option>no</option></select>
+        </div>
+        <p class="muted mini">Solo para roles: Empleado, Ingreso, Administrador</p>
+      </div>
+    </div>
+    <div class="row" style="margin-top:.8rem">
+      <button class="btn success" onclick="saveNuevo()">Guardar</button>
+    </div>`;
+        root.append(card);
+      }
+      function toggleCreds() {
+        const v = EL("#r_tipo").value;
+        EL("#credBox").style.display = v !== "Cliente" ? "block" : "none";
+      }
+      function saveNuevo() {
+        const u = {
+          id: uuid(),
+          nombres: EL("#r_nombres").value,
+          apellidos: EL("#r_apellidos").value,
+          cedula: EL("#r_cedula").value,
+          nacimiento: EL("#r_nac").value,
+          email: EL("#r_email").value,
+          telefono: EL("#r_tel").value,
+          direccion: EL("#r_dir").value,
+          genero: EL("#r_gen").value,
+          foto: EL("#r_foto").value,
+          obraSocial: EL("#r_obra").value,
+          notas: EL("#r_notas").value,
+          tipo: EL("#r_tipo").value,
+          activo: true,
+          membresia: EL("#r_mem").value,
+          saldo: 0,
+          inscritoPrimera: new Date().toISOString(),
+          membresiaInicio: new Date().toISOString(),
+          membresiaFin: new Date(Date.now() + 30 * 86400000).toISOString(),
+          ultimoIngreso: null,
+          creadoAt: new Date().toISOString(),
+        };
+        if (!u.nombres || !u.apellidos || !u.cedula)
+          return alert("Complete nombres, apellidos y cédula");
+        DB.users.push(u);
+        save();
+        alert("Cliente creado");
+        render();
+      }
+
+      /******************** SECCIÓN 9: EXPORTAR DATOS ********************/
+      function renderExport(root) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+    <h3 class="section-title">Exportar asistencias a Excel (CSV)</h3>
+    <div class="row">
+      <input id="ex_from" class="date" type="date" />
+      <input id="ex_to" class="date" type="date" />
+      <button class="btn" onclick="doExport()">Exportar</button>
+    </div>
+    <p class="muted mini">Solo exporta clientes con asistencia entre las fechas.</p>`;
+        root.append(card);
+      }
+      function doExport() {
+        const from = new Date(EL("#ex_from").value);
+        const to = new Date(EL("#ex_to").value);
+        if (!EL("#ex_from").value || !EL("#ex_to").value)
+          return alert("Seleccione ambas fechas");
+        to.setHours(23, 59, 59, 999);
+        const rows = DB.attendance.filter(
+          (a) => new Date(a.at) >= from && new Date(a.at) <= to
+        );
+        const lines = [["Cliente", "Cédula", "Tipo", "Fecha", "Hora"]];
+        rows.forEach((a) => {
+          const u = DB.users.find((x) => x.id === a.clientId);
+          lines.push([
+            `${u?.nombres} ${u?.apellidos}`,
+            u?.cedula,
+            a.type,
+            fmtDate(a.at),
+            fmtTime(a.at),
+          ]);
+        });
+        const csv = lines
+          .map((r) =>
+            r
+              .map((x) => `"${(x ?? "").toString().replace(/"/g, '""')}"`)
+              .join(",")
+          )
+          .join("\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "asistencias.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      /******************** SECCIÓN 10: MEMBRESÍAS ********************/
+      function renderMembresias(root) {
+        const rows = DB.memberships
+          .map((m) => {
+            const clientes = DB.users.filter(
+              (u) => u.membresia === m.id
+            ).length;
+            return `<tr>
+      <td><b>${m.nombre}</b></td>
+      <td>${m.detalle}</td>
+      <td>${clientes}</td>
+      <td>${m.frecuencia}</td>
+      <td>${m.sucursal}</td>
+      <td>$ ${m.monto.toFixed(2)}</td>
+      <td class="row">
+        <button class="btn" onclick='editMem("${m.id}")'>Editar</button>
+        <button class="btn danger" onclick='delMem("${m.id}")'>Eliminar</button>
+      </td>
+    </tr>`;
+          })
+          .join("");
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+    <h3 class="section-title">Membresías</h3>
+    <div class="row" style="margin:.4rem 0">
+      <input id="mem_nom" class="input" placeholder="Nombre"/>
+      <input id="mem_det" class="input" placeholder="Detalle"/>
+      <input id="mem_freq" class="input" placeholder="Frecuencia (ej. 30 días)"/>
+      <input id="mem_suc" class="input" placeholder="Sucursal" value="${DB.settings.sucursal}"/>
+      <input id="mem_monto" class="input" type="number" placeholder="Monto"/>
+      <button class="btn success" onclick="addMem()">Agregar</button>
+    </div>
+    <table><thead><tr><th>Cuadro</th><th>Detalle</th><th>Clientes</th><th>Frecuencia</th><th>Sucursal</th><th>Monto</th><th>Acciones</th></tr></thead><tbody>${rows}</tbody></table>`;
+        root.append(card);
+      }
+      function addMem() {
+        const m = {
+          id: uuid(),
+          nombre: EL("#mem_nom").value,
+          detalle: EL("#mem_det").value,
+          frecuencia: EL("#mem_freq").value,
+          sucursal: EL("#mem_suc").value,
+          monto: Number(EL("#mem_monto").value || 0),
+        };
+        if (!m.nombre) return alert("Nombre requerido");
+        DB.memberships.push(m);
+        save();
+        render();
+      }
+      function editMem(id) {
+        const m = DB.memberships.find((x) => x.id === id);
+        if (!m) return;
+        const nom = prompt("Nombre", m.nombre);
+        if (nom == null) return;
+        m.nombre = nom;
+        save();
+        render();
+      }
+      function delMem(id) {
+        if (confirm("Eliminar membresía?")) {
+          DB.memberships = DB.memberships.filter((x) => x.id !== id);
+          save();
+          render();
+        }
+      }
+
+      /******************** SECCIÓN 11: INFORME DE PAGO ********************/
+      function renderPagos(root) {
+        const card = document.createElement("div");
+        card.className = "card";
+        const clienteOpts = DB.users
+          .map(
+            (u) =>
+              `<option value='${u.id}'>${u.nombres} ${u.apellidos}</option>`
+          )
+          .join("");
+        card.innerHTML = `
+    <h3 class="section-title">Informe de pago</h3>
+    <div class="grid cols-2">
+      <select id="pay_user" class="select">${clienteOpts}</select>
+      <input id="pay_date" class="date" type="date" value="${new Date()
+        .toISOString()
+        .slice(0, 10)}" />
+      <input id="pay_bank" class="input" placeholder="Banco" />
+      <input id="pay_amount" class="input" type="number" placeholder="Monto" />
+      <input id="pay_det1" class="input" placeholder="Detalle (opcional)" />
+      <input id="pay_det2" class="input" placeholder="Detalle (opcional)" />
+      <input id="pay_userName" class="input" placeholder="Usuario que informa" value="Admin" />
+    </div>
+    <div class="row" style="margin-top:.8rem">
+      <button class="btn success" onclick="informarPago()">Informar</button>
+    </div>
+    <div class="sep"></div>
+    <h4>Pagos informados</h4>
+    <div id="pagosTabla"></div>`;
+        root.append(card);
+        drawPagosTabla();
+      }
+      function informarPago() {
+        const id = EL("#pay_user").value;
+        const amount = Number(EL("#pay_amount").value || 0);
+        if (!id || !amount) return alert("Seleccione cliente y monto");
+        DB.payments.push({
+          id: uuid(),
+          clientId: id,
+          amount,
+          bank: EL("#pay_bank").value,
+          note: (EL("#pay_det1").value + " " + EL("#pay_det2").value).trim(),
+          at: new Date(EL("#pay_date").value).toISOString(),
+          user: EL("#pay_userName").value,
+        });
+        const u = DB.users.find((x) => x.id === id);
+        if (u) {
+          u.saldo = Math.max(0, (u.saldo || 0) - amount);
+        }
+        save();
+        alert("Pago registrado");
+        drawPagosTabla();
+      }
+      function drawPagosTabla() {
+        const rows = DB.payments
+          .slice()
+          .reverse()
+          .map((p) => {
+            const u = DB.users.find((x) => x.id === p.clientId);
+            return `<tr><td>${fmtDate(p.at)}</td><td>${u?.nombres} ${
+              u?.apellidos
+            }</td><td>${p.bank || "-"}</td><td>$ ${p.amount.toFixed(
+              2
+            )}</td><td>${p.note || "-"}</td><td class='muted mini'>${
+              p.user || "-"
+            }</td></tr>`;
+          })
+          .join("");
+        EL(
+          "#pagosTabla"
+        ).innerHTML = `<table><thead><tr><th>Fecha</th><th>Cliente</th><th>Banco</th><th>Monto</th><th>Detalle</th><th>Usuario</th></tr></thead><tbody>${
+          rows || '<tr><td colspan=6 class="muted">Sin pagos</td></tr>'
+        }</tbody></table>`;
+      }
+      function abrirPagos(id) {
+        const cliente = DB.users.find((u) => u.id === id);
+        if (cliente) {
+          currentClientDetail = cliente;
+          active = "cliente-detalle";
+          render();
+        }
+      }
+      function registrarPago(id) {
+        active = "pagos";
+        render();
+        EL("#pay_user").value = id;
+        EL("#pay_amount").focus();
+      }
+      function abrirCuenta(id) {
+        alert("Cuenta de cliente " + id + " (demo)");
+      }
+
+      /******************** SECCIÓN 12: SECCIÓN DE CAMBIO ********************/
+      function renderCambio(root) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+    <h3 class="section-title">Sección de cambio</h3>
+    <div class="grid cols-2">
+      <div class="card">
+        <h4>Cambiar contraseña (demo)</h4>
+        <input id="chg_old" class="input" type="password" placeholder="Contraseña actual" />
+        <input id="chg_new" class="input" type="password" placeholder="Nueva contraseña" />
+        <button class="btn" style="margin-top:.6rem" onclick="alert('Contraseña actualizada (demo)')">Actualizar</button>
+      </div>
+      <div class="card">
+        <h4>Preferencias</h4>
+        <div class="row">
+          <input id="pref_suc" class="input" value="${DB.settings.sucursal}" placeholder="Sucursal" />
+          <button class="btn" onclick="changeSucursal()">Guardar</button>
+        </div>
+      </div>
+    </div>`;
+        root.append(card);
+      }
+      function changeSucursal() {
+        DB.settings.sucursal = EL("#pref_suc").value || "Matriz";
+        save();
+        EL("#sucursalActual").textContent = DB.settings.sucursal;
+        alert("Sucursal actualizada");
+      }
+
+      /******************** EDITAR CLIENTE (BÁSICO) ********************/
+      function editarCliente(id) {
+        const u = DB.users.find((x) => x.id === id);
+        if (!u) return;
+        const tel = prompt("Teléfono", u.telefono || "");
+        if (tel == null) return;
+        u.telefono = tel;
+        save();
+        showCliente(u);
+      }
+
+      /******************** BÚSQUEDA GLOBAL ********************/
+      function quickSearch(q) {
+        q = q.toLowerCase();
+        if (!q) {
+          return;
+        }
+        const u = DB.users.find(
+          (x) =>
+            (x.nombres + " " + x.apellidos).toLowerCase().includes(q) ||
+            x.cedula.includes(q) ||
+            (x.telefono || "").includes(q)
+        );
+        if (u) {
+          // Redirigir directamente a la pantalla detallada del cliente
+          currentClientDetail = u;
+          active = "cliente-detalle";
+          render();
+          // Limpiar el campo de búsqueda
+          document.getElementById("globalSearch").value = "";
+        }
+      }
+
+      /******************** TEMA ********************/
+      function toggleTheme() {
+        const body = document.body;
+        const dark = body.dataset.theme === "dark";
+        if (dark) {
+          body.dataset.theme = "light";
+          document.documentElement.style.setProperty("--bg", "#f5f5f5");
+          document.documentElement.style.setProperty("--panel", "#f0f0f0");
+          document.documentElement.style.setProperty("--card", "#ffffff");
+          document.documentElement.style.setProperty("--muted", "#e8e8e8");
+          document.documentElement.style.setProperty("--text", "#000000");
+          document.documentElement.style.setProperty("--sub", "#000000");
+        } else {
+          body.dataset.theme = "dark";
+          document.documentElement.style.setProperty("--bg", "#282624");
+          document.documentElement.style.setProperty("--panel", "#333333");
+          document.documentElement.style.setProperty("--card", "#3a3a3a");
+          document.documentElement.style.setProperty("--muted", "#444444");
+          document.documentElement.style.setProperty("--text", "#ffffff");
+          document.documentElement.style.setProperty("--sub", "#ffffff");
+        }
+      }
+
+      // Auto-login si ya está la sesión (demo)
+      if (sessionStorage.getItem("auth") === "ok") {
+        EL("#loginView").classList.add("hidden");
+        EL("#appView").classList.remove("hidden");
+        initApp();
+      }
+
+      /******************** VISTA DETALLADA DEL CLIENTE ********************/
+      function renderClienteDetalle(root, cliente) {
+        const diasRest = daysDiff(cliente.membresiaFin, NOW());
+        const estado =
+          diasRest < 0
+            ? `<span class='badge tag-danger'>Caducada hace ${Math.abs(
+                diasRest
+              )} días</span>`
+            : diasRest <= 5
+            ? `<span class='badge tag-warn'>${diasRest} días para caducar</span>`
+            : `<span class='badge tag-success'>Vigente (${diasRest} días)</span>`;
+
+        root.innerHTML = `
+          <div style="background: var(--card); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+            <!-- Header del cliente -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+              <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <img src="${
+                  cliente.foto ||
+                  "https://i.pinimg.com/1200x/18/46/68/1846687bddac97ce0d0c949348e3f74f.jpg"
+                }" 
+                     alt="Foto del cliente" 
+                     style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--brand);">
+                <div>
+                  <h2 style="margin: 0; color: var(--text); font-size: 1.8rem; font-weight: 700;">${
+                    cliente.nombres
+                  } ${cliente.apellidos}</h2>
+                  <p style="margin: 0.3rem 0 0 0; color: var(--sub); font-size: 1rem;">Usuario registrado el ${fmtDate(
+                    cliente.inscritoPrimera
+                  )}</p>
+                </div>
+              </div>
+              <div style="display: flex; gap: 1rem;">
+                <button class="btn" style="background: #25D366; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Enviar WhatsApp
+                </button>
+                
+              </div>
+            </div>
+
+            <!-- Barra de estado -->
+            <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; padding: 1rem; background: var(--panel); border-radius: 8px;">
+              <div style="background: var(--ok); color: white; padding: 0.4rem 1rem; border-radius: 6px; font-weight: 600;">Cuenta al día</div>
+              <div style="color: var(--text); font-weight: 600;">Cédula ${
+                cliente.cedula
+              }</div>
+              <div style="color: var(--text);">Última Asistencia: hace 1 hora</div>
+              
+            </div>
+
+                      <!-- Pestañas de navegación -->
+          <div style="display: flex; gap: 0; margin-bottom: 2rem; border-bottom: 2px solid var(--muted);">
+            <button class="tab-btn active" onclick="cambiarTabCliente('cuenta')" style="padding: 1rem 2rem; background: var(--brand); color: white; border: none; border-radius: 8px 8px 0 0; font-weight: 600; cursor: pointer;">$ Cuenta Corriente</button>
+            <button class="tab-btn" onclick="cambiarTabCliente('membresias')" style="padding: 1rem 2rem; background: transparent; color: var(--text); border: none; font-weight: 600; cursor: pointer;">Membresías</button>
+          </div>
+
+            <!-- Contenido de las pestañas -->
+            <div id="tab-content">
+              ${renderTabCuenta(cliente)}
+            </div>
+          </div>
+        `;
+      }
+
+      function cambiarTabCliente(tab) {
+        // Actualizar botones de pestañas
+        document.querySelectorAll(".tab-btn").forEach((btn) => {
+          btn.style.background = "transparent";
+          btn.style.color = "var(--text)";
+          btn.style.borderRadius = "0";
+        });
+        event.target.style.background = "var(--brand)";
+        event.target.style.color = "white";
+        event.target.style.borderRadius = "8px 8px 0 0";
+
+        // Actualizar contenido
+        const tabContent = document.getElementById("tab-content");
+        if (tab === "cuenta") {
+          tabContent.innerHTML = renderTabCuenta(currentClientDetail);
+        } else if (tab === "membresias") {
+          tabContent.innerHTML = renderTabMembresias(currentClientDetail);
+        }
+      }
+
+      function renderTabCuenta(cliente) {
+        return `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <span style="color: var(--text);">Mostrar</span>
+                <select style="border: 1px solid var(--muted); border-radius: 4px; padding: 0.3rem; background: white;">
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                </select>
+                <span style="color: var(--text);">registros</span>
+              </div>
+                             <div style="display: flex; gap: 1rem;">
+                 <button class="btn" onclick="abrirModalCargo()" style="background: var(--danger); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                   </svg>
+                   Nuevo Cargo
+                 </button>
+                 <button class="btn" onclick="abrirModalPago()" style="background: var(--ok); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                   </svg>
+                   Nuevo Pago
+                 </button>
+               </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="color: var(--text);">Buscar:</span>
+                <input type="text" placeholder="Buscar registros..." style="border: 1px solid var(--muted); border-radius: 4px; padding: 0.3rem 0.6rem; background: white;">
+              </div>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+              <thead>
+                <tr style="background: var(--panel);">
+                  <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">
+                    Fecha ↕
+                  </th>
+                  <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">
+                    Detalle ↕
+                  </th>
+                  <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">
+                    Sucursal ↕
+                  </th>
+                  <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">
+                    Usuario ↕
+                  </th>
+                  <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">
+                    Monto ↕
+                  </th>
+                  <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">
+                    Acciones ↕
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: rgba(102, 187, 106, 0.1);">
+                  <td style="padding: 1rem; color: var(--text);">21-07-2025</td>
+                  <td style="padding: 1rem; color: var(--text);">TRIMESTRAL</td>
+                  <td style="padding: 1rem;">
+                    <span style="background: var(--brand); color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">QT</span>
+                  </td>
+                  <td style="padding: 1rem;">
+                    <span style="background: #333; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">UQ</span>
+                  </td>
+                  <td style="padding: 1rem; color: var(--text); font-weight: 600;">Tarjeta $ 150,00</td>
+                  <td style="padding: 1rem;">
+                    <button style="background: none; border: none; cursor: pointer; color: var(--text);">⋮</button>
+                  </td>
+                </tr>
+                <tr style="background: rgba(239, 83, 80, 0.1);">
+                  <td style="padding: 1rem; color: var(--text);">21-07-2025</td>
+                  <td style="padding: 1rem; color: var(--text);">trimestral QT [Julio 2025] Trimestral (3)</td>
+                  <td style="padding: 1rem;">
+                    <span style="background: var(--brand); color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">QT</span>
+                  </td>
+                  <td style="padding: 1rem;">
+                    <span style="background: #333; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">PG</span>
+                  </td>
+                  <td style="padding: 1rem; color: var(--text); font-weight: 600;">$ 150,00</td>
+                  <td style="padding: 1rem;">
+                    <button style="background: none; border: none; cursor: pointer; color: var(--text);">⋮</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      function renderTabMembresias(cliente) {
+        return `
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 style="color: var(--text); margin: 0; font-size: 1.2rem; font-weight: 600;">Membresías del Cliente</h3>
+              <button onclick="abrirModalMembresia()" style="background: var(--ok); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: 600;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Nueva Membresía
+              </button>
+            </div>
+            
+            <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+              <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr style="background: var(--panel);">
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">#</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">Membresia</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">Descuento</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">Inicio</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">Vencimiento</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">Auto-Renovación</th>
+                    <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--muted);">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="border-bottom: 1px solid var(--muted);">
+                    <td style="padding: 1rem; color: var(--text);">27558</td>
+                    <td style="padding: 1rem; color: var(--text);">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        Plan Anual
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--sub);">
+                          <path d="M9.09 9C9.3251 8.33167 9.78918 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.30197 14.92 10C14.92 12 11.92 13 11.92 13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
+                    </td>
+                    <td style="padding: 1rem;">
+                    </td>
+                    <td style="padding: 1rem; color: var(--text);">04/02/2025</td>
+                    <td style="padding: 1rem;">
+                      <span style="background: #17a2b8; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">VENCE EN 5 MESES</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                      <span style="background: #fd7e14; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">NO</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                      <div style="display: flex; gap: 0.5rem;">
+                        <button style="background: var(--danger); color: white; border: none; padding: 0.4rem; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                        <button style="background: var(--brand); color: white; border: none; padding: 0.4rem; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 2V5M16 2V5M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--muted);">
+                    <td style="padding: 1rem; color: var(--text);">18473</td>
+                    <td style="padding: 1rem; color: var(--text);">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        Plan Mensual
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--sub);">
+                          <path d="M9.09 9C9.3251 8.33167 9.78918 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.30197 14.92 10C14.92 12 11.92 13 11.92 13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
+                    </td>
+                    <td style="padding: 1rem;">
+                    </td>
+                    <td style="padding: 1rem; color: var(--text);">04/02/2024</td>
+                    <td style="padding: 1rem;">
+                      <span style="background: var(--danger); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">VENCIDO</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                      <span style="background: #fd7e14; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">NO</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                      <div style="display: flex; gap: 0.5rem;">
+                        <button style="background: var(--brand); color: white; border: none; padding: 0.4rem; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 2V5M16 2V5M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--muted);">
+                    <td style="padding: 1rem; color: var(--text);">18472</td>
+                    <td style="padding: 1rem; color: var(--text);">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        Plan Trimestral
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--sub);">
+                          <path d="M9.09 9C9.3251 8.33167 9.78918 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.30197 14.92 10C14.92 12 11.92 13 11.92 13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
+                    </td>
+                    <td style="padding: 1rem;">
+                    </td>
+                    <td style="padding: 1rem; color: var(--text);">15/01/2024</td>
+                    <td style="padding: 1rem;">
+                      <span style="background: var(--danger); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">VENCIDO</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                      <span style="background: #fd7e14; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">NO</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                      <div style="display: flex; gap: 0.5rem;">
+                        <button style="background: var(--brand); color: white; border: none; padding: 0.4rem; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 2V5M16 2V5M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid var(--muted);">
+                    <td style="padding: 1rem; color: var(--text);">18471</td>
+                    <td style="padding: 1rem; color: var(--text);">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        Plan Semanal
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--sub);">
+                          <path d="M9.09 9C9.3251 8.33167 9.78918 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.30197 14.92 10C14.92 12 11.92 13 11.92 13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
+                    </td>
+                    <td style="padding: 1rem;">
+                    </td>
+                    <td style="padding: 1rem; color: var(--text);">10/01/2024</td>
+                    <td style="padding: 1rem;">
+                      <span style="background: var(--danger); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">VENCIDO</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                      <span style="background: #fd7e14; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">NO</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                      <div style="display: flex; gap: 0.5rem;">
+                        <button style="background: var(--brand); color: white; border: none; padding: 0.4rem; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 2V5M16 2V5M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 1rem; color: var(--text);">18470</td>
+                    <td style="padding: 1rem; color: var(--text);">
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        Plan Diario
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--sub);">
+                          <path d="M9.09 9C9.3251 8.33167 9.78918 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.30197 14.92 10C14.92 12 11.92 13 11.92 13M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </div>
+                    </td>
+                    <td style="padding: 1rem;">
+                    </td>
+                    <td style="padding: 1rem; color: var(--text);">05/01/2024</td>
+                    <td style="padding: 1rem;">
+                      <span style="background: var(--danger); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">VENCIDO</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                      <span style="background: #fd7e14; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">NO</span>
+                    </td>
+                    <td style="padding: 1rem;">
+                      <div style="display: flex; gap: 0.5rem;">
+                        <button style="background: var(--brand); color: white; border: none; padding: 0.4rem; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 2V5M16 2V5M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      /******************** FUNCIONES DE MODALES ********************/
+      function abrirModalCargo() {
+        const modal = document.getElementById("modalCargo");
+        modal.style.display = "flex";
+
+        // Establecer fecha y hora actual
+        const now = new Date();
+        const fechaHora = now.toISOString().slice(0, 16);
+        document.getElementById("cargoFecha").value = fechaHora;
+
+        // Limpiar formulario
+        document.getElementById("formCargo").reset();
+      }
+
+      function cerrarModalCargo() {
+        const modal = document.getElementById("modalCargo");
+        modal.style.display = "none";
+      }
+
+      function abrirModalPago() {
+        const modal = document.getElementById("modalPago");
+        modal.style.display = "flex";
+
+        // Establecer fecha y hora actual
+        const now = new Date();
+        const fechaHora = now.toISOString().slice(0, 16);
+        document.getElementById("pagoFecha").value = fechaHora;
+
+        // Limpiar formulario
+        document.getElementById("formPago").reset();
+      }
+
+      function cerrarModalPago() {
+        const modal = document.getElementById("modalPago");
+        modal.style.display = "none";
+      }
+
+      // Event listeners para los formularios
+      document.addEventListener("DOMContentLoaded", function () {
+        // Formulario de cargo
+        document
+          .getElementById("formCargo")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            guardarCargo();
+          });
+
+        // Formulario de pago
+        document
+          .getElementById("formPago")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            guardarPago();
+          });
+
+        // Cerrar modales al hacer clic fuera de ellos
+        document
+          .getElementById("modalCargo")
+          .addEventListener("click", function (e) {
+            if (e.target === this) {
+              cerrarModalCargo();
+            }
+          });
+
+        document
+          .getElementById("modalPago")
+          .addEventListener("click", function (e) {
+            if (e.target === this) {
+              cerrarModalPago();
+            }
+          });
+
+        // Formulario de membresía
+        document
+          .getElementById("formMembresia")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            guardarMembresia();
+          });
+
+        // Cerrar modal de membresía al hacer clic fuera de él
+        document
+          .getElementById("modalMembresia")
+          .addEventListener("click", function (e) {
+            if (e.target === this) {
+              cerrarModalMembresia();
+            }
+          });
+      });
+
+      function guardarCargo() {
+        const fecha = document.getElementById("cargoFecha").value;
+        const detalle = document.getElementById("cargoDetalle").value;
+        const monto = document.getElementById("cargoMonto").value;
+        const sucursal = document.getElementById("cargoSucursal").value;
+        const notas = document.getElementById("cargoNotas").value;
+        const registrarPago =
+          document.getElementById("cargoRegistrarPago").checked;
+
+        if (!detalle || !monto) {
+          alert("Por favor complete los campos obligatorios");
+          return;
+        }
+
+        // Aquí se guardaría el cargo en la base de datos
+        console.log("Guardando cargo:", {
+          fecha,
+          detalle,
+          monto,
+          sucursal,
+          notas,
+          registrarPago,
+        });
+
+        // Si está marcado registrar pago, abrir modal de pago
+        if (registrarPago) {
+          cerrarModalCargo();
+          setTimeout(() => {
+            abrirModalPago();
+            document.getElementById("pagoMonto").value = monto;
+            document.getElementById("pagoDetalle").value =
+              "Pago por cargo: " + detalle;
+          }, 300);
+        } else {
+          cerrarModalCargo();
+          alert("Cargo registrado exitosamente");
+        }
+      }
+
+      function guardarPago() {
+        const fecha = document.getElementById("pagoFecha").value;
+        const detalle = document.getElementById("pagoDetalle").value;
+        const monto = document.getElementById("pagoMonto").value;
+        const metodo = document.getElementById("pagoMetodo").value;
+        const sucursal = document.getElementById("pagoSucursal").value;
+        const notas = document.getElementById("pagoNotas").value;
+
+        if (!detalle || !monto) {
+          alert("Por favor complete los campos obligatorios");
+          return;
+        }
+
+        // Aquí se guardaría el pago en la base de datos
+        console.log("Guardando pago:", {
+          fecha,
+          detalle,
+          monto,
+          metodo,
+          sucursal,
+          notas,
+        });
+
+        cerrarModalPago();
+        alert("Pago registrado exitosamente");
+      }
+
+      function abrirModalMembresia() {
+        const modal = document.getElementById("modalMembresia");
+        modal.style.display = "flex";
+
+        // Establecer fecha actual
+        const now = new Date();
+        const fechaHoy = now.toISOString().split("T")[0];
+        document.getElementById("membresiaFechaInicio").value = fechaHoy;
+
+        // Limpiar formulario
+        document.getElementById("formMembresia").reset();
+      }
+
+      function cerrarModalMembresia() {
+        const modal = document.getElementById("modalMembresia");
+        modal.style.display = "none";
+      }
+
+      function guardarMembresia() {
+        const actividad = document.getElementById("membresiaActividad").value;
+        const fechaInicio = document.getElementById(
+          "membresiaFechaInicio"
+        ).value;
+        const descuento = document.getElementById("membresiaDescuento").value;
+        const cambioApp = document.getElementById("membresiaCambioApp").checked;
+
+        if (!actividad || !fechaInicio || !descuento) {
+          alert("Por favor complete todos los campos obligatorios");
+          return;
+        }
+
+        // Aquí se guardaría la membresía en la base de datos
+        console.log("Guardando membresía:", {
+          actividad,
+          fechaInicio,
+          descuento,
+          cambioApp: cambioApp ? "Sí" : "No",
+        });
+
+        cerrarModalMembresia();
+        alert("Membresía agregada exitosamente");
+      }
+
+      /******************** SIDEBAR CONTROL ********************/
+      function toggleSidebar() {
+        const sidebar = EL(".sidebar");
+        const overlay = EL(".sidebar-overlay");
+
+        if (sidebar.classList.contains("closed")) {
+          // Abrir el sidebar
+          sidebar.classList.remove("closed");
+          sidebar.classList.add("open");
+          overlay.classList.add("open");
+        } else {
+          // Cerrar el sidebar
+          sidebar.classList.remove("open");
+          sidebar.classList.add("closed");
+          overlay.classList.remove("open");
+        }
+      }
+
+      function closeSidebar() {
+        const sidebar = EL(".sidebar");
+        const overlay = EL(".sidebar-overlay");
+        sidebar.classList.remove("open");
+        sidebar.classList.add("closed");
+        overlay.classList.remove("open");
+      }
+    </script>
+  </body>
+</html>
