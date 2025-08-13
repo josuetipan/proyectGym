@@ -2579,10 +2579,6 @@
           this.memberships = data.memberships || seedMemberships();
           this.attendance = data.attendance || []; // {id, clientId, type:'entrada'|'salida', at}
           this.payments = data.payments || []; // {id, clientId, amount, bank, note, at, user}
-          this.entrenamientos = data.entrenamientos || []; // {id, clienteId, cedula, genero, secciones, fechaAsignacion, sucursal}
-          this.plantillasWhatsApp =
-            data.plantillasWhatsApp || seedPlantillasWhatsApp(); // {id, titulo, mensaje, categoria, activa, fechaCreacion}
-          this.descuentos = data.descuentos || seedDescuentos(); // {id, nombre, monto, activo, fechaCreacion}
           this.settings = data.settings || {
             sucursal: "Matriz",
             theme: "dark",
@@ -2593,9 +2589,6 @@
         memberships: [],
         attendance: [],
         payments: [],
-        entrenamientos: [],
-        plantillasWhatsApp: [],
-        descuentos: [],
         settings: {},
       };
       const save = () =>
@@ -2607,9 +2600,6 @@
             attendance: DB.attendance,
             payments: DB.payments,
             settings: DB.settings,
-            entrenamientos: DB.entrenamientos || [],
-            plantillasWhatsApp: DB.plantillasWhatsApp || [],
-            descuentos: DB.descuentos || [],
           })
         );
 
@@ -3007,15 +2997,14 @@
           ],
         },
         {
-          id: "asignacion-entrenamiento",
-          label: "Asignación de Entrenamiento",
-        },
-        {
-          id: "gestion",
-          label: "Gestión",
+          id: "facturacion",
+          label: "Facturación",
           submenu: [
-            { id: "plantillas-whatsapp", label: "Plantillas de WhatsApp" },
-            { id: "descuentos", label: "Descuentos" },
+            { id: "nueva-factura", label: "Nueva Factura" },
+            { id: "facturas-pendientes", label: "Facturas Pendientes" },
+            { id: "historial-facturas", label: "Historial de Facturas" },
+            { id: "reportes-facturacion", label: "Reportes" },
+            { id: "configuracion-facturacion", label: "Configuración" },
           ],
         },
         { id: "export", label: "Exportar datos" },
@@ -3124,14 +3113,19 @@
         if (active === "deudores") return renderDeudores(root);
         if (active === "cumples") return renderCumples(root);
         if (active === "registro") return renderRegistro(root);
-        if (active === "asignacion-entrenamiento")
-          return renderAsignacionEntrenamiento(root);
-        if (active === "plantillas-whatsapp")
-          return renderPlantillasWhatsApp(root);
-        if (active === "descuentos") return renderDescuentos(root);
         if (active === "export") return renderExport(root);
         if (active === "membresias") return renderMembresias(root);
         if (active === "pagos") return renderPagos(root);
+        // Secciones de Facturación
+        if (active === "nueva-factura") return renderNuevaFactura(root);
+        if (active === "facturas-pendientes")
+          return renderFacturasPendientes(root);
+        if (active === "historial-facturas")
+          return renderHistorialFacturas(root);
+        if (active === "reportes-facturacion")
+          return renderReportesFacturacion(root);
+        if (active === "configuracion-facturacion")
+          return renderConfiguracionFacturacion(root);
       }
 
       /******************** SECCIÓN 1: INGRESO ********************/
@@ -5534,9 +5528,25 @@
       <form id="formInformarPago" style="display: grid; gap: 1.5rem;">
         <!-- Cliente -->
         <div>
-          
+          <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Cliente *</label>
           <div style="position: relative;">
-            
+            <select id="pay_user" style="
+              width: 100%;
+              padding: 0.8rem;
+              border: 1px solid var(--muted);
+              border-radius: 6px;
+              background: white;
+              font-size: 1rem;
+              appearance: none;
+            " required>
+              <option value="">Seleccione un cliente</option>
+              ${DB.users
+                .map(
+                  (u) =>
+                    `<option value='${u.id}'>${u.nombres} ${u.apellidos} - ${u.cedula}</option>`
+                )
+                .join("")}
+            </select>
             <div style="
               position: absolute;
               right: 0.8rem;
@@ -6405,94 +6415,75 @@
       function generarMensajeWhatsApp(cliente, plantilla) {
         const saldo = cliente.saldo || 0;
         const diasRest = daysDiff(cliente.membresiaFin, NOW());
-        const sucursal = DB.settings.sucursal || "Matriz";
 
         let mensaje = "";
 
-        // Si es una plantilla personalizada del sistema, usarla
-        if (plantilla.startsWith("plantilla_")) {
-          const plantillaId = plantilla.replace("plantilla_", "");
-          const plantillaPersonalizada = DB.plantillasWhatsApp.find(p => p.id === plantillaId);
-          
-          if (plantillaPersonalizada) {
-            mensaje = plantillaPersonalizada.mensaje
-              .replace(/{nombre}/g, cliente.nombres)
-              .replace(/{monto}/g, saldo.toFixed(2))
-              .replace(/{fecha}/g, cliente.membresiaFin ? new Date(cliente.membresiaFin).toLocaleDateString('es-EC') : 'N/A')
-              .replace(/{dias}/g, diasRest.toString())
-              .replace(/{sucursal}/g, sucursal);
-          } else {
-            mensaje = `Hola ${cliente.nombres}!\n\nEsperamos que estés muy bien.\n\nSaludos,\nPOWERGYM UltraFitEc`;
-          }
-        } else {
-          // Plantillas predefinidas
-          switch (plantilla) {
-            case "deudor":
-              mensaje = `Hola, ${cliente.nombres} ${cliente.apellidos}!
+        switch (plantilla) {
+          case "deudor":
+            mensaje = `Hola, ${cliente.nombres} ${cliente.apellidos}!
 
 Esperamos que estés muy bien.
 
 Te contamos que en tu cuenta quedó una deuda pendiente de $${saldo.toFixed(
-                2
-              )}. Podés pagarla por transferencia o pasar por el gym a saldar tu cuenta.
+              2
+            )}. Podés pagarla por transferencia o pasar por el gym a saldar tu cuenta.
 
 Saludos,
 POWERGYM UltraFitEc`;
-              break;
+            break;
 
-            case "recordatorio":
-              mensaje = `Hola ${cliente.nombres}!
+          case "recordatorio":
+            mensaje = `Hola ${cliente.nombres}!
 
 Te recordamos que tienes un saldo pendiente de $${saldo.toFixed(
-                2
-              )} en tu cuenta.
+              2
+            )} en tu cuenta.
 
 Para evitar inconvenientes, te sugerimos regularizar tu situación lo antes posible.
 
 Gracias por tu comprensión.`;
-              break;
+            break;
 
-            case "bienvenida":
-              mensaje = `¡Hola ${cliente.nombres}!
+          case "bienvenida":
+            mensaje = `¡Hola ${cliente.nombres}!
 
 ¡Bienvenido/a a POWERGYM UltraFitEc!
 
 Estamos muy contentos de que te hayas unido a nuestra familia fitness. Esperamos que disfrutes de todas nuestras instalaciones y servicios.
 
 ¡Nos vemos en el gym! 💪`;
-              break;
+            break;
 
-            case "membresia":
-              const estado =
-                diasRest < 0
-                  ? "vencida"
-                  : diasRest <= 5
-                  ? "por vencer"
-                  : "vigente";
-              mensaje = `Hola ${cliente.nombres}!
+          case "membresia":
+            const estado =
+              diasRest < 0
+                ? "vencida"
+                : diasRest <= 5
+                ? "por vencer"
+                : "vigente";
+            mensaje = `Hola ${cliente.nombres}!
 
 Tu membresía está ${estado}. ${
-                diasRest < 0
-                  ? `Vencida hace ${Math.abs(diasRest)} días.`
-                  : diasRest <= 5
-                  ? `Vence en ${diasRest} días.`
-                  : `Tienes ${diasRest} días restantes.`
-              }
+              diasRest < 0
+                ? `Vencida hace ${Math.abs(diasRest)} días.`
+                : diasRest <= 5
+                ? `Vence en ${diasRest} días.`
+                : `Tienes ${diasRest} días restantes.`
+            }
 
 Te invitamos a renovar para continuar disfrutando de todos nuestros servicios.
 
 ¡Gracias por elegirnos!`;
-              break;
+            break;
 
-            case "personalizado":
-              mensaje = `Hola ${cliente.nombres}!
+          case "personalizado":
+            mensaje = `Hola ${cliente.nombres}!
 
 Esperamos que estés muy bien.
 
 Saludos,
 POWERGYM UltraFitEc`;
-              break;
-          }
+            break;
         }
 
         EL("#whatsappMensaje").value = mensaje;
@@ -8705,2214 +8696,267 @@ POWERGYM UltraFitEc`;
       // Llamar a la función cuando se carga la página
       document.addEventListener("DOMContentLoaded", actualizarSucursalActual);
 
-      /******************** ASIGNACIÓN DE ENTRENAMIENTO ********************/
+      /******************** SECCIONES DE FACTURACIÓN ********************/
 
-      // Base de datos de ejercicios por género y tipo
-      const EJERCICIOS_DB = {
-        Hombre: {
-          Pecho: [
-            "Press de banca con barra",
-            "Press de banca con mancuernas",
-            "Press inclinado con barra",
-            "Press inclinado con mancuernas",
-            "Press declinado",
-            "Aperturas con mancuernas",
-            "Aperturas en polea",
-            "Flexiones de pecho",
-            "Press de pecho en máquina",
-            "Pullover con mancuerna",
-          ],
-          Dorsales: [
-            "Dominadas",
-            "Remo con barra",
-            "Remo con mancuernas",
-            "Remo en polea baja",
-            "Pull-down en polea alta",
-            "Remo invertido",
-            "Pull-over con barra",
-            "Remo en máquina",
-            "Superman",
-            "Remo con banda elástica",
-          ],
-          Hombros: [
-            "Press militar con barra",
-            "Press militar con mancuernas",
-            "Elevaciones laterales",
-            "Elevaciones frontales",
-            "Elevaciones posteriores",
-            "Remo vertical",
-            "Press Arnold",
-            "Elevaciones en Y",
-            "Rotaciones externas",
-            "Shrugs con barra",
-          ],
-          Bíceps: [
-            "Curl con barra",
-            "Curl con mancuernas",
-            "Curl martillo",
-            "Curl concentrado",
-            "Curl en polea",
-            "Curl 21",
-            "Curl predicador",
-            "Curl spider",
-            "Curl con banda elástica",
-            "Curl Zottman",
-          ],
-          Tríceps: [
-            "Press de banca cerrado",
-            "Extensiones con barra",
-            "Extensiones con mancuernas",
-            "Fondos en paralelas",
-            "Extensiones en polea",
-            "Patada de burro",
-            "Extensiones tras nuca",
-            "Press francés",
-            "Extensiones con banda elástica",
-            "Dips en banco",
-          ],
-          Piernas: [
-            "Sentadillas con barra",
-            "Sentadillas con mancuernas",
-            "Peso muerto",
-            "Extensiones de cuádriceps",
-            "Curl de femoral",
-            "Prensa de piernas",
-            "Zancadas con mancuernas",
-            "Elevaciones de gemelos",
-            "Sentadillas búlgaras",
-            "Hip thrust",
-          ],
-          Abdominales: [
-            "Crunches",
-            "Plancha",
-            "Elevaciones de piernas",
-            "Russian twists",
-            "Bicycle crunches",
-            "Mountain climbers",
-            "Leg raises",
-            "Ab wheel rollout",
-            "Plank con rotación",
-            "Dead bug",
-          ],
-        },
-        Mujer: {
-          Pecho: [
-            "Press de banca con mancuernas",
-            "Aperturas con mancuernas",
-            "Press inclinado con mancuernas",
-            "Flexiones de pecho modificadas",
-            "Press de pecho en máquina",
-            "Aperturas en polea",
-            "Push-ups con rodillas",
-            "Press declinado con mancuernas",
-            "Pullover con mancuerna",
-            "Chest fly en máquina",
-          ],
-          Dorsales: [
-            "Remo con mancuernas",
-            "Remo en polea baja",
-            "Pull-down en polea alta",
-            "Remo invertido",
-            "Superman",
-            "Remo con banda elástica",
-            "Pull-over con mancuerna",
-            "Remo en máquina",
-            "Lat pulldown",
-            "Remo sentado",
-          ],
-          Hombros: [
-            "Press militar con mancuernas",
-            "Elevaciones laterales",
-            "Elevaciones frontales",
-            "Elevaciones posteriores",
-            "Press Arnold",
-            "Elevaciones en Y",
-            "Rotaciones externas",
-            "Shrugs con mancuernas",
-            "Elevaciones con banda elástica",
-            "Press con mancuernas sentado",
-          ],
-          Bíceps: [
-            "Curl con mancuernas",
-            "Curl martillo",
-            "Curl concentrado",
-            "Curl en polea",
-            "Curl con banda elástica",
-            "Curl predicador",
-            "Curl spider",
-            "Curl 21",
-            "Curl Zottman",
-            "Curl alternado",
-          ],
-          Tríceps: [
-            "Extensiones con mancuernas",
-            "Extensiones en polea",
-            "Patada de burro",
-            "Extensiones tras nuca",
-            "Extensiones con banda elástica",
-            "Dips en banco",
-            "Press de banca cerrado",
-            "Extensiones con barra",
-            "Fondos modificados",
-            "Kickbacks",
-          ],
-          Piernas: [
-            "Sentadillas con mancuernas",
-            "Zancadas con mancuernas",
-            "Prensa de piernas",
-            "Extensiones de cuádriceps",
-            "Curl de femoral",
-            "Elevaciones de gemelos",
-            "Sentadillas búlgaras",
-            "Hip thrust",
-            "Step-ups",
-            "Glute bridges",
-          ],
-          Abdominales: [
-            "Crunches",
-            "Plancha",
-            "Elevaciones de piernas",
-            "Russian twists",
-            "Bicycle crunches",
-            "Mountain climbers",
-            "Leg raises",
-            "Plank con rotación",
-            "Dead bug",
-            "Bird dog",
-          ],
-        },
-      };
-
-      // Variables globales para el entrenamiento
-      let clienteSeleccionado = null;
-      let entrenamientoActual = {
-        clienteId: null,
-        cedula: "",
-        genero: "",
-        secciones: [],
-      };
-
-      function renderAsignacionEntrenamiento(root) {
+      // Nueva Factura
+      function renderNuevaFactura(root) {
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-          <h3 class="section-title">Asignación de Entrenamiento</h3>
-          
-          <!-- Paso 1: Búsqueda por cédula -->
-          <div style="background: var(--card); border: 1px solid var(--muted); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
-            <h4 style="margin: 0 0 1rem 0; color: var(--text); font-size: 1.1rem; font-weight: 600;">Paso 1: Buscar Cliente</h4>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-              <input 
-                type="text" 
-                id="cedulaBusqueda" 
-                placeholder="Ingrese cédula del cliente (10 dígitos)" 
-                maxlength="10"
-                style="flex: 1; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-                oninput="validarCedulaBusqueda(this.value)"
-              />
-              <button class="btn primary" onclick="buscarClienteEntrenamiento()" style="padding: 0.8rem 1.5rem;">
-                Buscar Cliente
-              </button>
-              <button class="btn" onclick="limpiarBusquedaEntrenamiento()" style="padding: 0.8rem 1.5rem;">
-                Limpiar
-              </button>
+          <h3 class="section-title">Nueva Factura</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div>
+              <h4 style="margin: 0 0 1rem 0; color: var(--text);">Información del Cliente</h4>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Buscar Cliente</label>
+                <input class="input" placeholder="Cédula o nombre del cliente" />
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Fecha de Factura</label>
+                <input class="date" type="date" />
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Sucursal</label>
+                <select class="select">
+                  <option>Matriz</option>
+                  <option>Ponciano</option>
+                  <option>QT</option>
+                </select>
+              </div>
             </div>
-            <div id="resultadoBusqueda" style="margin-top: 1rem;"></div>
+            <div>
+              <h4 style="margin: 0 0 1rem 0; color: var(--text);">Productos/Servicios</h4>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Membresía</label>
+                <select class="select">
+                  <option>Mensual - $25</option>
+                  <option>Trimestral - $65</option>
+                  <option>Anual - $220</option>
+                </select>
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Cantidad</label>
+                <input class="input" type="number" value="1" min="1" />
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Descuento (%)</label>
+                <input class="input" type="number" value="0" min="0" max="100" />
+              </div>
+            </div>
           </div>
-
-          <!-- Paso 2: Selección de género (solo si se encontró cliente) -->
-          <div id="pasoGenero" style="display: none; background: var(--card); border: 1px solid var(--muted); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
-            <h4 style="margin: 0 0 1rem 0; color: var(--text); font-size: 1.1rem; font-weight: 600;">Paso 2: Seleccionar Género</h4>
-            <div style="display: flex; gap: 1rem;">
-              <button class="btn" onclick="seleccionarGenero('Hombre')" id="btnHombre" style="padding: 1rem 2rem; font-size: 1rem;">
-                Hombre
-              </button>
-              <button class="btn" onclick="seleccionarGenero('Mujer')" id="btnMujer" style="padding: 1rem 2rem; font-size: 1rem;">
-                Mujer
-              </button>
+          <div style="margin-top: 2rem; padding: 1rem; background: var(--panel); border-radius: 8px;">
+            <h4 style="margin: 0 0 1rem 0; color: var(--text);">Resumen de Factura</h4>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <span>Subtotal:</span>
+              <span>$25.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <span>IVA (12%):</span>
+              <span>$3.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 1.1rem; border-top: 1px solid var(--muted); padding-top: 0.5rem;">
+              <span>Total:</span>
+              <span>$28.00</span>
             </div>
           </div>
-
-          <!-- Paso 3: Configuración de entrenamiento -->
-          <div id="pasoEntrenamiento" style="display: none;">
-            <div style="background: var(--card); border: 1px solid var(--muted); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
-              <h4 style="margin: 0 0 1rem 0; color: var(--text); font-size: 1.1rem; font-weight: 600;">Paso 3: Configurar Entrenamiento</h4>
-              
-              <!-- Información del cliente -->
-              <div style="background: rgba(218, 131, 224, 0.1); border: 1px solid var(--brand); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Cliente Seleccionado:</div>
-                <div id="infoClienteEntrenamiento" style="color: var(--sub);"></div>
-              </div>
-
-              <!-- Secciones de entrenamiento -->
-              <div id="seccionesEntrenamiento">
-                <!-- Las secciones se generarán dinámicamente -->
-              </div>
-
-              <!-- Botones para agregar/quitar secciones -->
-              <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button class="btn success" onclick="agregarSeccion()" style="padding: 0.8rem 1.5rem;">
-                  ➕ Agregar Sección
-                </button>
-                <button class="btn danger" onclick="quitarSeccion()" style="padding: 0.8rem 1.5rem;">
-                  ➖ Quitar Sección
-                </button>
-              </div>
-            </div>
-
-            <!-- Paso 4: Resumen y asignación -->
-            <div id="pasoResumen" style="background: var(--card); border: 1px solid var(--muted); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
-              <h4 style="margin: 0 0 1rem 0; color: var(--text); font-size: 1.1rem; font-weight: 600;">Paso 4: Resumen del Entrenamiento</h4>
-              <div id="resumenEntrenamiento" style="background: rgba(102, 187, 106, 0.1); border: 1px solid var(--ok); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                <!-- El resumen se generará dinámicamente -->
-              </div>
-              <div style="display: flex; gap: 1rem;">
-                <button class="btn primary" onclick="asignarEntrenamiento()" style="padding: 1rem 2rem; font-size: 1.1rem;">
-                  ✅ Asignar Entrenamiento
-                </button>
-                <button class="btn" onclick="limpiarEntrenamiento()" style="padding: 1rem 2rem; font-size: 1.1rem;">
-                  🔄 Nuevo Entrenamiento
-                </button>
-              </div>
-            </div>
+          <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+            <button class="btn ghost">Cancelar</button>
+            <button class="btn primary">Generar Factura</button>
           </div>
         `;
         root.append(card);
       }
 
-      function validarCedulaBusqueda(cedula) {
-        // Solo permitir números y máximo 10 dígitos
-        const cedulaLimpia = cedula.replace(/\D/g, "");
-        EL("#cedulaBusqueda").value = cedulaLimpia.slice(0, 10);
-      }
-
-      function buscarClienteEntrenamiento() {
-        const cedula = EL("#cedulaBusqueda").value.trim();
-        if (!cedula || cedula.length !== 10) {
-          alert("Por favor ingrese una cédula válida de 10 dígitos");
-          return;
-        }
-
-        const cliente = DB.users.find((u) => u.cedula === cedula);
-        if (!cliente) {
-          EL("#resultadoBusqueda").innerHTML = `
-            <div style="color: var(--danger); padding: 0.8rem; background: rgba(239, 83, 80, 0.1); border-radius: 6px; border: 1px solid var(--danger);">
-              ❌ Cliente no encontrado con la cédula ${cedula}
-            </div>
-          `;
-          return;
-        }
-
-        clienteSeleccionado = cliente;
-        entrenamientoActual.clienteId = cliente.id;
-        entrenamientoActual.cedula = cliente.cedula;
-        entrenamientoActual.genero = cliente.genero;
-
-        EL("#resultadoBusqueda").innerHTML = `
-          <div style="color: var(--ok); padding: 0.8rem; background: rgba(102, 187, 106, 0.1); border-radius: 6px; border: 1px solid var(--ok);">
-            ✅ Cliente encontrado: ${cliente.nombres} ${cliente.apellidos} (${cliente.genero})
-          </div>
-        `;
-
-        // Mostrar paso 2
-        EL("#pasoGenero").style.display = "block";
-
-        // Pre-seleccionar género si está disponible
-        if (cliente.genero) {
-          setTimeout(() => seleccionarGenero(cliente.genero), 100);
-        }
-      }
-
-      function limpiarBusquedaEntrenamiento() {
-        EL("#cedulaBusqueda").value = "";
-        EL("#resultadoBusqueda").innerHTML = "";
-        EL("#pasoGenero").style.display = "none";
-        EL("#pasoEntrenamiento").style.display = "none";
-        clienteSeleccionado = null;
-        entrenamientoActual = {
-          clienteId: null,
-          cedula: "",
-          genero: "",
-          secciones: [],
-        };
-      }
-
-      function seleccionarGenero(genero) {
-        entrenamientoActual.genero = genero;
-
-        // Actualizar botones
-        EL("#btnHombre").classList.remove("primary");
-        EL("#btnMujer").classList.remove("primary");
-        EL("#btn" + (genero === "Hombre" ? "Hombre" : "Mujer")).classList.add(
-          "primary"
-        );
-
-        // Mostrar paso 3
-        EL("#pasoEntrenamiento").style.display = "block";
-
-        // Actualizar información del cliente
-        EL("#infoClienteEntrenamiento").innerHTML = `
-          <strong>${clienteSeleccionado.nombres} ${clienteSeleccionado.apellidos}</strong><br>
-          Cédula: ${clienteSeleccionado.cedula}<br>
-          Género: ${genero}
-        `;
-
-        // Inicializar con una sección
-        entrenamientoActual.secciones = [];
-        agregarSeccion();
-      }
-
-      function agregarSeccion() {
-        const seccionId = entrenamientoActual.secciones.length + 1;
-        const letraSeccion = String.fromCharCode(64 + seccionId); // A, B, C, etc.
-
-        entrenamientoActual.secciones.push({
-          id: seccionId,
-          letra: letraSeccion,
-          tiposEjercicios: [], // Array para múltiples tipos
-          ejercicios: [],
-        });
-
-        renderizarSecciones();
-        actualizarResumen();
-      }
-
-      function quitarSeccion() {
-        if (entrenamientoActual.secciones.length > 1) {
-          entrenamientoActual.secciones.pop();
-          renderizarSecciones();
-          actualizarResumen();
-        } else {
-          alert("Debe mantener al menos una sección");
-        }
-      }
-
-      function renderizarSecciones() {
-        const container = EL("#seccionesEntrenamiento");
-        container.innerHTML = "";
-
-        entrenamientoActual.secciones.forEach((seccion, index) => {
-          const seccionDiv = document.createElement("div");
-          seccionDiv.style.cssText =
-            "background: white; border: 1px solid var(--muted); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem;";
-
-          seccionDiv.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-              <h5 style="margin: 0; color: var(--text); font-size: 1rem; font-weight: 600;">Sección ${seccion.letra}</h5>
-              <span style="background: var(--brand); color: white; padding: 0.3rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">${seccion.id}</span>
-            </div>
-
-            <!-- Selección de tipo de ejercicio -->
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Agregar Tipo de Ejercicio:</label>
-              <select 
-                id="tipoEjercicio_${seccion.id}" 
-                onchange="cambiarTipoEjercicio(${seccion.id}, this.value)"
-                style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-              >
-                <option value="">Seleccionar tipo de ejercicio...</option>
-                <option value="Pecho">Pecho</option>
-                <option value="Dorsales">Dorsales</option>
-                <option value="Hombros">Hombros</option>
-                <option value="Bíceps">Bíceps</option>
-                <option value="Tríceps">Tríceps</option>
-                <option value="Piernas">Piernas</option>
-                <option value="Abdominales">Abdominales</option>
-              </select>
-            </div>
-
-            <!-- Tipos de ejercicios agregados -->
-            <div id="tiposAgregados_${seccion.id}" style="margin-bottom: 1rem;">
-              <!-- Los tipos agregados se mostrarán aquí -->
-            </div>
-
-            <!-- Lista de ejercicios (solo si se seleccionó tipo) -->
-            <div id="ejercicios_${seccion.id}" style="display: none;">
-              <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Ejercicios (selección múltiple):</label>
-              <div id="listaEjercicios_${seccion.id}" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--muted); border-radius: 6px; padding: 0.5rem; background: #f8f9fa;">
-                <!-- Los ejercicios se cargarán dinámicamente -->
-              </div>
-            </div>
-
-            <!-- Ejercicios seleccionados -->
-            <div id="ejerciciosSeleccionados_${seccion.id}" style="margin-top: 1rem;">
-              <!-- Los ejercicios seleccionados se mostrarán aquí -->
-            </div>
-          `;
-
-          container.appendChild(seccionDiv);
-
-          // Mostrar tipos agregados si existen
-          if (seccion.tiposEjercicios && seccion.tiposEjercicios.length > 0) {
-            mostrarTiposAgregados(seccion.id);
-            cargarEjercicios(
-              seccion.id,
-              seccion.tiposEjercicios[0],
-              seccion.ejercicios
-            );
-          }
-        });
-      }
-
-      function cambiarTipoEjercicio(seccionId, tipo) {
-        const seccion = entrenamientoActual.secciones.find(
-          (s) => s.id === seccionId
-        );
-        if (seccion) {
-          // Guardar los ejercicios actuales antes de cambiar
-          const ejerciciosActuales = [...seccion.ejercicios];
-
-          // Si ya existe este tipo en la sección, no hacer nada
-          if (
-            seccion.tiposEjercicios &&
-            seccion.tiposEjercicios.includes(tipo)
-          ) {
-            alert("Este tipo de ejercicio ya está agregado a esta sección");
-            return;
-          }
-
-          // Inicializar tiposEjercicios si no existe
-          if (!seccion.tiposEjercicios) {
-            seccion.tiposEjercicios = [];
-          }
-
-          // Agregar el nuevo tipo
-          seccion.tiposEjercicios.push(tipo);
-
-          // Cargar ejercicios del nuevo tipo
-          cargarEjercicios(seccionId, tipo, ejerciciosActuales);
-
-          // Mostrar tipos agregados
-          mostrarTiposAgregados(seccionId);
-        }
-        actualizarResumen();
-      }
-
-      function mostrarTiposAgregados(seccionId) {
-        const seccion = entrenamientoActual.secciones.find(
-          (s) => s.id === seccionId
-        );
-        const container = EL(`#tiposAgregados_${seccionId}`);
-
-        if (
-          seccion &&
-          seccion.tiposEjercicios &&
-          seccion.tiposEjercicios.length > 0
-        ) {
-          container.innerHTML = `
-          <div style="background: rgba(218, 131, 224, 0.1); border: 1px solid var(--brand); border-radius: 6px; padding: 0.8rem;">
-            <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Tipos agregados:</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-              ${seccion.tiposEjercicios
-                .map(
-                  (tipo) => `
-                <span style="background: var(--brand); color: white; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500; display: flex; align-items: center; gap: 0.3rem;">
-                  ${tipo}
-                  <button onclick="quitarTipoEjercicio(${seccionId}, '${tipo}')" style="background: none; border: none; color: white; cursor: pointer; font-size: 0.7rem; padding: 0;">✕</button>
-                </span>
-              `
-                )
-                .join("")}
-            </div>
-          </div>
-        `;
-        } else {
-          container.innerHTML = "";
-        }
-      }
-
-      function quitarTipoEjercicio(seccionId, tipo) {
-        const seccion = entrenamientoActual.secciones.find(
-          (s) => s.id === seccionId
-        );
-        if (seccion) {
-          // Remover el tipo
-          seccion.tiposEjercicios = seccion.tiposEjercicios.filter(
-            (t) => t !== tipo
-          );
-
-          // Remover ejercicios de ese tipo
-          const ejerciciosDelTipo =
-            EJERCICIOS_DB[entrenamientoActual.genero][tipo] || [];
-          seccion.ejercicios = seccion.ejercicios.filter(
-            (ej) => !ejerciciosDelTipo.includes(ej)
-          );
-
-          // Actualizar vista
-          mostrarTiposAgregados(seccionId);
-          if (seccion.tiposEjercicios.length > 0) {
-            cargarEjercicios(
-              seccionId,
-              seccion.tiposEjercicios[0],
-              seccion.ejercicios
-            );
-          } else {
-            EL(`#ejercicios_${seccionId}`).style.display = "none";
-            EL(`#ejerciciosSeleccionados_${seccionId}`).innerHTML = "";
-          }
-          actualizarResumen();
-        }
-      }
-
-      function cargarEjercicios(seccionId, tipo, ejerciciosExistentes = []) {
-        const ejercicios =
-          EJERCICIOS_DB[entrenamientoActual.genero][tipo] || [];
-        const seccion = entrenamientoActual.secciones.find(
-          (s) => s.id === seccionId
-        );
-
-        if (!seccion) return;
-
-        // Mantener ejercicios existentes y agregar los nuevos
-        if (ejerciciosExistentes.length > 0) {
-          seccion.ejercicios = [...ejerciciosExistentes];
-        }
-
-        // Crear un contenedor para todos los tipos de ejercicios
-        const container = EL(`#listaEjercicios_${seccionId}`);
-
-        // Obtener todos los tipos de ejercicios de esta sección
-        const todosLosTipos = seccion.tiposEjercicios || [tipo];
-
-        let htmlCompleto = "";
-
-        todosLosTipos.forEach((tipoEjercicio) => {
-          const ejerciciosDelTipo =
-            EJERCICIOS_DB[entrenamientoActual.genero][tipoEjercicio] || [];
-
-          htmlCompleto += `
-            <div style="margin-bottom: 1rem; padding: 0.8rem; background: rgba(218, 131, 224, 0.05); border-radius: 6px; border-left: 3px solid var(--brand);">
-              <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem; font-size: 0.9rem;">${tipoEjercicio}</div>
-              ${ejerciciosDelTipo
-                .map((ejercicio, index) => {
-                  const isChecked = seccion.ejercicios.includes(ejercicio);
-                  return `
-                  <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 4px; cursor: pointer; transition: background 0.2s; margin-bottom: 0.2rem;" onmouseover="this.style.background='rgba(218, 224, 131, 0.1)'" onmouseout="this.style.background='transparent'">
-                    <input 
-                      type="checkbox" 
-                      id="ej_${seccionId}_${tipoEjercicio}_${index}"
-                      value="${ejercicio}"
-                      ${isChecked ? "checked" : ""}
-                      onchange="toggleEjercicio(${seccionId}, '${ejercicio}', this.checked)"
-                      style="margin: 0;"
-                    />
-                    <span style="font-size: 0.9rem;">${ejercicio}</span>
-                  </label>
-                `;
-                })
-                .join("")}
-            </div>
-          `;
-        });
-
-        container.innerHTML = htmlCompleto;
-        EL(`#ejercicios_${seccionId}`).style.display = "block";
-        actualizarEjerciciosSeleccionados(seccionId);
-      }
-
-      function toggleEjercicio(seccionId, ejercicio, seleccionado) {
-        const seccion = entrenamientoActual.secciones.find(
-          (s) => s.id === seccionId
-        );
-        if (seccion) {
-          if (seleccionado) {
-            if (!seccion.ejercicios.includes(ejercicio)) {
-              seccion.ejercicios.push(ejercicio);
-            }
-          } else {
-            seccion.ejercicios = seccion.ejercicios.filter(
-              (e) => e !== ejercicio
-            );
-          }
-        }
-        actualizarEjerciciosSeleccionados(seccionId);
-        actualizarResumen();
-      }
-
-      function actualizarEjerciciosSeleccionados(seccionId) {
-        const seccion = entrenamientoActual.secciones.find(
-          (s) => s.id === seccionId
-        );
-        const container = EL(`#ejerciciosSeleccionados_${seccionId}`);
-
-        if (seccion && seccion.ejercicios.length > 0) {
-          container.innerHTML = `
-            <div style="background: rgba(102, 187, 106, 0.1); border: 1px solid var(--ok); border-radius: 6px; padding: 0.8rem;">
-              <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Ejercicios seleccionados (${
-                seccion.ejercicios.length
-              }):</div>
-              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                ${seccion.ejercicios
-                  .map(
-                    (ejercicio) => `
-                  <span style="background: var(--ok); color: white; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${ejercicio}</span>
-                `
-                  )
-                  .join("")}
-              </div>
-            </div>
-          `;
-        } else {
-          container.innerHTML = `
-            <div style="background: rgba(255, 167, 38, 0.1); border: 1px solid var(--warn); border-radius: 6px; padding: 0.8rem; color: var(--warn); font-size: 0.9rem;">
-              ⚠️ No hay ejercicios seleccionados para esta sección
-            </div>
-          `;
-        }
-      }
-
-      function actualizarResumen() {
-        const container = EL("#resumenEntrenamiento");
-        const totalEjercicios = entrenamientoActual.secciones.reduce(
-          (total, seccion) => total + seccion.ejercicios.length,
-          0
-        );
-
-        container.innerHTML = `
+      // Facturas Pendientes
+      function renderFacturasPendientes(root) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3 class="section-title">Facturas Pendientes</h3>
           <div style="margin-bottom: 1rem;">
-            <strong>Cliente:</strong> ${clienteSeleccionado.nombres} ${
-          clienteSeleccionado.apellidos
-        }<br>
-            <strong>Cédula:</strong> ${entrenamientoActual.cedula}<br>
-            <strong>Género:</strong> ${entrenamientoActual.genero}<br>
-            <strong>Secciones:</strong> ${
-              entrenamientoActual.secciones.length
-            }<br>
-            <strong>Total ejercicios:</strong> ${totalEjercicios}
+            <input class="input" placeholder="Buscar facturas..." style="max-width: 300px;" />
           </div>
-          
-          <div style="max-height: 300px; overflow-y: auto;">
-                         ${entrenamientoActual.secciones
-                           .map(
-                             (seccion) => `
-                <div style="background: white; border: 1px solid var(--muted); border-radius: 6px; padding: 1rem; margin-bottom: 0.8rem;">
-                  <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Sección ${
-                    seccion.letra
-                  } - ${
-                               seccion.tiposEjercicios &&
-                               seccion.tiposEjercicios.length > 0
-                                 ? seccion.tiposEjercicios.join(", ")
-                                 : "Sin tipos seleccionados"
-                             }</div>
-                  ${
-                    seccion.ejercicios.length > 0
-                      ? `
-                    <div style="font-size: 0.9rem; color: var(--sub);">
-                      ${seccion.ejercicios
-                        .map((ejercicio) => `• ${ejercicio}`)
-                        .join("<br>")}
-                    </div>
-                  `
-                      : '<div style="color: var(--warn); font-size: 0.9rem;">No hay ejercicios seleccionados</div>'
-                  }
-                </div>
-              `
-                           )
-                           .join("")}
-          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>N° Factura</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>FAC-001</td>
+                <td>María López</td>
+                <td>2024-01-15</td>
+                <td>$28.00</td>
+                <td><span class="badge tag-warn">Pendiente</span></td>
+                <td>
+                  <button class="btn" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Ver</button>
+                  <button class="btn success" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Cobrar</button>
+                </td>
+              </tr>
+              <tr>
+                <td>FAC-002</td>
+                <td>Juan Pérez</td>
+                <td>2024-01-14</td>
+                <td>$65.00</td>
+                <td><span class="badge tag-warn">Pendiente</span></td>
+                <td>
+                  <button class="btn" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Ver</button>
+                  <button class="btn success" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Cobrar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         `;
+        root.append(card);
       }
 
-      function asignarEntrenamiento() {
-        // Validar que haya al menos una sección con ejercicios
-        const seccionesValidas = entrenamientoActual.secciones.filter(
-          (s) =>
-            s.tiposEjercicios &&
-            s.tiposEjercicios.length > 0 &&
-            s.ejercicios.length > 0
-        );
-
-        if (seccionesValidas.length === 0) {
-          alert(
-            "Debe configurar al menos una sección con ejercicios antes de asignar el entrenamiento"
-          );
-          return;
-        }
-
-        // Guardar el entrenamiento en la base de datos
-        const entrenamiento = {
-          id: uuid(),
-          clienteId: entrenamientoActual.clienteId,
-          cedula: entrenamientoActual.cedula,
-          genero: entrenamientoActual.genero,
-          secciones: entrenamientoActual.secciones,
-          fechaAsignacion: new Date().toISOString(),
-          sucursal: DB.settings.sucursal,
-        };
-
-        // Agregar a la base de datos (si no existe, crearla)
-        if (!DB.entrenamientos) {
-          DB.entrenamientos = [];
-        }
-        DB.entrenamientos.push(entrenamiento);
-        save();
-
-        // Mostrar confirmación
-        alert(
-          `✅ Entrenamiento asignado exitosamente a ${
-            clienteSeleccionado.nombres
-          } ${clienteSeleccionado.apellidos}\n\nSecciones: ${
-            seccionesValidas.length
-          }\nTotal ejercicios: ${seccionesValidas.reduce(
-            (total, s) => total + s.ejercicios.length,
-            0
-          )}`
-        );
-
-        // Limpiar formulario
-        limpiarEntrenamiento();
-      }
-
-      function limpiarEntrenamiento() {
-        limpiarBusquedaEntrenamiento();
-        EL("#pasoGenero").style.display = "none";
-        EL("#pasoEntrenamiento").style.display = "none";
-      }
-
-      /******************** GESTIÓN DE PLANTILLAS WHATSAPP ********************/
-
-      function seedPlantillasWhatsApp() {
-        return [
-          {
-            id: "p1",
-            titulo: "Recordatorio de Pago",
-            mensaje:
-              "Hola {nombre}, te recordamos que tienes un pago pendiente de ${monto}. Tu membresía vence el {fecha}. Por favor, acércate a nuestra sucursal para regularizar tu situación. ¡Gracias!",
-            categoria: "Pagos",
-            activa: true,
-            fechaCreacion: new Date().toISOString(),
-          },
-          {
-            id: "p2",
-            titulo: "Bienvenida Nuevo Cliente",
-            mensaje:
-              "¡Hola {nombre}! Bienvenido/a a nuestro gimnasio. Tu membresía está activa desde hoy. Recuerda traer tu documento de identidad en tu primera visita. ¡Nos vemos pronto!",
-            categoria: "Bienvenida",
-            activa: true,
-            fechaCreacion: new Date().toISOString(),
-          },
-          {
-            id: "p3",
-            titulo: "Renovación de Membresía",
-            mensaje:
-              "Hola {nombre}, tu membresía vence en {dias} días. Te ofrecemos descuentos especiales por renovación anticipada. ¡No pierdas tus beneficios!",
-            categoria: "Membresías",
-            activa: true,
-            fechaCreacion: new Date().toISOString(),
-          },
-          {
-            id: "p4",
-            titulo: "Cliente Deudor",
-            mensaje:
-              "Hola {nombre}, tu cuenta presenta un saldo pendiente de ${monto}. Para evitar la suspensión de tu membresía, te solicitamos regularizar tu situación lo antes posible.",
-            categoria: "Deudores",
-            activa: true,
-            fechaCreacion: new Date().toISOString(),
-          },
-          {
-            id: "p5",
-            titulo: "Feliz Cumpleaños",
-            mensaje:
-              "¡Feliz cumpleaños {nombre}! 🎉🎂 En tu día especial, te regalamos una clase personalizada. ¡Ven a celebrar con nosotros!",
-            categoria: "Cumpleaños",
-            activa: true,
-            fechaCreacion: new Date().toISOString(),
-          },
-        ];
-      }
-
-      function renderPlantillasWhatsApp(root) {
+      // Historial de Facturas
+      function renderHistorialFacturas(root) {
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h3 class="section-title" style="margin: 0;">Plantillas de WhatsApp</h3>
-            <button class="btn primary" onclick="abrirModalNuevaPlantilla()" style="padding: 0.8rem 1.5rem;">
-              ➕ Nueva Plantilla
-            </button>
+          <h3 class="section-title">Historial de Facturas</h3>
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <input class="input" placeholder="Buscar facturas..." style="flex: 1;" />
+            <input class="date" type="date" placeholder="Desde" />
+            <input class="date" type="date" placeholder="Hasta" />
+            <button class="btn">Filtrar</button>
           </div>
-
-          <!-- Filtros -->
-          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-            <select id="filtroCategoria" onchange="filtrarPlantillas()" style="padding: 0.5rem; border: 1px solid var(--muted); border-radius: 6px; background: white;">
-              <option value="">Todas las categorías</option>
-              <option value="Pagos">Pagos</option>
-              <option value="Bienvenida">Bienvenida</option>
-              <option value="Membresías">Membresías</option>
-              <option value="Deudores">Deudores</option>
-              <option value="Cumpleaños">Cumpleaños</option>
-              <option value="General">General</option>
-            </select>
-            <select id="filtroEstado" onchange="filtrarPlantillas()" style="padding: 0.5rem; border: 1px solid var(--muted); border-radius: 6px; background: white;">
-              <option value="">Todos los estados</option>
-              <option value="activa">Activas</option>
-              <option value="inactiva">Inactivas</option>
-            </select>
-            <input 
-              type="text" 
-              id="buscarPlantilla" 
-              placeholder="Buscar plantilla..." 
-              oninput="filtrarPlantillas()"
-              style="padding: 0.5rem; border: 1px solid var(--muted); border-radius: 6px; background: white; flex: 1; min-width: 200px;"
-            />
-          </div>
-
-          <!-- Lista de plantillas -->
-          <div id="listaPlantillas" style="display: grid; gap: 1rem;">
-            <!-- Las plantillas se cargarán dinámicamente -->
-          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>N° Factura</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>FAC-001</td>
+                <td>María López</td>
+                <td>2024-01-15</td>
+                <td>$28.00</td>
+                <td><span class="badge tag-success">Pagada</span></td>
+                <td>
+                  <button class="btn" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Ver</button>
+                  <button class="btn" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">PDF</button>
+                </td>
+              </tr>
+              <tr>
+                <td>FAC-002</td>
+                <td>Juan Pérez</td>
+                <td>2024-01-14</td>
+                <td>$65.00</td>
+                <td><span class="badge tag-success">Pagada</span></td>
+                <td>
+                  <button class="btn" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Ver</button>
+                  <button class="btn" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">PDF</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         `;
         root.append(card);
-        cargarPlantillas();
       }
 
-      function cargarPlantillas() {
-        const container = EL("#listaPlantillas");
-        const plantillas = DB.plantillasWhatsApp || [];
-
-        if (plantillas.length === 0) {
-          container.innerHTML = `
-            <div style="text-align: center; padding: 3rem; color: var(--sub);">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1rem; opacity: 0.5;">
-                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V21C3 22.11 3.89 23 5 23H19C20.11 23 21 22.11 21 21V9ZM19 9H14V4H5V21H19V9Z" fill="currentColor"/>
-              </svg>
-              <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">No hay plantillas creadas</div>
-              <div style="font-size: 0.9rem;">Crea tu primera plantilla de WhatsApp</div>
-            </div>
-          `;
-          return;
-        }
-
-        const html = plantillas
-          .map(
-            (plantilla) => `
-          <div style="background: white; border: 1px solid var(--muted); border-radius: 8px; padding: 1.5rem; transition: all 0.2s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-              <div style="flex: 1;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                  <h4 style="margin: 0; color: var(--text); font-size: 1.1rem; font-weight: 600;">${
-                    plantilla.titulo
-                  }</h4>
-                  <span style="background: ${
-                    plantilla.activa ? "var(--ok)" : "var(--sub)"
-                  }; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">
-                    ${plantilla.activa ? "Activa" : "Inactiva"}
-                  </span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem;">
-                  <span style="background: var(--brand); color: white; padding: 0.3rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${
-                    plantilla.categoria
-                  }</span>
-                  <span style="color: var(--sub); font-size: 0.8rem;">Creada: ${new Date(
-                    plantilla.fechaCreacion
-                  ).toLocaleDateString("es-EC")}</span>
-                </div>
-              </div>
-              <div style="display: flex; gap: 0.5rem;">
-                <button class="btn" onclick="editarPlantilla('${
-                  plantilla.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="Editar">
-                  ✏️
-                </button>
-                <button class="btn" onclick="togglePlantilla('${
-                  plantilla.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="${
-              plantilla.activa ? "Desactivar" : "Activar"
-            }">
-                  ${plantilla.activa ? "🔴" : "🟢"}
-                </button>
-                <button class="btn danger" onclick="eliminarPlantilla('${
-                  plantilla.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="Eliminar">
-                  🗑️
-                </button>
-              </div>
-            </div>
-            
-            <div style="background: #f8f9fa; border: 1px solid var(--muted); border-radius: 6px; padding: 1rem; margin-bottom: 1rem;">
-              <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem; font-size: 0.9rem;">Mensaje:</div>
-              <div style="color: var(--sub); font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap;">${
-                plantilla.mensaje
-              }</div>
-            </div>
-            
-            <div style="display: flex; gap: 0.5rem;">
-              <button class="btn" onclick="copiarPlantilla('${
-                plantilla.id
-              }')" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
-                📋 Copiar
-              </button>
-              <button class="btn success" onclick="usarPlantilla('${
-                plantilla.id
-              }')" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
-                📱 Usar
-              </button>
-            </div>
-          </div>
-        `
-          )
-          .join("");
-
-        container.innerHTML = html;
-      }
-
-      function filtrarPlantillas() {
-        const categoria = EL("#filtroCategoria").value;
-        const estado = EL("#filtroEstado").value;
-        const busqueda = EL("#buscarPlantilla").value.toLowerCase();
-
-        const plantillas = DB.plantillasWhatsApp || [];
-        const plantillasFiltradas = plantillas.filter((plantilla) => {
-          const cumpleCategoria =
-            !categoria || plantilla.categoria === categoria;
-          const cumpleEstado =
-            !estado ||
-            (estado === "activa" && plantilla.activa) ||
-            (estado === "inactiva" && !plantilla.activa);
-          const cumpleBusqueda =
-            !busqueda ||
-            plantilla.titulo.toLowerCase().includes(busqueda) ||
-            plantilla.mensaje.toLowerCase().includes(busqueda) ||
-            plantilla.categoria.toLowerCase().includes(busqueda);
-
-          return cumpleCategoria && cumpleEstado && cumpleBusqueda;
-        });
-
-        const container = EL("#listaPlantillas");
-        if (plantillasFiltradas.length === 0) {
-          container.innerHTML = `
-            <div style="text-align: center; padding: 2rem; color: var(--sub);">
-              <div style="font-size: 1rem;">No se encontraron plantillas con los filtros aplicados</div>
-            </div>
-          `;
-          return;
-        }
-
-        const html = plantillasFiltradas
-          .map(
-            (plantilla) => `
-          <div style="background: white; border: 1px solid var(--muted); border-radius: 8px; padding: 1.5rem; transition: all 0.2s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-              <div style="flex: 1;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                  <h4 style="margin: 0; color: var(--text); font-size: 1.1rem; font-weight: 600;">${
-                    plantilla.titulo
-                  }</h4>
-                  <span style="background: ${
-                    plantilla.activa ? "var(--ok)" : "var(--sub)"
-                  }; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">
-                    ${plantilla.activa ? "Activa" : "Inactiva"}
-                  </span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem;">
-                  <span style="background: var(--brand); color: white; padding: 0.3rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${
-                    plantilla.categoria
-                  }</span>
-                  <span style="color: var(--sub); font-size: 0.8rem;">Creada: ${new Date(
-                    plantilla.fechaCreacion
-                  ).toLocaleDateString("es-EC")}</span>
-                </div>
-              </div>
-              <div style="display: flex; gap: 0.5rem;">
-                <button class="btn" onclick="editarPlantilla('${
-                  plantilla.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="Editar">
-                  ✏️
-                </button>
-                <button class="btn" onclick="togglePlantilla('${
-                  plantilla.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="${
-              plantilla.activa ? "Desactivar" : "Activar"
-            }">
-                  ${plantilla.activa ? "🔴" : "🟢"}
-                </button>
-                <button class="btn danger" onclick="eliminarPlantilla('${
-                  plantilla.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="Eliminar">
-                  🗑️
-                </button>
-              </div>
-            </div>
-            
-            <div style="background: #f8f9fa; border: 1px solid var(--muted); border-radius: 6px; padding: 1rem; margin-bottom: 1rem;">
-              <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem; font-size: 0.9rem;">Mensaje:</div>
-              <div style="color: var(--sub); font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap;">${
-                plantilla.mensaje
-              }</div>
-            </div>
-            
-            <div style="display: flex; gap: 0.5rem;">
-              <button class="btn" onclick="copiarPlantilla('${
-                plantilla.id
-              }')" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
-                📋 Copiar
-              </button>
-              <button class="btn success" onclick="usarPlantilla('${
-                plantilla.id
-              }')" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
-                📱 Usar
-              </button>
-            </div>
-          </div>
-        `
-          )
-          .join("");
-
-        container.innerHTML = html;
-      }
-
-      function abrirModalNuevaPlantilla() {
-        const modal = document.createElement("div");
-        modal.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 2000;
-        `;
-
-        modal.innerHTML = `
-          <div style="
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-          ">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-              <h3 style="margin: 0; color: var(--text); font-size: 1.3rem; font-weight: 700;">Nueva Plantilla de WhatsApp</h3>
-              <button onclick="this.closest('.modal').remove()" style="
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: var(--sub);
-                padding: 0.5rem;
-              ">✕</button>
-            </div>
-
-            <form id="formNuevaPlantilla">
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Título de la plantilla:</label>
-                <input 
-                  type="text" 
-                  id="plantillaTitulo" 
-                  placeholder="Ej: Recordatorio de pago"
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-                  required
-                />
-              </div>
-
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Categoría:</label>
-                <select 
-                  id="plantillaCategoria" 
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-                  required
-                >
-                  <option value="">Seleccionar categoría...</option>
-                  <option value="Pagos">Pagos</option>
-                  <option value="Bienvenida">Bienvenida</option>
-                  <option value="Membresías">Membresías</option>
-                  <option value="Deudores">Deudores</option>
-                  <option value="Cumpleaños">Cumpleaños</option>
-                  <option value="General">General</option>
-                </select>
-              </div>
-
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Mensaje:</label>
-                <textarea 
-                  id="plantillaMensaje" 
-                  rows="8"
-                  placeholder="Escribe tu mensaje aquí. Puedes usar variables como {nombre}, {monto}, {fecha}, etc."
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white; resize: vertical;"
-                  required
-                ></textarea>
-              </div>
-
-              <div style="margin-bottom: 1.5rem;">
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                  <input type="checkbox" id="plantillaActiva" checked style="margin: 0;">
-                  <span style="color: var(--text); font-weight: 500;">Plantilla activa</span>
-                </label>
-              </div>
-
-              <div style="background: #f8f9fa; border: 1px solid var(--muted); border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem;">
-                <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Variables disponibles:</div>
-                <div style="font-size: 0.9rem; color: var(--sub);">
-                  <code>{nombre}</code> - Nombre del cliente<br>
-                  <code>{monto}</code> - Monto de pago/deuda<br>
-                  <code>{fecha}</code> - Fecha de vencimiento<br>
-                  <code>{dias}</code> - Días restantes<br>
-                  <code>{sucursal}</code> - Nombre de la sucursal
-                </div>
-              </div>
-
-              <div style="display: flex; justify-content: flex-end; gap: 1rem;">
-                <button 
-                  type="button" 
-                  onclick="this.closest('.modal').remove()" 
-                  style="
-                    background: var(--panel);
-                    color: var(--text);
-                    border: 1px solid var(--muted);
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 6px;
-                    cursor: pointer;
-                  "
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  style="
-                    background: var(--ok);
-                    color: white;
-                    border: none;
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: 600;
-                  "
-                >
-                  Guardar Plantilla
-                </button>
-              </div>
-            </form>
-          </div>
-        `;
-
-        modal.className = "modal";
-        document.body.appendChild(modal);
-
-        // Manejar envío del formulario
-        EL("#formNuevaPlantilla").onsubmit = function (e) {
-          e.preventDefault();
-          guardarNuevaPlantilla();
-        };
-
-        // Cerrar modal al hacer clic fuera
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) {
-            modal.remove();
-          }
-        });
-      }
-
-      function guardarNuevaPlantilla() {
-        const titulo = EL("#plantillaTitulo").value.trim();
-        const categoria = EL("#plantillaCategoria").value;
-        const mensaje = EL("#plantillaMensaje").value.trim();
-        const activa = EL("#plantillaActiva").checked;
-
-        if (!titulo || !categoria || !mensaje) {
-          alert("Por favor completa todos los campos obligatorios");
-          return;
-        }
-
-        const nuevaPlantilla = {
-          id: uuid(),
-          titulo: titulo,
-          mensaje: mensaje,
-          categoria: categoria,
-          activa: activa,
-          fechaCreacion: new Date().toISOString(),
-        };
-
-        DB.plantillasWhatsApp.push(nuevaPlantilla);
-        save();
-
-        // Cerrar modal y actualizar vista
-        document.querySelector(".modal").remove();
-        cargarPlantillas();
-
-        alert("✅ Plantilla creada exitosamente");
-      }
-
-      function editarPlantilla(id) {
-        const plantilla = DB.plantillasWhatsApp.find((p) => p.id === id);
-        if (!plantilla) return;
-
-        const modal = document.createElement("div");
-        modal.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 2000;
-        `;
-
-        modal.innerHTML = `
-          <div style="
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-          ">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-              <h3 style="margin: 0; color: var(--text); font-size: 1.3rem; font-weight: 700;">Editar Plantilla</h3>
-              <button onclick="this.closest('.modal').remove()" style="
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: var(--sub);
-                padding: 0.5rem;
-              ">✕</button>
-            </div>
-
-            <form id="formEditarPlantilla">
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Título de la plantilla:</label>
-                <input 
-                  type="text" 
-                  id="plantillaTituloEdit" 
-                  value="${plantilla.titulo}"
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-                  required
-                />
-              </div>
-
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Categoría:</label>
-                <select 
-                  id="plantillaCategoriaEdit" 
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-                  required
-                >
-                  <option value="Pagos" ${
-                    plantilla.categoria === "Pagos" ? "selected" : ""
-                  }>Pagos</option>
-                  <option value="Bienvenida" ${
-                    plantilla.categoria === "Bienvenida" ? "selected" : ""
-                  }>Bienvenida</option>
-                  <option value="Membresías" ${
-                    plantilla.categoria === "Membresías" ? "selected" : ""
-                  }>Membresías</option>
-                  <option value="Deudores" ${
-                    plantilla.categoria === "Deudores" ? "selected" : ""
-                  }>Deudores</option>
-                  <option value="Cumpleaños" ${
-                    plantilla.categoria === "Cumpleaños" ? "selected" : ""
-                  }>Cumpleaños</option>
-                  <option value="General" ${
-                    plantilla.categoria === "General" ? "selected" : ""
-                  }>General</option>
-                </select>
-              </div>
-
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Mensaje:</label>
-                <textarea 
-                  id="plantillaMensajeEdit" 
-                  rows="8"
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white; resize: vertical;"
-                  required
-                >${plantilla.mensaje}</textarea>
-              </div>
-
-              <div style="margin-bottom: 1.5rem;">
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                  <input type="checkbox" id="plantillaActivaEdit" ${
-                    plantilla.activa ? "checked" : ""
-                  } style="margin: 0;">
-                  <span style="color: var(--text); font-weight: 500;">Plantilla activa</span>
-                </label>
-              </div>
-
-              <div style="display: flex; justify-content: flex-end; gap: 1rem;">
-                <button 
-                  type="button" 
-                  onclick="this.closest('.modal').remove()" 
-                  style="
-                    background: var(--panel);
-                    color: var(--text);
-                    border: 1px solid var(--muted);
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 6px;
-                    cursor: pointer;
-                  "
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  style="
-                    background: var(--ok);
-                    color: white;
-                    border: none;
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: 600;
-                  "
-                >
-                  Actualizar Plantilla
-                </button>
-              </div>
-            </form>
-          </div>
-        `;
-
-        modal.className = "modal";
-        document.body.appendChild(modal);
-
-        // Manejar envío del formulario
-        EL("#formEditarPlantilla").onsubmit = function (e) {
-          e.preventDefault();
-          actualizarPlantilla(id);
-        };
-
-        // Cerrar modal al hacer clic fuera
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) {
-            modal.remove();
-          }
-        });
-      }
-
-      function actualizarPlantilla(id) {
-        const titulo = EL("#plantillaTituloEdit").value.trim();
-        const categoria = EL("#plantillaCategoriaEdit").value;
-        const mensaje = EL("#plantillaMensajeEdit").value.trim();
-        const activa = EL("#plantillaActivaEdit").checked;
-
-        if (!titulo || !categoria || !mensaje) {
-          alert("Por favor completa todos los campos obligatorios");
-          return;
-        }
-
-        const plantilla = DB.plantillasWhatsApp.find((p) => p.id === id);
-        if (plantilla) {
-          plantilla.titulo = titulo;
-          plantilla.mensaje = mensaje;
-          plantilla.categoria = categoria;
-          plantilla.activa = activa;
-
-          save();
-
-          // Cerrar modal y actualizar vista
-          document.querySelector(".modal").remove();
-          cargarPlantillas();
-
-          alert("✅ Plantilla actualizada exitosamente");
-        }
-      }
-
-      function togglePlantilla(id) {
-        const plantilla = DB.plantillasWhatsApp.find((p) => p.id === id);
-        if (plantilla) {
-          plantilla.activa = !plantilla.activa;
-          save();
-          cargarPlantillas();
-          alert(
-            `Plantilla ${
-              plantilla.activa ? "activada" : "desactivada"
-            } exitosamente`
-          );
-        }
-      }
-
-      function eliminarPlantilla(id) {
-        if (
-          confirm(
-            "¿Estás seguro de que quieres eliminar esta plantilla? Esta acción no se puede deshacer."
-          )
-        ) {
-          DB.plantillasWhatsApp = DB.plantillasWhatsApp.filter(
-            (p) => p.id !== id
-          );
-          save();
-          cargarPlantillas();
-          alert("✅ Plantilla eliminada exitosamente");
-        }
-      }
-
-      function copiarPlantilla(id) {
-        const plantilla = DB.plantillasWhatsApp.find((p) => p.id === id);
-        if (plantilla) {
-          navigator.clipboard
-            .writeText(plantilla.mensaje)
-            .then(() => {
-              alert("✅ Mensaje copiado al portapapeles");
-            })
-            .catch(() => {
-              alert("❌ No se pudo copiar al portapapeles");
-            });
-        }
-      }
-
-      function usarPlantilla(id) {
-        const plantilla = DB.plantillasWhatsApp.find((p) => p.id === id);
-        if (plantilla) {
-          abrirModalEnviarWhatsApp(plantilla);
-        }
-      }
-
-      function abrirModalEnviarWhatsApp(plantilla) {
-        const modal = document.createElement("div");
-        modal.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 2000;
-        `;
-
-        modal.innerHTML = `
-          <div style="
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-          ">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-              <h3 style="margin: 0; color: var(--text); font-size: 1.3rem; font-weight: 700;">Enviar Mensaje por WhatsApp</h3>
-              <button onclick="this.closest('.modal').remove()" style="
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: var(--sub);
-                padding: 0.5rem;
-              ">✕</button>
-            </div>
-
-            <div style="margin-bottom: 1.5rem;">
-              <div style="background: #f8f9fa; border: 1px solid var(--muted); border-radius: 6px; padding: 1rem; margin-bottom: 1rem;">
-                <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Plantilla: ${plantilla.titulo}</div>
-                <div style="color: var(--sub); font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap;">${plantilla.mensaje}</div>
-              </div>
-            </div>
-
-            <form id="formEnviarWhatsApp">
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Número de teléfono:</label>
-                <input 
-                  type="tel" 
-                  id="numeroWhatsApp" 
-                  placeholder="Ej: 593991234567 (sin + ni espacios)"
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-                  required
-                />
-                <div style="font-size: 0.8rem; color: var(--sub); margin-top: 0.3rem;">
-                  Formato: código de país + número (ej: 593991234567)
-                </div>
-              </div>
-
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Mensaje personalizado:</label>
-                <textarea 
-                  id="mensajePersonalizado" 
-                  rows="6"
-                  placeholder="Personaliza el mensaje aquí..."
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white; resize: vertical;"
-                >${plantilla.mensaje}</textarea>
-              </div>
-
-              <div style="background: #e8f5e8; border: 1px solid #4caf50; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem;">
-                <div style="font-weight: 600; color: #2e7d32; margin-bottom: 0.5rem;">💡 Variables disponibles:</div>
-                <div style="font-size: 0.9rem; color: #2e7d32;">
-                  <code>{nombre}</code> - Nombre del cliente<br>
-                  <code>{monto}</code> - Monto de pago/deuda<br>
-                  <code>{fecha}</code> - Fecha de vencimiento<br>
-                  <code>{dias}</code> - Días restantes<br>
-                  <code>{sucursal}</code> - Nombre de la sucursal
-                </div>
-              </div>
-
-              <div style="display: flex; justify-content: flex-end; gap: 1rem;">
-                <button 
-                  type="button" 
-                  onclick="this.closest('.modal').remove()" 
-                  style="
-                    background: var(--panel);
-                    color: var(--text);
-                    border: 1px solid var(--muted);
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 6px;
-                    cursor: pointer;
-                  "
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  style="
-                    background: #25d366;
-                    color: white;
-                    border: none;
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: 600;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                  "
-                >
-                  📱 Enviar por WhatsApp
-                </button>
-              </div>
-            </form>
-          </div>
-        `;
-
-        modal.className = "modal";
-        document.body.appendChild(modal);
-
-        // Manejar envío del formulario
-        EL("#formEnviarWhatsApp").onsubmit = function(e) {
-          e.preventDefault();
-          enviarWhatsApp();
-        };
-
-        // Cerrar modal al hacer clic fuera
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) {
-            modal.remove();
-          }
-        });
-      }
-
-      function enviarWhatsApp() {
-        const numero = EL("#numeroWhatsApp").value.trim();
-        const mensaje = EL("#mensajePersonalizado").value.trim();
-
-        if (!numero || !mensaje) {
-          alert("Por favor completa todos los campos obligatorios");
-          return;
-        }
-
-        // Validar formato del número
-        const numeroLimpio = numero.replace(/\D/g, "");
-        if (numeroLimpio.length < 10) {
-          alert("Por favor ingresa un número de teléfono válido");
-          return;
-        }
-
-        // Codificar el mensaje para URL
-        const mensajeCodificado = encodeURIComponent(mensaje);
-        
-        // Crear URL de WhatsApp
-        const urlWhatsApp = `https://wa.me/${numeroLimpio}?text=${mensajeCodificado}`;
-        
-        // Abrir WhatsApp en nueva pestaña
-        window.open(urlWhatsApp, '_blank');
-        
-        // Cerrar modal
-        document.querySelector(".modal").remove();
-        
-        alert("✅ WhatsApp abierto con el mensaje listo para enviar");
-      }
-
-      /******************** GESTIÓN DE DESCUENTOS ********************/
-
-      function seedDescuentos() {
-        return [
-          {
-            id: "d1",
-            nombre: "Descuento Estudiantil",
-            monto: 15,
-            activo: true,
-            fechaCreacion: new Date().toISOString(),
-          },
-          {
-            id: "d2",
-            nombre: "Descuento Familiar",
-            monto: 20,
-            activo: true,
-            fechaCreacion: new Date().toISOString(),
-          },
-          {
-            id: "d3",
-            nombre: "Descuento Anual",
-            monto: 25,
-            activo: true,
-            fechaCreacion: new Date().toISOString(),
-          },
-          {
-            id: "d4",
-            nombre: "Descuento Senior",
-            monto: 10,
-            activo: false,
-            fechaCreacion: new Date().toISOString(),
-          },
-        ];
-      }
-
-      function renderDescuentos(root) {
+      // Reportes de Facturación
+      function renderReportesFacturacion(root) {
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h3 class="section-title" style="margin: 0;">Gestión de Descuentos</h3>
-            <button class="btn primary" onclick="abrirModalNuevoDescuento()" style="padding: 0.8rem 1.5rem;">
-              ➕ Agregar Descuento
-            </button>
+          <h3 class="section-title">Reportes de Facturación</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div style="background: var(--card); border: 1px solid var(--muted); border-radius: 8px; padding: 1.5rem; text-align: center;">
+              <div style="font-size: 2rem; font-weight: 700; color: var(--brand); margin-bottom: 0.5rem;">$1,250</div>
+              <div style="color: var(--sub); font-size: 0.9rem;">Ventas del Mes</div>
+            </div>
+            <div style="background: var(--card); border: 1px solid var(--muted); border-radius: 8px; padding: 1.5rem; text-align: center;">
+              <div style="font-size: 2rem; font-weight: 700; color: var(--ok); margin-bottom: 0.5rem;">45</div>
+              <div style="color: var(--sub); font-size: 0.9rem;">Facturas Generadas</div>
+            </div>
+            <div style="background: var(--card); border: 1px solid var(--muted); border-radius: 8px; padding: 1.5rem; text-align: center;">
+              <div style="font-size: 2rem; font-weight: 700; color: var(--warn); margin-bottom: 0.5rem;">5</div>
+              <div style="color: var(--sub); font-size: 0.9rem;">Pendientes de Pago</div>
+            </div>
+            <div style="background: var(--card); border: 1px solid var(--muted); border-radius: 8px; padding: 1.5rem; text-align: center;">
+              <div style="font-size: 2rem; font-weight: 700; color: var(--danger); margin-bottom: 0.5rem;">$180</div>
+              <div style="color: var(--sub); font-size: 0.9rem;">Total Pendiente</div>
+            </div>
           </div>
-
-          <!-- Filtros -->
-          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-            <select id="filtroEstadoDescuento" onchange="filtrarDescuentos()" style="padding: 0.5rem; border: 1px solid var(--muted); border-radius: 6px; background: white;">
-              <option value="">Todos los estados</option>
-              <option value="activo">Activos</option>
-              <option value="inactivo">Inactivos</option>
-            </select>
-            <input 
-              type="text" 
-              id="buscarDescuento" 
-              placeholder="Buscar descuento..." 
-              oninput="filtrarDescuentos()"
-              style="padding: 0.5rem; border: 1px solid var(--muted); border-radius: 6px; background: white; flex: 1; min-width: 200px;"
-            />
-          </div>
-
-          <!-- Lista de descuentos -->
-          <div id="listaDescuentos" style="display: grid; gap: 1rem;">
-            <!-- Los descuentos se cargarán dinámicamente -->
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn">Reporte de Ventas</button>
+            <button class="btn">Reporte de Cobranza</button>
+            <button class="btn">Reporte de Productos</button>
+            <button class="btn">Exportar a Excel</button>
           </div>
         `;
         root.append(card);
-        cargarDescuentos();
       }
 
-      function cargarDescuentos() {
-        const container = EL("#listaDescuentos");
-        const descuentos = DB.descuentos || [];
-
-        if (descuentos.length === 0) {
-          container.innerHTML = `
-            <div style="text-align: center; padding: 3rem; color: var(--sub);">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1rem; opacity: 0.5;">
-                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V21C3 22.11 3.89 23 5 23H19C20.11 23 21 22.11 21 21V9ZM19 9H14V4H5V21H19V9Z" fill="currentColor"/>
-              </svg>
-              <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">No hay descuentos creados</div>
-              <div style="font-size: 0.9rem;">Crea tu primer descuento</div>
-            </div>
-          `;
-          return;
-        }
-
-        const html = descuentos
-          .map(
-            (descuento) => `
-          <div style="background: white; border: 1px solid var(--muted); border-radius: 8px; padding: 1.5rem; transition: all 0.2s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-              <div style="flex: 1;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                  <h4 style="margin: 0; color: var(--text); font-size: 1.1rem; font-weight: 600;">${
-                    descuento.nombre
-                  }</h4>
-                  <span style="background: ${
-                    descuento.activo ? "var(--ok)" : "var(--sub)"
-                  }; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">
-                    ${descuento.activo ? "Activo" : "Inactivo"}
-                  </span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem;">
-                  <span style="background: var(--brand); color: white; padding: 0.3rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${
-                    descuento.monto
-                  }%</span>
-                  <span style="color: var(--sub); font-size: 0.8rem;">Creado: ${new Date(
-                    descuento.fechaCreacion
-                  ).toLocaleDateString("es-EC")}</span>
-                </div>
+      // Configuración de Facturación
+      function renderConfiguracionFacturacion(root) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3 class="section-title">Configuración de Facturación</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div>
+              <h4 style="margin: 0 0 1rem 0; color: var(--text);">Datos de la Empresa</h4>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Razón Social</label>
+                <input class="input" value="GYM FITNESS S.A." />
               </div>
-              <div style="display: flex; gap: 0.5rem;">
-                <button class="btn" onclick="editarDescuento('${
-                  descuento.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="Editar">
-                  ✏️
-                </button>
-                <button class="btn" onclick="toggleDescuento('${
-                  descuento.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="${
-              descuento.activo ? "Desactivar" : "Activar"
-            }">
-                  ${descuento.activo ? "🔴" : "🟢"}
-                </button>
-                <button class="btn danger" onclick="eliminarDescuento('${
-                  descuento.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="Eliminar">
-                  🗑️
-                </button>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">RUC</label>
+                <input class="input" value="1234567890001" />
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Dirección</label>
+                <input class="input" value="Av. Amazonas 123, Quito" />
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Teléfono</label>
+                <input class="input" value="02-2345678" />
               </div>
             </div>
-            
-            <div style="background: #f8f9fa; border: 1px solid var(--muted); border-radius: 6px; padding: 1rem;">
-              <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem; font-size: 0.9rem;">Detalles del descuento:</div>
-              <div style="color: var(--sub); font-size: 0.9rem; line-height: 1.5;">
-                <strong>Nombre:</strong> ${descuento.nombre}<br>
-                <strong>Porcentaje:</strong> ${descuento.monto}%<br>
-                <strong>Estado:</strong> ${
-                  descuento.activo ? "Activo" : "Inactivo"
-                }<br>
-                <strong>Fecha de creación:</strong> ${new Date(
-                  descuento.fechaCreacion
-                ).toLocaleDateString("es-EC")}
+            <div>
+              <h4 style="margin: 0 0 1rem 0; color: var(--text);">Configuración de Factura</h4>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Prefijo Factura</label>
+                <input class="input" value="FAC-" />
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Siguiente Número</label>
+                <input class="input" type="number" value="3" />
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">IVA (%)</label>
+                <input class="input" type="number" value="12" />
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Moneda</label>
+                <select class="select">
+                  <option>USD - Dólar Americano</option>
+                  <option>EUR - Euro</option>
+                </select>
               </div>
             </div>
           </div>
-        `
-          )
-          .join("");
-
-        container.innerHTML = html;
-      }
-
-      function filtrarDescuentos() {
-        const estado = EL("#filtroEstadoDescuento").value;
-        const busqueda = EL("#buscarDescuento").value.toLowerCase();
-
-        const descuentos = DB.descuentos || [];
-        const descuentosFiltrados = descuentos.filter((descuento) => {
-          const cumpleEstado =
-            !estado ||
-            (estado === "activo" && descuento.activo) ||
-            (estado === "inactivo" && !descuento.activo);
-          const cumpleBusqueda =
-            !busqueda ||
-            descuento.nombre.toLowerCase().includes(busqueda) ||
-            descuento.monto.toString().includes(busqueda);
-
-          return cumpleEstado && cumpleBusqueda;
-        });
-
-        const container = EL("#listaDescuentos");
-        if (descuentosFiltrados.length === 0) {
-          container.innerHTML = `
-            <div style="text-align: center; padding: 2rem; color: var(--sub);">
-              <div style="font-size: 1rem;">No se encontraron descuentos con los filtros aplicados</div>
-            </div>
-          `;
-          return;
-        }
-
-        const html = descuentosFiltrados
-          .map(
-            (descuento) => `
-          <div style="background: white; border: 1px solid var(--muted); border-radius: 8px; padding: 1.5rem; transition: all 0.2s ease;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-              <div style="flex: 1;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                  <h4 style="margin: 0; color: var(--text); font-size: 1.1rem; font-weight: 600;">${
-                    descuento.nombre
-                  }</h4>
-                  <span style="background: ${
-                    descuento.activo ? "var(--ok)" : "var(--sub)"
-                  }; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">
-                    ${descuento.activo ? "Activo" : "Inactivo"}
-                  </span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem;">
-                  <span style="background: var(--brand); color: white; padding: 0.3rem 0.8rem; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${
-                    descuento.monto
-                  }%</span>
-                  <span style="color: var(--sub); font-size: 0.8rem;">Creado: ${new Date(
-                    descuento.fechaCreacion
-                  ).toLocaleDateString("es-EC")}</span>
-                </div>
-              </div>
-              <div style="display: flex; gap: 0.5rem;">
-                <button class="btn" onclick="editarDescuento('${
-                  descuento.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="Editar">
-                  ✏️
-                </button>
-                <button class="btn" onclick="toggleDescuento('${
-                  descuento.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="${
-              descuento.activo ? "Desactivar" : "Activar"
-            }">
-                  ${descuento.activo ? "🔴" : "🟢"}
-                </button>
-                <button class="btn danger" onclick="eliminarDescuento('${
-                  descuento.id
-                }')" style="padding: 0.5rem; font-size: 0.8rem;" title="Eliminar">
-                  🗑️
-                </button>
-              </div>
-            </div>
-            
-            <div style="background: #f8f9fa; border: 1px solid var(--muted); border-radius: 6px; padding: 1rem;">
-              <div style="font-weight: 600; color: var(--text); margin-bottom: 0.5rem; font-size: 0.9rem;">Detalles del descuento:</div>
-              <div style="color: var(--sub); font-size: 0.9rem; line-height: 1.5;">
-                <strong>Nombre:</strong> ${descuento.nombre}<br>
-                <strong>Porcentaje:</strong> ${descuento.monto}%<br>
-                <strong>Estado:</strong> ${
-                  descuento.activo ? "Activo" : "Inactivo"
-                }<br>
-                <strong>Fecha de creación:</strong> ${new Date(
-                  descuento.fechaCreacion
-                ).toLocaleDateString("es-EC")}
-              </div>
-            </div>
-          </div>
-        `
-          )
-          .join("");
-
-        container.innerHTML = html;
-      }
-
-      function abrirModalNuevoDescuento() {
-        const modal = document.createElement("div");
-        modal.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 2000;
-        `;
-
-        modal.innerHTML = `
-          <div style="
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-          ">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-              <h3 style="margin: 0; color: var(--text); font-size: 1.3rem; font-weight: 700;">Nuevo Descuento</h3>
-              <button onclick="this.closest('.modal').remove()" style="
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: var(--sub);
-                padding: 0.5rem;
-              ">✕</button>
-            </div>
-
-            <form id="formNuevoDescuento">
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Nombre del descuento:</label>
-                <input 
-                  type="text" 
-                  id="descuentoNombre" 
-                  placeholder="Ej: Descuento Estudiantil"
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-                  required
-                />
-              </div>
-
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Porcentaje de descuento (%):</label>
-                <input 
-                  type="number" 
-                  id="descuentoMonto" 
-                  min="1" 
-                  max="100"
-                  placeholder="Ej: 15"
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-                  required
-                />
-              </div>
-
-              <div style="margin-bottom: 1.5rem;">
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                  <input type="checkbox" id="descuentoActivo" checked style="margin: 0;">
-                  <span style="color: var(--text); font-weight: 500;">Descuento activo</span>
-                </label>
-              </div>
-
-              <div style="display: flex; justify-content: flex-end; gap: 1rem;">
-                <button 
-                  type="button" 
-                  onclick="this.closest('.modal').remove()" 
-                  style="
-                    background: var(--panel);
-                    color: var(--text);
-                    border: 1px solid var(--muted);
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 6px;
-                    cursor: pointer;
-                  "
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  style="
-                    background: var(--ok);
-                    color: white;
-                    border: none;
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: 600;
-                  "
-                >
-                  Guardar Descuento
-                </button>
-              </div>
-            </form>
+          <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+            <button class="btn ghost">Cancelar</button>
+            <button class="btn primary">Guardar Configuración</button>
           </div>
         `;
-
-        modal.className = "modal";
-        document.body.appendChild(modal);
-
-        // Manejar envío del formulario
-        EL("#formNuevoDescuento").onsubmit = function (e) {
-          e.preventDefault();
-          guardarNuevoDescuento();
-        };
-
-        // Cerrar modal al hacer clic fuera
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) {
-            modal.remove();
-          }
-        });
-      }
-
-      function guardarNuevoDescuento() {
-        const nombre = EL("#descuentoNombre").value.trim();
-        const monto = parseInt(EL("#descuentoMonto").value);
-        const activo = EL("#descuentoActivo").checked;
-
-        if (!nombre || !monto || monto < 1 || monto > 100) {
-          alert(
-            "Por favor completa todos los campos correctamente. El porcentaje debe estar entre 1% y 100%"
-          );
-          return;
-        }
-
-        const nuevoDescuento = {
-          id: uuid(),
-          nombre: nombre,
-          monto: monto,
-          activo: activo,
-          fechaCreacion: new Date().toISOString(),
-        };
-
-        DB.descuentos.push(nuevoDescuento);
-        save();
-
-        // Cerrar modal y actualizar vista
-        document.querySelector(".modal").remove();
-        cargarDescuentos();
-
-        alert("✅ Descuento creado exitosamente");
-      }
-
-      function editarDescuento(id) {
-        const descuento = DB.descuentos.find((d) => d.id === id);
-        if (!descuento) return;
-
-        const modal = document.createElement("div");
-        modal.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 2000;
-        `;
-
-        modal.innerHTML = `
-          <div style="
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-          ">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-              <h3 style="margin: 0; color: var(--text); font-size: 1.3rem; font-weight: 700;">Editar Descuento</h3>
-              <button onclick="this.closest('.modal').remove()" style="
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: var(--sub);
-                padding: 0.5rem;
-              ">✕</button>
-            </div>
-
-            <form id="formEditarDescuento">
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Nombre del descuento:</label>
-                <input 
-                  type="text" 
-                  id="descuentoNombreEdit" 
-                  value="${descuento.nombre}"
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-                  required
-                />
-              </div>
-
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600;">Porcentaje de descuento (%):</label>
-                <input 
-                  type="number" 
-                  id="descuentoMontoEdit" 
-                  min="1" 
-                  max="100"
-                  value="${descuento.monto}"
-                  style="width: 100%; padding: 0.8rem; border: 1px solid var(--muted); border-radius: 6px; background: white;"
-                  required
-                />
-              </div>
-
-              <div style="margin-bottom: 1.5rem;">
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                  <input type="checkbox" id="descuentoActivoEdit" ${
-                    descuento.activo ? "checked" : ""
-                  } style="margin: 0;">
-                  <span style="color: var(--text); font-weight: 500;">Descuento activo</span>
-                </label>
-              </div>
-
-              <div style="display: flex; justify-content: flex-end; gap: 1rem;">
-                <button 
-                  type="button" 
-                  onclick="this.closest('.modal').remove()" 
-                  style="
-                    background: var(--panel);
-                    color: var(--text);
-                    border: 1px solid var(--muted);
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 6px;
-                    cursor: pointer;
-                  "
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  style="
-                    background: var(--ok);
-                    color: white;
-                    border: none;
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: 600;
-                  "
-                >
-                  Actualizar Descuento
-                </button>
-              </div>
-            </form>
-          </div>
-        `;
-
-        modal.className = "modal";
-        document.body.appendChild(modal);
-
-        // Manejar envío del formulario
-        EL("#formEditarDescuento").onsubmit = function (e) {
-          e.preventDefault();
-          actualizarDescuento(id);
-        };
-
-        // Cerrar modal al hacer clic fuera
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) {
-            modal.remove();
-          }
-        });
-      }
-
-      function actualizarDescuento(id) {
-        const nombre = EL("#descuentoNombreEdit").value.trim();
-        const monto = parseInt(EL("#descuentoMontoEdit").value);
-        const activo = EL("#descuentoActivoEdit").checked;
-
-        if (!nombre || !monto || monto < 1 || monto > 100) {
-          alert(
-            "Por favor completa todos los campos correctamente. El porcentaje debe estar entre 1% y 100%"
-          );
-          return;
-        }
-
-        const descuento = DB.descuentos.find((d) => d.id === id);
-        if (descuento) {
-          descuento.nombre = nombre;
-          descuento.monto = monto;
-          descuento.activo = activo;
-
-          save();
-
-          // Cerrar modal y actualizar vista
-          document.querySelector(".modal").remove();
-          cargarDescuentos();
-
-          alert("✅ Descuento actualizado exitosamente");
-        }
-      }
-
-      function toggleDescuento(id) {
-        const descuento = DB.descuentos.find((d) => d.id === id);
-        if (descuento) {
-          descuento.activo = !descuento.activo;
-          save();
-          cargarDescuentos();
-          alert(
-            `Descuento ${
-              descuento.activo ? "activado" : "desactivado"
-            } exitosamente`
-          );
-        }
-      }
-
-      function eliminarDescuento(id) {
-        if (
-          confirm(
-            "¿Estás seguro de que quieres eliminar este descuento? Esta acción no se puede deshacer."
-          )
-        ) {
-          DB.descuentos = DB.descuentos.filter((d) => d.id !== id);
-          save();
-          cargarDescuentos();
-          alert("✅ Descuento eliminado exitosamente");
-        }
+        root.append(card);
       }
     </script>
   </body>
