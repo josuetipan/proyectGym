@@ -3021,6 +3021,7 @@
         { id: "export", label: "Exportar datos" },
         { id: "membresias", label: "Membresías" },
         { id: "pagos", label: "Informe de pago" },
+        { id: "facturacion", label: "Facturación" },
       ];
       let active = "ingreso";
       let currentClientDetail = null; // Para la vista detallada del cliente
@@ -3132,6 +3133,7 @@
         if (active === "export") return renderExport(root);
         if (active === "membresias") return renderMembresias(root);
         if (active === "pagos") return renderPagos(root);
+        if (active === "facturacion") return renderFacturacion(root);
       }
 
       /******************** SECCIÓN 1: INGRESO ********************/
@@ -11464,6 +11466,660 @@ POWERGYM UltraFitEc`;
               "'": "&#039;",
             }[m])
         );
+      }
+
+      /******************** SECCIÓN FACTURACIÓN ********************/
+      function renderFacturacion(root) {
+        const wrap = document.createElement("div");
+        wrap.className = "grid cols-2";
+        wrap.style.gap = "2rem";
+
+        // Col 1: Formulario de Facturación
+        const c1 = document.createElement("div");
+        c1.className = "card";
+        c1.style.background =
+          "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)";
+        c1.style.border = "2px solid var(--brand)";
+        c1.style.boxShadow = "0 8px 32px rgba(218, 131, 224, 0.15)";
+        c1.innerHTML = `
+          <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="width: 80px; height: 80px; background: var(--gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: white;">
+                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 style="margin: 0; color: var(--brand); font-size: 1.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;">Sistema de Facturación</h3>
+            <p style="margin: 0.5rem 0 0 0; color: var(--sub); font-size: 0.9rem;">Gestión profesional de documentos comerciales</p>
+          </div>
+          
+          <div style="background: rgba(255, 255, 255, 0.8); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(218, 131, 224, 0.2); margin-bottom: 1.5rem;">
+            <h4 style="margin: 0 0 1rem 0; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--brand);">
+                <path d="M8 2V5M16 2V5M3 10H21M5 4H19C20.1046 4 21 4.89543 21 6V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Información del Documento
+            </h4>
+            
+            <div class="row" style="margin-bottom: 1rem;">
+              <div style="flex: 1; margin-right: 0.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">Tipo</label>
+                <select id="fc_tipo" class="select" style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;">
+                  <option value="FACTURA">📄 FACTURA</option>
+                  <option value="NOTA DE VENTA">📋 NOTA DE VENTA</option>
+                  <option value="COMPROBANTE">🧾 COMPROBANTE</option>
+                </select>
+              </div>
+              <div style="flex: 1; margin-left: 0.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">Fecha</label>
+                <input type="datetime-local" id="fc_fecha" class="input" value="${new Date()
+                  .toISOString()
+                  .slice(
+                    0,
+                    16
+                  )}" style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;">
+              </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 1rem;">
+              <div style="flex: 1; margin-right: 0.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">🏢 Sucursal</label>
+                <select id="fc_sucursal" class="select" style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;">
+                  <option value="Matriz">🏢 Matriz</option>
+                  <option value="Ponciano">🏢 Ponciano</option>
+                  <option value="QT">🏢 QT</option>
+                </select>
+              </div>
+              <div style="flex: 1; margin-left: 0.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">💳 Pago</label>
+                <select id="fc_metodo" class="select" style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;">
+                  <option value="Efectivo">💵 Efectivo</option>
+                  <option value="Tarjeta">💳 Tarjeta</option>
+                  <option value="Transferencia">🏦 Transferencia</option>
+                  <option value="Depósito">🏛️ Depósito</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: rgba(255, 255, 255, 0.8); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(218, 131, 224, 0.2); margin-bottom: 1.5rem;">
+            <h4 style="margin: 0 0 1rem 0; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--brand);">
+                <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Datos del Cliente
+            </h4>
+            
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">👤 Cliente</label>
+              <input type="text" id="fc_cliente" class="input" placeholder="Nombre del cliente o Consumidor Final" style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;">
+            </div>
+
+            <div class="row" style="margin-bottom: 1rem;">
+              <div style="flex: 1; margin-right: 0.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">🆔 Identificación</label>
+                <input type="text" id="fc_ident" class="input" placeholder="Cédula/RUC" style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;">
+              </div>
+              <div style="flex: 1; margin-left: 0.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">📧 Email</label>
+                <input type="email" id="fc_email" class="input" placeholder="Email del cliente" style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;">
+              </div>
+            </div>
+
+            <div style="margin-bottom: 0;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">📝 Notas</label>
+              <textarea id="fc_notas" class="input" placeholder="Observaciones adicionales" rows="3" style="width: 100%; resize: vertical; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;"></textarea>
+            </div>
+          </div>
+
+          <div style="background: rgba(255, 255, 255, 0.8); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(218, 131, 224, 0.2); margin-bottom: 1.5rem;">
+            <h4 style="margin: 0 0 1rem 0; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--brand);">
+                <path d="M20 7L10 17L5 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Productos y Servicios
+            </h4>
+            
+            <div id="fc_items" style="margin-bottom: 1rem;">
+              <!-- Los items se renderizarán aquí -->
+            </div>
+
+            <button class="btn" onclick="fcAgregarItem()" style="width: 100%; margin-bottom: 0; background: var(--gradient); color: white; border: none; border-radius: 10px; padding: 1rem; font-weight: 600; font-size: 1rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(218, 131, 224, 0.3);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.5rem;">
+                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              ➕ Agregar Producto/Servicio
+            </button>
+          </div>
+
+          <div style="background: rgba(255, 255, 255, 0.9); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--brand); box-shadow: 0 8px 25px rgba(218, 131, 224, 0.2);">
+            <h4 style="margin: 0 0 1rem 0; color: var(--brand); font-weight: 700; text-align: center; font-size: 1.1rem;">Acciones</h4>
+            
+            <div class="row" style="justify-content: space-between; margin-bottom: 0;">
+              <button class="btn ghost" onclick="fcLimpiarFormulario()" style="flex: 1; margin-right: 0.5rem; border: 2px solid var(--muted); border-radius: 10px; padding: 1rem; font-weight: 600; transition: all 0.3s ease;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.5rem;">
+                  <path d="M19 7L10 16L5 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                🧹 Limpiar
+              </button>
+              <button class="btn primary" onclick="fcGenerarFactura()" style="flex: 1; margin-left: 0.5rem; background: var(--gradient); border: none; border-radius: 10px; padding: 1rem; font-weight: 700; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(218, 131, 224, 0.4);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.5rem;">
+                  <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                ✨ Generar Factura
+              </button>
+            </div>
+          </div>
+        `;
+
+        // Col 2: Resumen y Historial
+        const c2 = document.createElement("div");
+        c2.className = "card";
+        c2.style.background =
+          "linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)";
+        c2.style.border = "2px solid var(--muted)";
+        c2.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.08)";
+        c2.innerHTML = `
+          <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: white;">
+                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3 style="margin: 0; color: var(--text); font-size: 1.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;">Resumen de Facturación</h3>
+            <p style="margin: 0.5rem 0 0 0; color: var(--sub); font-size: 0.9rem;">Cálculos automáticos en tiempo real</p>
+          </div>
+          
+          <div id="fc_resumen" style="margin-bottom: 2rem;">
+            <div style="text-align: center; padding: 2rem; color: var(--sub);">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1rem; opacity: 0.5;">
+                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div>Complete el formulario para ver el resumen</div>
+            </div>
+          </div>
+
+          <div style="background: rgba(255, 255, 255, 0.9); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(218, 131, 224, 0.2);">
+            <h4 style="margin: 0 0 1rem 0; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 0.5rem; text-align: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--brand);">
+                <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              📚 Historial Reciente
+            </h4>
+            <div id="fc_hist">
+              <!-- El historial se renderizará aquí -->
+            </div>
+          </div>
+        `;
+
+        wrap.append(c1, c2);
+        root.append(wrap);
+
+        // Inicializar estado y renderizar
+        if (!window.__FC_STATE) {
+          window.__FC_STATE = {
+            items: [],
+            historial: [],
+          };
+        }
+
+        fcRenderItems();
+        fcRenderResumen();
+        fcRenderHistorial();
+      }
+
+      // Funciones auxiliares para facturación
+      function fcAgregarItem() {
+        if (!window.__FC_STATE)
+          window.__FC_STATE = { items: [], historial: [] };
+
+        const item = {
+          id: Date.now(),
+          descripcion: "",
+          cantidad: 1,
+          precioUnit: 0,
+          descuentoPct: 0,
+          gravaIva: true,
+        };
+
+        window.__FC_STATE.items.push(item);
+        fcRenderItems();
+        fcRenderResumen();
+      }
+
+      function fcEliminarItem(id) {
+        if (!window.__FC_STATE) return;
+        window.__FC_STATE.items = window.__FC_STATE.items.filter(
+          (i) => i.id !== id
+        );
+        fcRenderItems();
+        fcRenderResumen();
+      }
+
+      function fcRenderItems() {
+        const cont = document.getElementById("fc_items");
+        if (!cont) return;
+
+        cont.innerHTML = "";
+
+        if (window.__FC_STATE.items.length === 0) {
+          cont.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: var(--sub); background: rgba(255, 255, 255, 0.6); border-radius: 12px; border: 2px dashed rgba(218, 131, 224, 0.3);">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1rem; opacity: 0.5;">
+                <path d="M20 7L10 17L5 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div style="font-size: 1.1rem; font-weight: 600;">No hay productos agregados</div>
+              <div style="font-size: 0.9rem; margin-top: 0.5rem;">Haz clic en "Agregar Producto/Servicio" para comenzar</div>
+            </div>`;
+          return;
+        }
+
+        window.__FC_STATE.items.forEach((item, index) => {
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "card";
+          itemDiv.style.marginBottom = "1rem";
+          itemDiv.style.padding = "1.5rem";
+          itemDiv.style.background = "rgba(255, 255, 255, 0.9)";
+          itemDiv.style.border = "2px solid rgba(218, 131, 224, 0.2)";
+          itemDiv.style.borderRadius = "12px";
+          itemDiv.style.boxShadow = "0 4px 15px rgba(218, 131, 224, 0.1)";
+          itemDiv.style.transition = "all 0.3s ease";
+
+          itemDiv.innerHTML = `
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 1rem; align-items: center;">
+              <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">📝 Descripción</label>
+                <input type="text" class="input" placeholder="Producto o servicio" 
+                       value="${item.descripcion}" 
+                       onchange="fcActualizarItem(${
+                         item.id
+                       }, 'descripcion', this.value)"
+                       style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">🔢 Cantidad</label>
+                <input type="number" class="input" placeholder="Cant." 
+                       value="${item.cantidad}" 
+                       onchange="fcActualizarItem(${
+                         item.id
+                       }, 'cantidad', Number(this.value))"
+                       style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;" min="1" step="1">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">💰 Precio</label>
+                <input type="number" class="input" placeholder="P.Unit." 
+                       value="${item.precioUnit}" 
+                       onchange="fcActualizarItem(${
+                         item.id
+                       }, 'precioUnit', Number(this.value))"
+                       style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;" min="0" step="0.01">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">🎯 Descuento</label>
+                <input type="number" class="input" placeholder="Desc.%" 
+                       value="${item.descuentoPct}" 
+                       onchange="fcActualizarItem(${
+                         item.id
+                       }, 'descuentoPct', Number(this.value))"
+                       style="width: 100%; border: 2px solid rgba(218, 131, 224, 0.3); border-radius: 8px; padding: 0.8rem; background: white; transition: all 0.3s ease;" min="0" max="100" step="0.01">
+              </div>
+              <div style="text-align: center;">
+                <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; padding: 0.8rem; background: rgba(218, 131, 224, 0.1); border-radius: 8px; border: 2px solid rgba(218, 131, 224, 0.3); transition: all 0.3s ease;">
+                  <input type="checkbox" ${item.gravaIva ? "checked" : ""} 
+                         onchange="fcActualizarItem(${
+                           item.id
+                         }, 'gravaIva', this.checked)"
+                         style="margin: 0; width: 18px; height: 18px;">
+                  <span style="font-size: 0.9rem; font-weight: 600; color: var(--brand);">IVA</span>
+                </label>
+              </div>
+              <div style="text-align: center;">
+                <button class="btn danger" onclick="fcEliminarItem(${
+                  item.id
+                })" style="padding: 0.8rem; border-radius: 8px; background: linear-gradient(135deg, #ef5350 0%, #d32f2f 100%); border: none; box-shadow: 0 4px 15px rgba(239, 83, 80, 0.3); transition: all 0.3s ease;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: white;">
+                    <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          `;
+
+          cont.appendChild(itemDiv);
+        });
+      }
+
+      function fcActualizarItem(id, campo, valor) {
+        if (!window.__FC_STATE) return;
+        const item = window.__FC_STATE.items.find((i) => i.id === id);
+        if (item) {
+          item[campo] = valor;
+          fcRenderResumen();
+        }
+      }
+
+      function fcRenderResumen() {
+        const cont = document.getElementById("fc_resumen");
+        if (!cont) return;
+
+        if (!window.__FC_STATE || window.__FC_STATE.items.length === 0) {
+          cont.innerHTML = `
+            <div style="text-align: center; padding: 3rem; color: var(--sub); background: rgba(255, 255, 255, 0.6); border-radius: 16px; border: 2px dashed rgba(218, 131, 224, 0.3);">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1rem; opacity: 0.5;">
+                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">Resumen no disponible</div>
+              <div style="font-size: 0.9rem;">Complete el formulario para ver el resumen</div>
+            </div>
+          `;
+          return;
+        }
+
+        const resumen = fcCalcularTotales();
+
+        cont.innerHTML = `
+          <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); padding: 2rem; border-radius: 16px; border: 2px solid var(--brand); box-shadow: 0 8px 32px rgba(218, 131, 224, 0.2);">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+              <h4 style="margin: 0; color: var(--brand); font-size: 1.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;">Resumen de Facturación</h4>
+            </div>
+            
+            <div style="background: rgba(255, 255, 255, 0.8); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(218, 131, 224, 0.2); margin-bottom: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.8rem; background: rgba(218, 131, 224, 0.05); border-radius: 8px;">
+                <span style="font-weight: 600; color: var(--text);">📊 Subtotal 0%:</span>
+                <span style="font-weight: 700; color: var(--text); font-size: 1.1rem;">$${resumen.sub0.toFixed(
+                  2
+                )}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.8rem; background: rgba(218, 131, 224, 0.05); border-radius: 8px;">
+                <span style="font-weight: 600; color: var(--text);">💰 Subtotal IVA:</span>
+                <span style="font-weight: 700; color: var(--text); font-size: 1.1rem;">$${resumen.subIva.toFixed(
+                  2
+                )}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.8rem; background: rgba(255, 167, 38, 0.1); border-radius: 8px;">
+                <span style="font-weight: 600; color: var(--warn);">🎯 Descuentos:</span>
+                <span style="font-weight: 700; color: var(--warn); font-size: 1.1rem;">$${resumen.descuento.toFixed(
+                  2
+                )}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 0.8rem; background: rgba(239, 83, 80, 0.1); border-radius: 8px;">
+                <span style="font-weight: 600; color: var(--danger);">📋 IVA (12%):</span>
+                <span style="font-weight: 700; color: var(--danger); font-size: 1.1rem;">$${resumen.iva.toFixed(
+                  2
+                )}</span>
+              </div>
+              
+              <div style="background: var(--gradient); padding: 1.5rem; border-radius: 12px; text-align: center; box-shadow: 0 6px 20px rgba(218, 131, 224, 0.3);">
+                <div style="color: white; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;">Total a Pagar</div>
+                <div style="color: white; font-size: 2rem; font-weight: 800;">$${resumen.total.toFixed(
+                  2
+                )}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function fcCalcularTotales() {
+        if (!window.__FC_STATE || !window.__FC_STATE.items)
+          return { sub0: 0, subIva: 0, descuento: 0, iva: 0, total: 0 };
+
+        const IVA_PORC = 0.12;
+        let sub0 = 0;
+        let subIva = 0;
+
+        window.__FC_STATE.items.forEach((item) => {
+          const bruto = item.cantidad * item.precioUnit;
+          const descuento = bruto * (item.descuentoPct / 100);
+          const neto = bruto - descuento;
+
+          if (item.gravaIva) {
+            subIva += neto;
+          } else {
+            sub0 += neto;
+          }
+        });
+
+        const iva = Number((subIva * IVA_PORC).toFixed(2));
+        const total = Number((sub0 + subIva + iva).toFixed(2));
+        const descuento = Number(
+          window.__FC_STATE.items
+            .reduce((a, i) => {
+              const bruto = i.cantidad * i.precioUnit;
+              return a + (bruto - bruto * (1 - i.descuentoPct / 100));
+            }, 0)
+            .toFixed(2)
+        );
+
+        return { sub0, subIva, descuento, iva, total };
+      }
+
+      function fcLimpiarFormulario() {
+        if (!window.__FC_STATE) return;
+        window.__FC_STATE.items = [];
+        fcRenderItems();
+        fcRenderResumen();
+
+        // Limpiar campos del formulario
+        document.getElementById("fc_cliente").value = "";
+        document.getElementById("fc_ident").value = "";
+        document.getElementById("fc_email").value = "";
+        document.getElementById("fc_notas").value = "";
+        document.getElementById("fc_tipo").value = "FACTURA";
+        document.getElementById("fc_sucursal").value = "Matriz";
+        document.getElementById("fc_metodo").value = "Efectivo";
+        document.getElementById("fc_fecha").value = new Date()
+          .toISOString()
+          .slice(0, 16);
+      }
+
+      function fcGenerarFactura() {
+        if (!window.__FC_STATE || window.__FC_STATE.items.length === 0) {
+          alert("Debe agregar al menos un producto o servicio");
+          return;
+        }
+
+        const factura = fcObtenerDatosFactura();
+
+        // Aquí se podría implementar la generación del PDF o envío al sistema
+        alert(
+          "Factura generada exitosamente!\\n\\n" +
+            "Tipo: " +
+            factura.tipo +
+            "\\n" +
+            "Cliente: " +
+            (factura.cliente || "Consumidor Final") +
+            "\\n" +
+            "Total: $" +
+            factura.totales.total.toFixed(2) +
+            "\\n" +
+            "Sucursal: " +
+            factura.sucursal
+        );
+
+        // Agregar al historial
+        if (!window.__FC_STATE.historial) window.__FC_STATE.historial = [];
+        window.__FC_STATE.historial.unshift({
+          ...factura,
+          estado: "EMITIDA",
+          fecha: new Date().toLocaleString("es-EC"),
+        });
+
+        // Limpiar formulario
+        fcLimpiarFormulario();
+
+        // Actualizar vistas
+        fcRenderHistorial();
+      }
+
+      function fcObtenerDatosFactura() {
+        if (!window.__FC_STATE || !window.__FC_STATE.items) return {};
+
+        const IVA_PORC = 0.12;
+        let sub0 = 0;
+        let subIva = 0;
+
+        const items = window.__FC_STATE.items.map((item) => {
+          const bruto = item.cantidad * item.precioUnit;
+          const descuento = bruto * (item.descuentoPct / 100);
+          const neto = bruto - descuento;
+
+          if (item.gravaIva) {
+            subIva += neto;
+          } else {
+            sub0 += neto;
+          }
+
+          return {
+            descripcion: item.descripcion,
+            cantidad: item.cantidad,
+            precioUnit: item.precioUnit,
+            descuentoPct: item.descuentoPct,
+            gravaIva: item.gravaIva,
+            importe: neto,
+          };
+        });
+
+        const iva = Number((subIva * IVA_PORC).toFixed(2));
+        const total = Number((sub0 + subIva + iva).toFixed(2));
+        const descuento = Number(
+          items
+            .reduce((a, i) => {
+              const bruto = i.cantidad * i.precioUnit;
+              return a + (bruto - i.importe);
+            }, 0)
+            .toFixed(2)
+        );
+
+        return {
+          fecha: (document.getElementById("fc_fecha")?.value || "").replace(
+            "T",
+            " "
+          ),
+          tipo: document.getElementById("fc_tipo")?.value || "FACTURA",
+          sucursal: document.getElementById("fc_sucursal")?.value || "Matriz",
+          cliente: document.getElementById("fc_cliente")?.value || "",
+          identificacion: document.getElementById("fc_ident")?.value || "",
+          email: document.getElementById("fc_email")?.value || "",
+          notas: document.getElementById("fc_notas")?.value || "",
+          metodo: document.getElementById("fc_metodo")?.value || "Efectivo",
+          items,
+          totales: { sub0, subIva, descuento, iva, total },
+        };
+      }
+
+      function fcRenderHistorial() {
+        const cont = document.getElementById("fc_hist");
+        if (!cont) return;
+        cont.innerHTML = "";
+
+        if (
+          !window.__FC_STATE ||
+          !window.__FC_STATE.historial ||
+          window.__FC_STATE.historial.length === 0
+        ) {
+          cont.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: var(--sub); background: rgba(255, 255, 255, 0.6); border-radius: 12px; border: 2px dashed rgba(218, 131, 224, 0.3);">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1rem; opacity: 0.5;">
+                <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div style="font-size: 1.1rem; font-weight: 600;">No hay facturas recientes</div>
+              <div style="font-size: 0.9rem; margin-top: 0.5rem;">Las facturas generadas aparecerán aquí</div>
+            </div>`;
+          return;
+        }
+
+        window.__FC_STATE.historial.slice(0, 6).forEach((f, i) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.style.cursor = "pointer";
+          card.style.marginBottom = "0.8rem";
+          card.style.padding = "1.2rem";
+          card.style.background = "rgba(255, 255, 255, 0.9)";
+          card.style.border = "2px solid rgba(218, 131, 224, 0.2)";
+          card.style.borderRadius = "12px";
+          card.style.boxShadow = "0 4px 15px rgba(218, 131, 224, 0.1)";
+          card.style.transition = "all 0.3s ease";
+          card.onclick = () => fcCargarDesdeHist(i);
+
+          card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                  <div style="width: 8px; height: 8px; background: var(--brand); border-radius: 50%;"></div>
+                  <div style="font-weight: 700; color: var(--brand); font-size: 1rem;">${
+                    f.tipo
+                  }</div>
+                  <div style="font-weight: 600; color: var(--text); font-size: 0.9rem;">• ${
+                    f.sucursal
+                  }</div>
+                </div>
+                <div style="color: var(--sub); font-size: 0.85rem; margin-bottom: 0.3rem;">📅 ${
+                  f.fecha
+                }</div>
+                <div style="color: var(--text); font-weight: 600; font-size: 0.9rem;">👤 ${
+                  f.cliente || "Consumidor final"
+                }</div>
+              </div>
+              <div style="text-align: right; margin-left: 1rem;">
+                <div class="badge ${
+                  f.estado === "EMITIDA" ? "tag-success" : "tag-warn"
+                }" style="margin-bottom: 0.5rem; font-size: 0.8rem; padding: 0.4rem 0.8rem;">${
+            f.estado
+          }</div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: var(--brand);">$${f.totales.total.toFixed(
+                  2
+                )}</div>
+              </div>
+            </div>
+          `;
+
+          // Efecto hover
+          card.onmouseenter = () => {
+            card.style.transform = "translateY(-2px)";
+            card.style.boxShadow = "0 8px 25px rgba(218, 131, 224, 0.2)";
+            card.style.borderColor = "var(--brand)";
+          };
+
+          card.onmouseleave = () => {
+            card.style.transform = "translateY(0)";
+            card.style.boxShadow = "0 4px 15px rgba(218, 131, 224, 0.1)";
+            card.style.borderColor = "rgba(218, 131, 224, 0.2)";
+          };
+
+          cont.appendChild(card);
+        });
+      }
+
+      function fcCargarDesdeHist(idx) {
+        const f = window.__FC_STATE.historial[idx];
+        if (!f) return;
+
+        document.getElementById("fc_cliente").value = f.cliente || "";
+        document.getElementById("fc_ident").value = f.identificacion || "";
+        document.getElementById("fc_email").value = f.email || "";
+        document.getElementById("fc_notas").value = f.notas || "";
+        document.getElementById("fc_tipo").value = f.tipo || "FACTURA";
+        const iso = f.fecha
+          ? f.fecha.replace(" ", "T")
+          : new Date().toISOString().slice(0, 16);
+        document.getElementById("fc_fecha").value = iso;
+        document.getElementById("fc_sucursal").value = f.sucursar || "Matriz";
+
+        window.__FC_STATE.items = (f.items || []).map((it) => ({
+          id: Date.now() + Math.random(),
+          descripcion: it.descripcion,
+          cantidad: it.cantidad,
+          precioUnit: it.precioUnit,
+          descuentoPct: it.descuentoPct,
+          gravaIva: it.gravaIva,
+        }));
+
+        fcRenderItems();
+        fcRenderResumen();
       }
     </script>
   </body>
