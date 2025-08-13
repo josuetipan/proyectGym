@@ -3018,6 +3018,7 @@
             { id: "descuentos", label: "Descuentos" },
           ],
         },
+        { id: "facturacion", label: "Facturación" },
         { id: "export", label: "Exportar datos" },
         { id: "membresias", label: "Membresías" },
         { id: "pagos", label: "Informe de pago" },
@@ -3129,6 +3130,7 @@
         if (active === "plantillas-whatsapp")
           return renderPlantillasWhatsApp(root);
         if (active === "descuentos") return renderDescuentos(root);
+        if (active === "facturacion") return renderFacturacion(root);
         if (active === "export") return renderExport(root);
         if (active === "membresias") return renderMembresias(root);
         if (active === "pagos") return renderPagos(root);
@@ -5862,6 +5864,1135 @@
           </table>
         `;
       }
+
+      /******************** SECCIÓN 12: FACTURACIÓN ********************/
+      function renderFacturacion(root) {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h3 class="section-title" style="margin: 0;">Sistema de Facturación</h3>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button class="btn primary" onclick="nuevaFactura()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Nueva Factura
+        </button>
+        <button class="btn" onclick="abrirModalFactura()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Ver Facturas
+        </button>
+      </div>
+    </div>
+
+    <div class="grid cols-2" style="gap: 2rem;">
+      <!-- Panel izquierdo: Crear Factura -->
+      <div class="card" style="background: var(--card); border: 1px solid var(--muted);">
+        <h4 style="margin: 0 0 1.5rem 0; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Crear Nueva Factura
+        </h4>
+        
+        <form id="formFactura" style="display: grid; gap: 0.8rem;">
+          <!-- Información del Cliente -->
+          <div style="background: var(--panel); border-radius: 6px; padding: 0.8rem; border: 1px solid var(--muted);">
+            <h5 style="margin: 0 0 0.8rem 0; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Información del Cliente
+            </h5>
+            
+            <div style="display: grid; gap: 0.8rem;">
+              <!-- Cliente -->
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Cliente *</label>
+                <select id="facturaCliente" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;" required onchange="cargarDatosCliente()">
+                  <option value="">Seleccionar cliente...</option>
+                  ${DB.users
+                    .filter((u) => u.activo)
+                    .map(
+                      (u) =>
+                        `<option value="${u.id}">${u.nombres} ${u.apellidos} - ${u.cedula}</option>`
+                    )
+                    .join("")}
+                </select>
+              </div>
+
+              <!-- Información del cliente seleccionado -->
+              <div id="infoClienteFactura" style="display: none; background: white; border-radius: 4px; padding: 0.8rem; border: 1px solid var(--muted);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; font-size: 0.85rem;">
+                  <div>
+                    <span style="color: var(--sub);">Cédula:</span>
+                    <span id="clienteCedula" style="color: var(--text); font-weight: 600; margin-left: 0.3rem;"></span>
+                  </div>
+                  <div>
+                    <span style="color: var(--sub);">Teléfono:</span>
+                    <span id="clienteTelefono" style="color: var(--text); font-weight: 600; margin-left: 0.3rem;"></span>
+                  </div>
+                  <div>
+                    <span style="color: var(--sub);">Email:</span>
+                    <span id="clienteEmail" style="color: var(--text); font-weight: 600; margin-left: 0.3rem;"></span>
+                  </div>
+                  <div>
+                    <span style="color: var(--sub);">Dirección:</span>
+                    <span id="clienteDireccion" style="color: var(--text); font-weight: 600; margin-left: 0.3rem;"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de la Factura -->
+          <div style="background: var(--panel); border-radius: 6px; padding: 0.8rem; border: 1px solid var(--muted);">
+            <h5 style="margin: 0 0 0.8rem 0; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Información de la Factura
+            </h5>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+              <!-- Fecha -->
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Fecha de Factura *</label>
+                <input type="date" id="facturaFecha" value="${
+                  new Date().toISOString().split("T")[0]
+                }" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;" required>
+              </div>
+
+              <!-- Tipo de Documento -->
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Tipo de Documento *</label>
+                <select id="facturaTipoDocumento" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;" required>
+                  <option value="01">Factura</option>
+                  <option value="04">Nota de Crédito</option>
+                  <option value="05">Nota de Débito</option>
+                  <option value="06">Guía de Remisión</option>
+                  <option value="07">Comprobante de Retención</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalles de Productos/Servicios -->
+          <div style="background: var(--panel); border-radius: 6px; padding: 0.8rem; border: 1px solid var(--muted);">
+            <h5 style="margin: 0 0 0.8rem 0; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 11V7A4 4 0 0 0 8 7V11M5 9H19L20 21H4L5 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Detalles de Productos/Servicios
+            </h5>
+            
+            <div id="productosContainer">
+              <div class="producto-item" style="background: white; border-radius: 4px; padding: 0.8rem; border: 1px solid var(--muted); margin-bottom: 0.8rem;">
+                <div style="display: grid; gap: 0.8rem;">
+                  <!-- Descripción del producto -->
+                  <div>
+                    <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Descripción del Producto/Servicio *</label>
+                    <select id="facturaConcepto" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;" required onchange="actualizarPrecio()">
+                      <option value="">Seleccionar producto/servicio...</option>
+                      <option value="Membresía Mensual" data-precio="25.00" data-iva="12">Membresía Mensual - $25.00</option>
+                      <option value="Membresía Trimestral" data-precio="65.00" data-iva="12">Membresía Trimestral - $65.00</option>
+                      <option value="Membresía Anual" data-precio="220.00" data-iva="12">Membresía Anual - $220.00</option>
+                      <option value="Entrenamiento Personal" data-precio="15.00" data-iva="12">Entrenamiento Personal - $15.00</option>
+                      <option value="Clases Especiales" data-precio="10.00" data-iva="12">Clases Especiales - $10.00</option>
+                      <option value="Productos" data-precio="0.00" data-iva="12">Productos - Precio variable</option>
+                      <option value="Otros" data-precio="0.00" data-iva="12">Otros - Precio variable</option>
+                    </select>
+                  </div>
+
+                  <!-- Descripción adicional -->
+                  <div>
+                    <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Descripción Adicional</label>
+                    <textarea id="facturaDescripcion" rows="2" placeholder="Descripción detallada del producto o servicio..." style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; resize: vertical; font-size: 0.9rem;"></textarea>
+                  </div>
+
+                  <!-- Cantidad, Precio Unitario y Subtotal -->
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem;">
+                    <div>
+                      <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Cantidad *</label>
+                      <input type="number" id="facturaCantidad" value="1" min="1" step="1" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;" required onchange="calcularSubtotal()">
+                    </div>
+                    <div>
+                      <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Precio Unitario *</label>
+                      <div style="display: flex; align-items: center;">
+                        <span style="background: var(--panel); border: 1px solid var(--muted); border-right: none; border-radius: 4px 0 0 4px; padding: 0.6rem; font-weight: 600; color: var(--text); font-size: 0.9rem;">$</span>
+                        <input type="number" id="facturaPrecioUnitario" step="0.01" min="0" placeholder="0.00" style="flex: 1; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 0 4px 4px 0; background: white; font-size: 0.9rem;" required onchange="calcularSubtotal()">
+                      </div>
+                    </div>
+                    <div>
+                      <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Subtotal</label>
+                      <div style="background: var(--panel); border: 1px solid var(--muted); border-radius: 4px; padding: 0.6rem; text-align: center; font-weight: 600; color: var(--text); font-size: 0.9rem;">
+                        $<span id="facturaSubtotal">0.00</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón para agregar más productos -->
+            <button type="button" onclick="agregarProducto()" style="width: 100%; padding: 0.6rem; background: var(--brand); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; margin-top: 0.8rem; font-size: 0.9rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.5rem;">
+                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Agregar Otro Producto
+            </button>
+          </div>
+
+          <!-- Descuentos e Impuestos -->
+          <div style="background: var(--panel); border-radius: 6px; padding: 0.8rem; border: 1px solid var(--muted);">
+            <h5 style="margin: 0 0 0.8rem 0; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Descuentos e Impuestos
+            </h5>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+              <!-- Descuento -->
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Descuento (%)</label>
+                <input type="number" id="facturaDescuento" value="0" min="0" max="100" step="0.01" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;" onchange="calcularTotales()">
+              </div>
+
+              <!-- IVA -->
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">IVA (%)</label>
+                <input type="number" id="facturaIVA" value="12" min="0" max="100" step="0.01" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;" onchange="calcularTotales()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Totales -->
+          <div style="background: var(--panel); border-radius: 6px; padding: 0.8rem; border: 1px solid var(--muted);">
+            <h5 style="margin: 0 0 0.8rem 0; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2V6M12 18V22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M2 12H6M18 12H22M7.76 7.76L4.93 4.93M19.07 19.07L16.24 16.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Resumen de Totales
+            </h5>
+            
+            <div style="display: grid; gap: 0.4rem; font-size: 0.95rem;">
+              <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--muted);">
+                <span style="color: var(--sub);">Subtotal:</span>
+                <span id="totalSubtotal" style="color: var(--text); font-weight: 600;">$0.00</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--muted);">
+                <span style="color: var(--sub);">Descuento:</span>
+                <span id="totalDescuento" style="color: var(--danger); font-weight: 600;">-$0.00</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--muted);">
+                <span style="color: var(--sub);">Base Imponible:</span>
+                <span id="totalBaseImponible" style="color: var(--text); font-weight: 600;">$0.00</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--muted);">
+                <span style="color: var(--sub);">IVA:</span>
+                <span id="totalIVA" style="color: var(--text); font-weight: 600;">$0.00</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 1.1rem; font-weight: 700; color: var(--text); border-top: 2px solid var(--brand);">
+                <span>TOTAL:</span>
+                <span id="totalFinal">$0.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información Adicional -->
+          <div style="background: var(--panel); border-radius: 6px; padding: 0.8rem; border: 1px solid var(--muted);">
+            <h5 style="margin: 0 0 0.8rem 0; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Información Adicional
+            </h5>
+            
+            <div style="display: grid; gap: 0.8rem;">
+              <!-- Sucursal -->
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Sucursal</label>
+                <select id="facturaSucursal" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;">
+                  <option value="Matriz">Matriz</option>
+                  <option value="Ponciano">Ponciano</option>
+                  <option value="QT">QT</option>
+                </select>
+              </div>
+
+              <!-- Forma de Pago -->
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Forma de Pago</label>
+                <select id="facturaFormaPago" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;">
+                  <option value="01">Efectivo</option>
+                  <option value="02">Cheque</option>
+                  <option value="03">Transferencia</option>
+                  <option value="04">Tarjeta de Crédito</option>
+                  <option value="05">Tarjeta de Débito</option>
+                  <option value="06">Otros</option>
+                </select>
+              </div>
+
+              <!-- Observaciones -->
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Observaciones</label>
+                <textarea id="facturaObservaciones" rows="2" placeholder="Observaciones adicionales..." style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; resize: vertical; font-size: 0.9rem;"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem;">
+            <button type="button" onclick="limpiarFormFactura()" style="flex: 1; padding: 0.6rem; background: var(--panel); color: var(--text); border: 1px solid var(--muted); border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+              Limpiar Formulario
+            </button>
+            <button type="submit" style="flex: 1; padding: 0.6rem; background: var(--ok); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.5rem;">
+                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Generar Factura Electrónica
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Panel derecho: Información y Estadísticas -->
+      <div class="card" style="background: var(--card); border: 1px solid var(--muted);">
+        <h4 style="margin: 0 0 1.5rem 0; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 3H21V7H3V3ZM3 9H21V21H3V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Estadísticas de Facturación
+        </h4>
+
+        <div style="display: grid; gap: 1rem;">
+          <!-- Estadísticas rápidas -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div style="background: rgba(102, 187, 106, 0.1); border: 1px solid var(--ok); border-radius: 8px; padding: 1rem; text-align: center;">
+              <div style="font-size: 2rem; font-weight: 700; color: var(--ok);">0</div>
+              <div style="font-size: 0.9rem; color: var(--text); font-weight: 600;">Facturas Hoy</div>
+            </div>
+            <div style="background: rgba(218, 131, 224, 0.1); border: 1px solid var(--brand); border-radius: 8px; padding: 1rem; text-align: center;">
+              <div style="font-size: 2rem; font-weight: 700; color: var(--brand);">$0.00</div>
+              <div style="font-size: 0.9rem; color: var(--text); font-weight: 600;">Total Hoy</div>
+            </div>
+          </div>
+
+          <!-- Información del sistema -->
+          <div style="background: var(--panel); border-radius: 8px; padding: 1rem;">
+            <h5 style="margin: 0 0 1rem 0; color: var(--text); font-weight: 600;">Información del Sistema</h5>
+            <div style="display: grid; gap: 0.5rem; font-size: 0.9rem;">
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--sub);">Sucursal actual:</span>
+                <span style="color: var(--text); font-weight: 600;">${
+                  DB.settings.sucursal || "Matriz"
+                }</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--sub);">Fecha:</span>
+                <span style="color: var(--text); font-weight: 600;">${new Date().toLocaleDateString(
+                  "es-EC"
+                )}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--sub);">Estado:</span>
+                <span style="color: var(--ok); font-weight: 600;">Activo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notas importantes -->
+          <div style="background: rgba(255, 167, 38, 0.1); border: 1px solid var(--warn); border-radius: 8px; padding: 1rem;">
+            <h5 style="margin: 0 0 0.5rem 0; color: var(--text); font-weight: 600; font-size: 0.9rem;">Notas Importantes</h5>
+            <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: var(--text);">
+              <li>Las facturas se generan automáticamente</li>
+              <li>Se pueden exportar en formato PDF</li>
+              <li>Los datos se guardan localmente</li>
+              <li>Respaldar información regularmente</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Facturas Recientes -->
+    <div class="card" style="margin-top: 2rem;">
+      <h4 style="margin: 0 0 1.5rem 0; color: var(--text); font-weight: 600;">Facturas Recientes</h4>
+      <div id="tablaFacturas" style="text-align: center; padding: 3rem; color: var(--sub);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+        <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">No hay facturas generadas</div>
+        <div style="font-size: 0.9rem;">Las facturas aparecerán aquí una vez creadas</div>
+      </div>
+    </div>
+  `;
+
+        root.appendChild(card);
+
+        // Agregar event listener al formulario
+        const form = card.querySelector("#formFactura");
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          generarFactura();
+        });
+      }
+
+      // Funciones auxiliares para facturación
+      function nuevaFactura() {
+        // Limpiar formulario
+        limpiarFormFactura();
+        // Hacer scroll al formulario
+        document
+          .querySelector("#formFactura")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      function limpiarFormFactura() {
+        document.getElementById("facturaCliente").value = "";
+        document.getElementById("facturaFecha").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("facturaTipoDocumento").value = "01";
+        document.getElementById("facturaConcepto").value = "";
+        document.getElementById("facturaDescripcion").value = "";
+        document.getElementById("facturaCantidad").value = "1";
+        document.getElementById("facturaPrecioUnitario").value = "";
+        document.getElementById("facturaDescuento").value = "0";
+        document.getElementById("facturaIVA").value = "12";
+        document.getElementById("facturaSucursal").value =
+          DB.settings.sucursal || "Matriz";
+        document.getElementById("facturaFormaPago").value = "01";
+        document.getElementById("facturaObservaciones").value = "";
+
+        // Ocultar información del cliente
+        document.getElementById("infoClienteFactura").style.display = "none";
+
+        // Limpiar productos adicionales
+        const productosContainer =
+          document.getElementById("productosContainer");
+        const productos = productosContainer.querySelectorAll(".producto-item");
+        for (let i = 1; i < productos.length; i++) {
+          productos[i].remove();
+        }
+
+        // Reiniciar cálculos
+        calcularTotales();
+      }
+
+      function cargarDatosCliente() {
+        const clienteId = document.getElementById("facturaCliente").value;
+        const infoCliente = document.getElementById("infoClienteFactura");
+
+        if (!clienteId) {
+          infoCliente.style.display = "none";
+          return;
+        }
+
+        const cliente = DB.users.find((u) => u.id === clienteId);
+        if (!cliente) return;
+
+        // Mostrar información del cliente
+        document.getElementById("clienteCedula").textContent =
+          cliente.cedula || "No especificada";
+        document.getElementById("clienteTelefono").textContent =
+          cliente.telefono || "No especificado";
+        document.getElementById("clienteEmail").textContent =
+          cliente.email || "No especificado";
+        document.getElementById("clienteDireccion").textContent =
+          cliente.direccion || "No especificada";
+
+        infoCliente.style.display = "block";
+      }
+
+      function actualizarPrecio() {
+        const conceptoSelect = document.getElementById("facturaConcepto");
+        const precioInput = document.getElementById("facturaPrecioUnitario");
+        const selectedOption =
+          conceptoSelect.options[conceptoSelect.selectedIndex];
+
+        if (selectedOption && selectedOption.dataset.precio) {
+          precioInput.value = selectedOption.dataset.precio;
+          calcularSubtotal();
+        }
+      }
+
+      function calcularSubtotal() {
+        const cantidad =
+          parseFloat(document.getElementById("facturaCantidad").value) || 0;
+        const precioUnitario =
+          parseFloat(document.getElementById("facturaPrecioUnitario").value) ||
+          0;
+        const subtotal = cantidad * precioUnitario;
+
+        document.getElementById("facturaSubtotal").textContent =
+          subtotal.toFixed(2);
+        calcularTotales();
+      }
+
+      function calcularTotales() {
+        const subtotal =
+          parseFloat(document.getElementById("facturaSubtotal").textContent) ||
+          0;
+        const descuentoPorcentaje =
+          parseFloat(document.getElementById("facturaDescuento").value) || 0;
+        const ivaPorcentaje =
+          parseFloat(document.getElementById("facturaIVA").value) || 0;
+
+        const descuentoMonto = (subtotal * descuentoPorcentaje) / 100;
+        const baseImponible = subtotal - descuentoMonto;
+        const ivaMonto = (baseImponible * ivaPorcentaje) / 100;
+        const total = baseImponible + ivaMonto;
+
+        // Actualizar display
+        document.getElementById("totalSubtotal").textContent =
+          "$" + subtotal.toFixed(2);
+        document.getElementById("totalDescuento").textContent =
+          "-$" + descuentoMonto.toFixed(2);
+        document.getElementById("totalBaseImponible").textContent =
+          "$" + baseImponible.toFixed(2);
+        document.getElementById("totalIVA").textContent =
+          "$" + ivaMonto.toFixed(2);
+        document.getElementById("totalFinal").textContent =
+          "$" + total.toFixed(2);
+      }
+
+      function agregarProducto() {
+        const productosContainer =
+          document.getElementById("productosContainer");
+        const productoIndex = productosContainer.children.length;
+
+        const nuevoProducto = document.createElement("div");
+        nuevoProducto.className = "producto-item";
+        nuevoProducto.style.cssText =
+          "background: white; border-radius: 6px; padding: 1rem; border: 1px solid var(--muted); margin-bottom: 1rem; position: relative;";
+
+        nuevoProducto.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+            <h6 style="margin: 0; color: var(--text); font-weight: 600; font-size: 0.9rem;">Producto ${
+              productoIndex + 1
+            }</h6>
+            <button type="button" onclick="eliminarProducto(this)" style="background: var(--danger); color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
+              Eliminar
+            </button>
+          </div>
+          <div style="display: grid; gap: 0.8rem;">
+            <div>
+              <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Descripción del Producto/Servicio *</label>
+              <select id="facturaConcepto_${productoIndex}" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;" required onchange="actualizarPrecioProducto(${productoIndex})">
+                <option value="">Seleccionar producto/servicio...</option>
+                <option value="Membresía Mensual" data-precio="25.00" data-iva="12">Membresía Mensual - $25.00</option>
+                <option value="Membresía Trimestral" data-precio="65.00" data-iva="12">Membresía Trimestral - $65.00</option>
+                <option value="Membresía Anual" data-precio="220.00" data-iva="12">Membresía Anual - $220.00</option>
+                <option value="Entrenamiento Personal" data-precio="15.00" data-iva="12">Entrenamiento Personal - $15.00</option>
+                <option value="Clases Especiales" data-precio="10.00" data-iva="12">Clases Especiales - $10.00</option>
+                <option value="Productos" data-precio="0.00" data-iva="12">Productos - Precio variable</option>
+                <option value="Otros" data-precio="0.00" data-iva="12">Otros - Precio variable</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Descripción Adicional</label>
+              <textarea id="facturaDescripcion_${productoIndex}" rows="2" placeholder="Descripción detallada del producto o servicio..." style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; resize: vertical; font-size: 0.9rem;"></textarea>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem;">
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Cantidad *</label>
+                <input type="number" id="facturaCantidad_${productoIndex}" value="1" min="1" step="1" style="width: 100%; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 4px; background: white; font-size: 0.9rem;" required onchange="calcularSubtotalProducto(${productoIndex})">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Precio Unitario *</label>
+                <div style="display: flex; align-items: center;">
+                  <span style="background: var(--panel); border: 1px solid var(--muted); border-right: none; border-radius: 4px 0 0 4px; padding: 0.6rem; font-weight: 600; color: var(--text); font-size: 0.9rem;">$</span>
+                  <input type="number" id="facturaPrecioUnitario_${productoIndex}" step="0.01" min="0" placeholder="0.00" style="flex: 1; padding: 0.6rem; border: 1px solid var(--muted); border-radius: 0 4px 4px 0; background: white; font-size: 0.9rem;" required onchange="calcularSubtotalProducto(${productoIndex})">
+                </div>
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 0.3rem; color: var(--text); font-weight: 600; font-size: 0.9rem;">Subtotal</label>
+                <div style="background: var(--panel); border: 1px solid var(--muted); border-radius: 4px; padding: 0.6rem; text-align: center; font-weight: 600; color: var(--text); font-size: 0.9rem;">
+                  $<span id="facturaSubtotal_${productoIndex}">0.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        productosContainer.appendChild(nuevoProducto);
+      }
+
+      function eliminarProducto(button) {
+        button.closest(".producto-item").remove();
+        calcularTotalesGenerales();
+      }
+
+      function actualizarPrecioProducto(index) {
+        const conceptoSelect = document.getElementById(
+          `facturaConcepto_${index}`
+        );
+        const precioInput = document.getElementById(
+          `facturaPrecioUnitario_${index}`
+        );
+        const selectedOption =
+          conceptoSelect.options[conceptoSelect.selectedIndex];
+
+        if (selectedOption && selectedOption.dataset.precio) {
+          precioInput.value = selectedOption.dataset.precio;
+          calcularSubtotalProducto(index);
+        }
+      }
+
+      function calcularSubtotalProducto(index) {
+        const cantidad =
+          parseFloat(
+            document.getElementById(`facturaCantidad_${index}`).value
+          ) || 0;
+        const precioUnitario =
+          parseFloat(
+            document.getElementById(`facturaPrecioUnitario_${index}`).value
+          ) || 0;
+        const subtotal = cantidad * precioUnitario;
+
+        document.getElementById(`facturaSubtotal_${index}`).textContent =
+          subtotal.toFixed(2);
+        calcularTotalesGenerales();
+      }
+
+      function calcularTotalesGenerales() {
+        // Calcular subtotal del primer producto
+        const subtotal1 =
+          parseFloat(document.getElementById("facturaSubtotal").textContent) ||
+          0;
+
+        // Calcular subtotales de productos adicionales
+        let subtotalAdicional = 0;
+        const productosAdicionales = document.querySelectorAll(
+          ".producto-item:not(:first-child)"
+        );
+        productosAdicionales.forEach((producto, index) => {
+          const subtotalElement = producto.querySelector(
+            `[id^="facturaSubtotal_"]`
+          );
+          if (subtotalElement) {
+            subtotalAdicional += parseFloat(subtotalElement.textContent) || 0;
+          }
+        });
+
+        const subtotalTotal = subtotal1 + subtotalAdicional;
+        const descuentoPorcentaje =
+          parseFloat(document.getElementById("facturaDescuento").value) || 0;
+        const ivaPorcentaje =
+          parseFloat(document.getElementById("facturaIVA").value) || 0;
+
+        const descuentoMonto = (subtotalTotal * descuentoPorcentaje) / 100;
+        const baseImponible = subtotalTotal - descuentoMonto;
+        const ivaMonto = (baseImponible * ivaPorcentaje) / 100;
+        const total = baseImponible + ivaMonto;
+
+        // Actualizar display
+        document.getElementById("totalSubtotal").textContent =
+          "$" + subtotalTotal.toFixed(2);
+        document.getElementById("totalDescuento").textContent =
+          "-$" + descuentoMonto.toFixed(2);
+        document.getElementById("totalBaseImponible").textContent =
+          "$" + baseImponible.toFixed(2);
+        document.getElementById("totalIVA").textContent =
+          "$" + ivaMonto.toFixed(2);
+        document.getElementById("totalFinal").textContent =
+          "$" + total.toFixed(2);
+      }
+
+      function generarFactura() {
+        const clienteId = document.getElementById("facturaCliente").value;
+        const fecha = document.getElementById("facturaFecha").value;
+        const tipoDocumento = document.getElementById(
+          "facturaTipoDocumento"
+        ).value;
+        const sucursal = document.getElementById("facturaSucursal").value;
+        const formaPago = document.getElementById("facturaFormaPago").value;
+        const observaciones = document.getElementById(
+          "facturaObservaciones"
+        ).value;
+        const descuentoPorcentaje =
+          parseFloat(document.getElementById("facturaDescuento").value) || 0;
+        const ivaPorcentaje =
+          parseFloat(document.getElementById("facturaIVA").value) || 0;
+
+        if (!clienteId || !fecha) {
+          alert("Por favor complete todos los campos obligatorios");
+          return;
+        }
+
+        const cliente = DB.users.find((u) => u.id === clienteId);
+        if (!cliente) {
+          alert("Cliente no encontrado");
+          return;
+        }
+
+        // Recolectar todos los productos
+        const productos = [];
+
+        // Primer producto (siempre presente)
+        const concepto1 = document.getElementById("facturaConcepto").value;
+        const descripcion1 =
+          document.getElementById("facturaDescripcion").value;
+        const cantidad1 =
+          parseFloat(document.getElementById("facturaCantidad").value) || 0;
+        const precioUnitario1 =
+          parseFloat(document.getElementById("facturaPrecioUnitario").value) ||
+          0;
+        const subtotal1 =
+          parseFloat(document.getElementById("facturaSubtotal").textContent) ||
+          0;
+
+        if (concepto1 && cantidad1 > 0 && precioUnitario1 > 0) {
+          productos.push({
+            concepto: concepto1,
+            descripcion: descripcion1,
+            cantidad: cantidad1,
+            precioUnitario: precioUnitario1,
+            subtotal: subtotal1,
+          });
+        }
+
+        // Productos adicionales
+        const productosAdicionales = document.querySelectorAll(
+          ".producto-item:not(:first-child)"
+        );
+        productosAdicionales.forEach((producto, index) => {
+          const concepto = producto.querySelector(
+            `[id^="facturaConcepto_"]`
+          ).value;
+          const descripcion = producto.querySelector(
+            `[id^="facturaDescripcion_"]`
+          ).value;
+          const cantidad =
+            parseFloat(
+              producto.querySelector(`[id^="facturaCantidad_"]`).value
+            ) || 0;
+          const precioUnitario =
+            parseFloat(
+              producto.querySelector(`[id^="facturaPrecioUnitario_"]`).value
+            ) || 0;
+          const subtotal =
+            parseFloat(
+              producto.querySelector(`[id^="facturaSubtotal_"]`).textContent
+            ) || 0;
+
+          if (concepto && cantidad > 0 && precioUnitario > 0) {
+            productos.push({
+              concepto: concepto,
+              descripcion: descripcion,
+              cantidad: cantidad,
+              precioUnitario: precioUnitario,
+              subtotal: subtotal,
+            });
+          }
+        });
+
+        if (productos.length === 0) {
+          alert("Debe agregar al menos un producto o servicio");
+          return;
+        }
+
+        // Calcular totales
+        const subtotalTotal = productos.reduce((sum, p) => sum + p.subtotal, 0);
+        const descuentoMonto = (subtotalTotal * descuentoPorcentaje) / 100;
+        const baseImponible = subtotalTotal - descuentoMonto;
+        const ivaMonto = (baseImponible * ivaPorcentaje) / 100;
+        const total = baseImponible + ivaMonto;
+
+        // Crear objeto de factura electrónica
+        const factura = {
+          id: uuid(),
+          numero: generarNumeroFactura(),
+          tipoDocumento: tipoDocumento,
+          clienteId: clienteId,
+          clienteNombre: `${cliente.nombres} ${cliente.apellidos}`,
+          clienteCedula: cliente.cedula,
+          clienteTelefono: cliente.telefono,
+          clienteEmail: cliente.email,
+          clienteDireccion: cliente.direccion,
+          fecha: fecha,
+          productos: productos,
+          subtotal: subtotalTotal,
+          descuentoPorcentaje: descuentoPorcentaje,
+          descuentoMonto: descuentoMonto,
+          baseImponible: baseImponible,
+          ivaPorcentaje: ivaPorcentaje,
+          ivaMonto: ivaMonto,
+          total: total,
+          sucursal: sucursal,
+          formaPago: formaPago,
+          observaciones: observaciones,
+          estado: "Pendiente",
+          createdAt: new Date().toISOString(),
+        };
+
+        // Guardar en localStorage (simulación de base de datos)
+        const facturas = JSON.parse(localStorage.getItem("facturas") || "[]");
+        facturas.push(factura);
+        localStorage.setItem("facturas", JSON.stringify(facturas));
+
+        // Mostrar mensaje de éxito
+        alert(
+          `Factura Electrónica #${factura.numero} generada exitosamente para ${
+            cliente.nombres
+          } ${cliente.apellidos}\n\nTotal: $${total.toFixed(2)}`
+        );
+
+        // Limpiar formulario
+        limpiarFormFactura();
+
+        // Actualizar tabla de facturas
+        actualizarTablaFacturas();
+      }
+
+      function generarNumeroFactura() {
+        const facturas = JSON.parse(localStorage.getItem("facturas") || "[]");
+        const numero = facturas.length + 1;
+        return `FAC-${new Date().getFullYear()}-${numero
+          .toString()
+          .padStart(4, "0")}`;
+      }
+
+      function actualizarTablaFacturas() {
+        const facturas = JSON.parse(localStorage.getItem("facturas") || "[]");
+        const tablaFacturas = document.getElementById("tablaFacturas");
+
+        if (facturas.length === 0) {
+          tablaFacturas.innerHTML = `
+            <div style="text-align: center; padding: 3rem; color: var(--sub);">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+              <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">No hay facturas generadas</div>
+              <div style="font-size: 0.9rem;">Las facturas aparecerán aquí una vez creadas</div>
+            </div>
+          `;
+          return;
+        }
+
+        const facturasRecientes = facturas.slice(-5); // Últimas 5 facturas
+        const rows = facturasRecientes
+          .map(
+            (f) => `
+          <tr style="border-bottom: 1px solid var(--muted);">
+            <td style="padding: 1rem; font-weight: 600; color: var(--text);">${
+              f.numero
+            }</td>
+            <td style="padding: 1rem;">${f.clienteNombre}</td>
+            <td style="padding: 1rem;">${f.fecha}</td>
+            <td style="padding: 1rem; text-align: center; font-weight: 600; color: var(--text);">$${(
+              f.total ||
+              f.monto ||
+              0
+            ).toFixed(2)}</td>
+            <td style="padding: 1rem; text-align: center;">
+              <span style="background: ${
+                f.estado === "Pagada" ? "var(--ok)" : "var(--warn)"
+              }; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                ${f.estado}
+              </span>
+            </td>
+            <td style="padding: 1rem; text-align: center;">
+              <button onclick="verFactura('${
+                f.id
+              }')" style="background: var(--brand); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
+                Ver
+              </button>
+            </td>
+          </tr>
+        `
+          )
+          .join("");
+
+        tablaFacturas.innerHTML = `
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: var(--panel);">
+                <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--muted);">Número</th>
+                <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--muted);">Cliente</th>
+                <th style="padding: 1rem; text-align: left; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--muted);">Fecha</th>
+                <th style="padding: 1rem; text-align: center; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--muted);">Monto</th>
+                <th style="padding: 1rem; text-align: center; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--muted);">Estado</th>
+                <th style="padding: 1rem; text-align: center; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--muted);">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        `;
+      }
+
+      function verFactura(id) {
+        const facturas = JSON.parse(localStorage.getItem("facturas") || "[]");
+        const factura = facturas.find((f) => f.id === id);
+        if (!factura) {
+          alert("Factura no encontrada");
+          return;
+        }
+
+        // Mostrar modal con detalles de la factura
+        const modal = document.createElement("div");
+        modal.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 2000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        `;
+
+        modal.innerHTML = `
+          <div style="background: white; border-radius: 12px; padding: 2rem; width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+              <h3 style="margin: 0; color: var(--text); font-size: 1.5rem; font-weight: 700;">Factura Electrónica ${
+                factura.numero
+              }</h3>
+              <button onclick="this.closest('.modal').remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--sub);">&times;</button>
+            </div>
+            
+            <div style="display: grid; gap: 1.5rem;">
+              <!-- Información del Cliente -->
+              <div style="background: var(--panel); border-radius: 8px; padding: 1rem;">
+                <h4 style="margin: 0 0 1rem 0; color: var(--text); font-weight: 600;">Información del Cliente</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+                  <div>
+                    <span style="color: var(--sub);">Nombre:</span>
+                    <span style="color: var(--text); font-weight: 600; margin-left: 0.5rem;">${
+                      factura.clienteNombre
+                    }</span>
+                  </div>
+                  <div>
+                    <span style="color: var(--sub);">Cédula:</span>
+                    <span style="color: var(--text); font-weight: 600; margin-left: 0.5rem;">${
+                      factura.clienteCedula || "No especificada"
+                    }</span>
+                  </div>
+                  <div>
+                    <span style="color: var(--sub);">Teléfono:</span>
+                    <span style="color: var(--text); font-weight: 600; margin-left: 0.5rem;">${
+                      factura.clienteTelefono || "No especificado"
+                    }</span>
+                  </div>
+                  <div>
+                    <span style="color: var(--sub);">Email:</span>
+                    <span style="color: var(--text); font-weight: 600; margin-left: 0.5rem;">${
+                      factura.clienteEmail || "No especificado"
+                    }</span>
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <span style="color: var(--sub);">Dirección:</span>
+                    <span style="color: var(--text); font-weight: 600; margin-left: 0.5rem;">${
+                      factura.clienteDireccion || "No especificada"
+                    }</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Información de la Factura -->
+              <div style="background: var(--panel); border-radius: 8px; padding: 1rem;">
+                <h4 style="margin: 0 0 1rem 0; color: var(--text); font-weight: 600;">Información de la Factura</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+                  <div>
+                    <span style="color: var(--sub);">Fecha:</span>
+                    <span style="color: var(--text); font-weight: 600; margin-left: 0.5rem;">${
+                      factura.fecha
+                    }</span>
+                  </div>
+                  <div>
+                    <span style="color: var(--sub);">Tipo:</span>
+                    <span style="color: var(--text); font-weight: 600; margin-left: 0.5rem;">${
+                      factura.tipoDocumento === "01"
+                        ? "Factura"
+                        : factura.tipoDocumento === "04"
+                        ? "Nota de Crédito"
+                        : factura.tipoDocumento === "05"
+                        ? "Nota de Débito"
+                        : "Otro"
+                    }</span>
+                  </div>
+                  <div>
+                    <span style="color: var(--sub);">Sucursal:</span>
+                    <span style="color: var(--text); font-weight: 600; margin-left: 0.5rem;">${
+                      factura.sucursal
+                    }</span>
+                  </div>
+                  <div>
+                    <span style="color: var(--sub);">Forma de Pago:</span>
+                    <span style="color: var(--text); font-weight: 600; margin-left: 0.5rem;">${
+                      factura.formaPago === "01"
+                        ? "Efectivo"
+                        : factura.formaPago === "02"
+                        ? "Cheque"
+                        : factura.formaPago === "03"
+                        ? "Transferencia"
+                        : factura.formaPago === "04"
+                        ? "Tarjeta de Crédito"
+                        : factura.formaPago === "05"
+                        ? "Tarjeta de Débito"
+                        : "Otros"
+                    }</span>
+                  </div>
+                  <div>
+                    <span style="color: var(--sub);">Estado:</span>
+                    <span style="color: ${
+                      factura.estado === "Pagada" ? "var(--ok)" : "var(--warn)"
+                    }; font-weight: 600; margin-left: 0.5rem;">${
+          factura.estado
+        }</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Productos/Servicios -->
+              <div style="background: var(--panel); border-radius: 8px; padding: 1rem;">
+                <h4 style="margin: 0 0 1rem 0; color: var(--text); font-weight: 600;">Productos/Servicios</h4>
+                <div style="display: grid; gap: 1rem;">
+                  ${factura.productos
+                    .map(
+                      (producto, index) => `
+                    <div style="background: white; border-radius: 6px; padding: 1rem; border: 1px solid var(--muted);">
+                      <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; font-size: 0.9rem;">
+                        <div>
+                          <div style="font-weight: 600; color: var(--text);">${
+                            producto.concepto
+                          }</div>
+                          ${
+                            producto.descripcion
+                              ? `<div style="color: var(--sub); font-size: 0.8rem;">${producto.descripcion}</div>`
+                              : ""
+                          }
+                        </div>
+                        <div style="text-align: center;">
+                          <span style="color: var(--sub);">Cantidad:</span>
+                          <div style="font-weight: 600; color: var(--text);">${
+                            producto.cantidad
+                          }</div>
+                        </div>
+                        <div style="text-align: center;">
+                          <span style="color: var(--sub);">Precio Unit.:</span>
+                          <div style="font-weight: 600; color: var(--text);">$${producto.precioUnitario.toFixed(
+                            2
+                          )}</div>
+                        </div>
+                        <div style="text-align: center;">
+                          <span style="color: var(--sub);">Subtotal:</span>
+                          <div style="font-weight: 600; color: var(--text);">$${producto.subtotal.toFixed(
+                            2
+                          )}</div>
+                        </div>
+                      </div>
+                    </div>
+                  `
+                    )
+                    .join("")}
+                </div>
+              </div>
+
+              <!-- Totales -->
+              <div style="background: var(--panel); border-radius: 8px; padding: 1rem;">
+                <h4 style="margin: 0 0 1rem 0; color: var(--text); font-weight: 600;">Resumen de Totales</h4>
+                <div style="display: grid; gap: 0.5rem; font-size: 1rem;">
+                  <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--muted);">
+                    <span style="color: var(--sub);">Subtotal:</span>
+                    <span style="color: var(--text); font-weight: 600;">$${factura.subtotal.toFixed(
+                      2
+                    )}</span>
+                  </div>
+                  ${
+                    factura.descuentoMonto > 0
+                      ? `
+                    <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--muted);">
+                      <span style="color: var(--sub);">Descuento (${
+                        factura.descuentoPorcentaje
+                      }%):</span>
+                      <span style="color: var(--danger); font-weight: 600;">-$${factura.descuentoMonto.toFixed(
+                        2
+                      )}</span>
+                    </div>
+                  `
+                      : ""
+                  }
+                  <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--muted);">
+                    <span style="color: var(--sub);">Base Imponible:</span>
+                    <span style="color: var(--text); font-weight: 600;">$${factura.baseImponible.toFixed(
+                      2
+                    )}</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--muted);">
+                    <span style="color: var(--sub);">IVA (${
+                      factura.ivaPorcentaje
+                    }%):</span>
+                    <span style="color: var(--text); font-weight: 600;">$${factura.ivaMonto.toFixed(
+                      2
+                    )}</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 1.2rem; font-weight: 700; color: var(--text); border-top: 2px solid var(--brand);">
+                    <span>TOTAL:</span>
+                    <span>$${factura.total.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              ${
+                factura.observaciones
+                  ? `
+                <div style="background: var(--panel); border-radius: 8px; padding: 1rem;">
+                  <h4 style="margin: 0 0 1rem 0; color: var(--text); font-weight: 600;">Observaciones</h4>
+                  <div style="color: var(--sub); font-size: 0.9rem;">${factura.observaciones}</div>
+                </div>
+              `
+                  : ""
+              }
+              
+              <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button onclick="imprimirFactura('${
+                  factura.id
+                }')" style="flex: 1; padding: 0.8rem; background: var(--brand); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.5rem;">
+                    <path d="M6 9V2H18V9M6 18H18V22H6V18ZM6 14H18V18H6V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Imprimir
+                </button>
+                <button onclick="descargarFactura('${
+                  factura.id
+                }')" style="flex: 1; padding: 0.8rem; background: var(--ok); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.5rem;">
+                    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M7 10L12 15M12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Descargar PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        modal.className = "modal";
+        document.body.appendChild(modal);
+      }
+
+      function imprimirFactura(id) {
+        alert("Función de impresión en desarrollo");
+      }
+
+      function descargarFactura(id) {
+        alert("Función de descarga PDF en desarrollo");
+      }
+
+      function abrirModalFactura() {
+        // Actualizar tabla de facturas
+        actualizarTablaFacturas();
+        // Hacer scroll a la tabla
+        document
+          .querySelector("#tablaFacturas")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
       function abrirPagos(id) {
         const cliente = DB.users.find((u) => u.id === id);
         if (cliente) {
